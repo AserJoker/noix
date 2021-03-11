@@ -19,12 +19,15 @@ const parseArgument = () => {
 const config = parseArgument();
 if (config.versioin) {
   console.log('v0.0.1');
+  process.exit(0);
 }
 if (!config.inputFile) {
   console.log('no input file');
+  process.exit(0);
 }
 if (!config.inputFile.endsWith('.ts')) {
   console.log('input file is not typescript file');
+  process.exit(0);
 }
 if (!config.outFile) {
   config.outFile = config.inputFile
@@ -49,6 +52,7 @@ try {
 } catch (e) {
   console.log('no config file');
   console.error(e);
+  process.exit(0);
 }
 const result = ts.transpileModule(source, {
   ...tsconfig,
