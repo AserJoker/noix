@@ -1,6 +1,5 @@
 import path from 'path';
 import fs from 'fs';
-import cp from 'child_process';
 const parseArgument = () => {
   const result: Record<string, string> = {};
   let key = 'inputFile';
@@ -61,8 +60,9 @@ try {
     }
   };
   try {
-    cp.execSync(`rm -rf ${execConfig.outputDir}`);
-    fs.mkdirSync(path.resolve(execConfig.outputDir));
+    if (!fs.existsSync(path.resolve(execConfig.outputDir))) {
+      fs.mkdirSync(path.resolve(execConfig.outputDir));
+    }
     resolveDir(execConfig.inputDir, execConfig.outputDir);
   } catch (e) {
     console.log(e);

@@ -1,11 +1,8 @@
 {
-  "name": "single-tsc",
+  "name": "ts-ignore-decorator",
   "version": "0.0.1",
   "main": "dist/main.js",
   "dependencies": {
     "typescript": "^4.2.3"
-  },
-  "devDependencies": {
-    "@types/node": "^14.14.33"
   }
 }

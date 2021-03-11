@@ -17,7 +17,7 @@ const parseArgument = () => {
   return result;
 };
 const config = parseArgument();
-if (config.versioin) {
+if (config.version !== undefined) {
   console.log('v0.0.1');
   process.exit(0);
 }

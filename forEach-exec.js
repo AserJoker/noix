@@ -1,7 +1,7 @@
 const cp = require('child_process');
 module.exports = {
-  inputDir: './project/demo',
-  outputDir: './dist/demo',
+  inputDir: './project/demo/src',
+  outputDir: './project/demo/dist',
   ignore: ['node_modules'],
   exec: (input, output) => {
     if (input.endsWith('.ts')) {
@@ -13,7 +13,14 @@ module.exports = {
           .map((s, index, arr) => {
             return index === arr.length - 1 ? 'js' : s;
           })
-          .join('.')}`
+          .join('.')}`,
+        (e, stdout, stderr) => {
+          if (e) {
+            throw e;
+          }
+          stdout !== '' && console.log(stdout);
+          stderr !== '' && console.error(stderr);
+        }
       );
     }
   }

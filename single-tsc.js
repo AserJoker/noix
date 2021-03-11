@@ -1,3 +1,8 @@
+const {
+  createTSIgnoreDecoratorTanstormer
+} = require('./build-tools/ts-ignore-decorator');
 module.exports = {
-  transformers: []
+  transformers: {
+    before: [createTSIgnoreDecoratorTanstormer()]
+  }
 };

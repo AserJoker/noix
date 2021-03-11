@@ -4,5 +4,8 @@
   "main": "dist/main.js",
   "devDependencies": {
     "@types/node": "^14.14.33"
+  },
+  "dependencies": {
+    "@types/glob": "^7.1.3"
   }
 }
