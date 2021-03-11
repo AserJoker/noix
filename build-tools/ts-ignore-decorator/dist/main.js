@@ -5,18 +5,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTSIgnoreDecoratorTanstormer = void 0;
 var typescript_1 = __importDefault(require("typescript"));
-var createTSIgnoreDecoratorTanstormer = function () {
+var createTSIgnoreDecoratorTanstormer = function (decorator) {
+    if (decorator === void 0) { decorator = '@Ignore'; }
     return function (context) {
         var visit = function (node) {
             if (typescript_1.default.isClassLike(node)) {
                 if (node.decorators &&
-                    node.decorators.find(function (d) { return d.getText() === '@Ignore'; })) {
+                    node.decorators.find(function (d) { return d.getText() === decorator; })) {
                     return undefined;
                 }
             }
             if (typescript_1.default.isClassElement(node)) {
                 if (node.decorators &&
-                    node.decorators.find(function (d) { return d.getText() === '@Ignore'; })) {
+                    node.decorators.find(function (d) { return d.getText() === decorator; })) {
                     return undefined;
                 }
             }
