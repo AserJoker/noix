@@ -1,0 +1,14 @@
+{
+  "name": "single-tsc",
+  "version": "0.0.1",
+  "bin": {
+    "single-tsc": "dist/main.js"
+  },
+  "main": "dist/main.js",
+  "dependencies": {
+    "typescript": "^4.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.33"
+  }
+}
