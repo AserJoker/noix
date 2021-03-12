@@ -1,7 +1,10 @@
 {
   "name": "single-tsc",
   "version": "0.0.1",
-  "main": "dist/main.js",
+  "main": "bin.js",
+  "bin": {
+    "single-tsc": "./bin.js"
+  },
   "dependencies": {
     "typescript": "^4.2.3"
   },

@@ -9,7 +9,9 @@
     "build-forEach-exec": "cd build-tools/forEach-exec&&tsc&&cd ../..",
     "build-ts-ignore-decorator": "cd build-tools/ts-ignore-decorator&&tsc&&cd ../..",
     "build-tools": "npm run build-single-tsc&&npm run build-forEach-exec&&npm run build-ts-ignore-decorator",
-    "build-server": "node build-tools/forEach-exec"
+    "build-server": "lerna exec npm run forEach-exec --scope",
+    "lerna:dev": "lerna exec npm run dev --scope",
+    "lerna:build": "lerna exec npm run build --scope"
   },
   "author": "",
   "license": "MIT",
@@ -21,13 +23,19 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
-    "lerna": "^3.22.1"
+    "lerna": "^3.22.1",
+    "ts-loader": "^8.0.17",
+    "single-tsc": "./build-tools/single-tsc",
+    "forEach-exec": "./build-tools/forEach-exec",
+    "ts-ignore-decorator": "./build-tools/ts-ignore-decorator"
   },
   "dependencies": {
     "typescript": "^4.2.3"
   },
   "prettier": {
     "singleQuote": true,
-    "trailingComma": "none"
+    "trailingComma": "none",
+    "stylelintIntegration": true,
+    "eslintIntegration": true
   }
 }

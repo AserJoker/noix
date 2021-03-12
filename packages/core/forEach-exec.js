@@ -1,7 +1,7 @@
 const cp = require('child_process');
 module.exports = {
-  inputDir: './project/demo/src',
-  outputDir: './project/demo/dist',
+  inputDir: './src',
+  outputDir: './dist',
   ignore: ['node_modules'],
   exec: (input, output) => {
     if (input.endsWith('.ts')) {

@@ -1,25 +1,11 @@
-const Ignore = <T>(target: T, name?: string) => {};
-@Ignore
-export class A {}
+import { NoixObject } from '@noix/core';
 
-export class B {
-  public FA() {
-    console.log('FA');
-  }
+class Base extends NoixObject {
+  @NoixObject.Metadata('value', 123)
+  protected a = 123;
 
-  @Ignore
-  public FB() {
-    console.log('FB');
-  }
-
-  constructor() {
-    if (this.FA) {
-      this.FA();
-    }
-    if (this.FB) {
-      this.FB();
-    }
-  }
+  @NoixObject.Metadata('value', 345)
+  private b = 345;
 }
-// eslint-disable-next-line no-new
-new B();
+class A extends Base {}
+console.log(NoixObject.GetMetadata(A, 'a', 'value'));

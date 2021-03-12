@@ -13,7 +13,8 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   rules: {
     'space-before-function-paren': 'off',
-    semi: 'off'
+    semi: 'off',
+    indent: 'off'
   },
   settings: {}
 };
