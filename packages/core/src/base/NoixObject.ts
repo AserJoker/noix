@@ -1,4 +1,9 @@
 export class NoixObject {
+  private static __classList: Map<
+    string | Symbol,
+    typeof NoixObject
+  > = new Map();
+
   private static __metadata: {
     name: string;
     meta: Record<string, Record<string, unknown>>;
@@ -31,8 +36,11 @@ export class NoixObject {
       } else {
         classObject.__metadata = {
           name: classObject.name,
-          meta: { ...metadata.meta, [fieldName]: { [name]: value || true } }
+          meta: { [fieldName]: { [name]: value || true } }
         };
+        Object.keys(metadata.meta).forEach(
+          (name) => (classObject.__metadata.meta[name] = metadata.meta[name])
+        );
       }
     } else {
       const meta = NoixObject.__metadata.meta['class:' + (<K>target).name];
@@ -77,7 +85,8 @@ export class NoixObject {
       const classObject = target.constructor as typeof NoixObject;
       let hook = classObject.__hook;
       if (hook.name !== classObject.name) {
-        classObject.__hook = { ...hook, name: classObject.name };
+        classObject.__hook = { hooks: [], name: classObject.name };
+        hook.hooks.forEach((_h) => classObject.__hook.hooks.push(_h));
         hook = classObject.__hook;
       }
       hook.hooks.push({ name, type, host });
@@ -117,5 +126,17 @@ export class NoixObject {
 
   public GetClassObject<T extends typeof NoixObject>(): T {
     return this.constructor as T;
+  }
+
+  public static Provide(token: string | Symbol) {
+    return <T extends typeof NoixObject>(target: T) => {
+      NoixObject.__classList.set(token, target);
+    };
+  }
+
+  public static Instance(token: string | Symbol) {
+    return <T extends NoixObject>(target: T, name: string) => {
+      Reflect.set(target, name, new (NoixObject.__classList.get(token)!)());
+    };
   }
 }

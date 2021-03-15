@@ -1,5 +1,11 @@
-import { NoixObject, BeforeHook, AfterHook } from '@noix/core';
-
+import {
+  NoixObject,
+  BeforeHook,
+  AfterHook,
+  Provide,
+  Instance
+} from '@noix/core';
+@Provide('abc')
 class Base extends NoixObject {
   private async say(str: string) {
     return str;
@@ -20,5 +26,15 @@ class Base extends NoixObject {
     return (await str) + ' after';
   }
 }
+
+class Test extends NoixObject {
+  @Instance('abc')
+  private data!: Base;
+
+  constructor() {
+    super();
+    console.log(this.data.GetClassObject().name);
+  }
+}
 // eslint-disable-next-line no-new
-new Base();
+new Test();
