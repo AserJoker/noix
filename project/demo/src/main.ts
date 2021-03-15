@@ -1,40 +1,27 @@
-import {
-  NoixObject,
-  BeforeHook,
-  AfterHook,
-  Provide,
-  Instance
-} from '@noix/core';
-@Provide('abc')
+import { NoixObject, NoixEvent, BaseEvent } from '@noix/core';
 class Base extends NoixObject {
-  private async say(str: string) {
-    return str;
+  public static EVENT_BUS: NoixEvent = new NoixEvent();
+}
+class A extends Base {
+  public tri() {
+    Base.EVENT_BUS.Trigger(new BaseEvent(BaseEvent.EVENT_NAME, this));
   }
 
   constructor() {
     super();
-    this.say('abc').then((str) => console.log(str));
-  }
-
-  @BeforeHook('say')
-  private beforeSay(str: string) {
-    return ['before ' + str];
-  }
-
-  @AfterHook('say')
-  private async afterSay(str: Promise<string>) {
-    return (await str) + ' after';
+    this.GetClassObject();
   }
 }
-
-class Test extends NoixObject {
-  @Instance('abc')
-  private data!: Base;
-
+class B extends Base {
   constructor() {
     super();
-    console.log(this.data.GetClassObject().name);
+    Base.EVENT_BUS.RegisterEventListener(
+      BaseEvent.EVENT_NAME,
+      (event: BaseEvent) => console.log(event)
+    );
   }
 }
-// eslint-disable-next-line no-new
-new Test();
+const a = new A();
+const b = new B();
+b.GetClassObject();
+a.tri();
