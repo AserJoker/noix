@@ -1,9 +1,10 @@
 {
   "name": "@noix/demo",
   "version": "0.0.1",
-  "main": "dist/main.js",
+  "main": "dist/noix.demo.js",
   "scripts": {
-    "start": "node ./dist/main.js"
+    "start": "node ./dist/noix.demo.js",
+    "build": "webpack"
   },
   "dependencies": {
     "@noix/core": "0.0.1"

@@ -1,1 +1,1 @@
-export * from './NoixObject';
+export * from './base';

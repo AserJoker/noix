@@ -1,11 +1,24 @@
-import { NoixObject } from '@noix/core';
+import { NoixObject, BeforeHook, AfterHook } from '@noix/core';
 
 class Base extends NoixObject {
-  @NoixObject.Metadata('value', 123)
-  protected a = 123;
+  private async say(str: string) {
+    return str;
+  }
 
-  @NoixObject.Metadata('value', 345)
-  private b = 345;
+  constructor() {
+    super();
+    this.say('abc').then((str) => console.log(str));
+  }
+
+  @BeforeHook('say')
+  private beforeSay(str: string) {
+    return ['before ' + str];
+  }
+
+  @AfterHook('say')
+  private async afterSay(str: Promise<string>) {
+    return (await str) + ' after';
+  }
 }
-class A extends Base {}
-console.log(NoixObject.GetMetadata(A, 'a', 'value'));
+// eslint-disable-next-line no-new
+new Base();
