@@ -20,7 +20,7 @@ export class NoixObject {
     } else {
       classObject.__metadata = {
         name: classObject.name,
-        meta: { fieldName: { name: value || true } }
+        meta: { ...metadata.meta, fieldName: { name: value || true } }
       };
     }
   };

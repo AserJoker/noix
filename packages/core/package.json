@@ -1,13 +1,11 @@
 {
   "name": "@noix/core",
   "version": "0.0.1",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "build": "forEach-exec"
   },
   "devDependencies": {
-    "single-tsc": "^0.0.1",
-    "foreach-exec": "^0.0.1",
     "ts-ignore-decorator": "^0.0.1"
   }
 }
