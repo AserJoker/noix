@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import fs from 'fs';
 import path from 'path';
-export const main = (argv: string[]) => {
+export const singleTSC = (argv: string[]) => {
   const parseArgument = () => {
     const result: Record<string, string> = {};
     let key = 'inputFile';
@@ -30,24 +30,18 @@ export const main = (argv: string[]) => {
     console.log('input file is not typescript file');
     process.exit(0);
   }
-  if (!config.outFile) {
-    config.outFile = config.inputFile
+  if (!config.outputFile) {
+    config.outputFile = config.inputFile
       .split('.')
       .map((t, index, arr) => (index === arr.length - 1 ? 'js' : t))
       .join('.');
   }
   const source = fs.readFileSync(config.inputFile).toString();
-  const tsconfigString = fs
-    .readFileSync(
-      config.tsconfig || path.resolve(process.cwd(), 'tsconfig.json')
-    )
-    .toString();
-  const reg = /("([^\\"]*(\\.)?)*")|('([^\\']*(\\.)?)*')|(\/{2,}.*?(\r|\n|$))|(\/\*(\n|.)*?\*\/)/g;
-
-  const tsconfig = JSON.parse(
-    tsconfigString.replace(reg, function (word) {
-      return /^\/{2,}/.test(word) || /^\/\*/.test(word) ? '' : word;
-    })
+  const tsconfig = ts.readJsonConfigFile(
+    config.tsconfig || path.resolve(process.cwd(), 'tsconfig.json'),
+    (file) => {
+      return fs.readFileSync(file).toString();
+    }
   );
   let tscPlusConfig;
   try {
@@ -62,7 +56,7 @@ export const main = (argv: string[]) => {
     fileName: config.inputFile,
     transformers: tscPlusConfig.transformers
   });
-  fs.writeFileSync(config.outFile, result.outputText);
+  fs.writeFileSync(config.outputFile, result.outputText);
   result.sourceMapText &&
-    fs.writeFileSync(config.outFile + '.map', result.sourceMapText);
+    fs.writeFileSync(config.outputFile + '.map', result.sourceMapText);
 };

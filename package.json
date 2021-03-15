@@ -4,14 +4,10 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
-    "test": "mocha",
-    "build-single-tsc": "cd build-tools/single-tsc&&tsc&&cd ../..",
-    "build-forEach-exec": "cd build-tools/forEach-exec&&tsc&&cd ../..",
-    "build-ts-ignore-decorator": "cd build-tools/ts-ignore-decorator&&tsc&&cd ../..",
-    "build-tools": "npm run build-single-tsc&&npm run build-forEach-exec&&npm run build-ts-ignore-decorator",
-    "build-server": "lerna exec npm run forEach-exec --scope",
+    "build-server": "lerna exec npm run foreach-exec --scope",
     "lerna:dev": "lerna exec npm run dev --scope",
-    "lerna:build": "lerna exec npm run build --scope"
+    "lerna:build": "lerna exec npm run build --scope",
+    "build-tools": "npm run lerna:build foreach-exec&&npm run lerna:build single-tsc&&npm run lerna:build ts-ignore-decorator"
   },
   "author": "",
   "license": "MIT",
@@ -24,10 +20,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "lerna": "^3.22.1",
-    "ts-loader": "^8.0.17",
-    "single-tsc": "./build-tools/single-tsc",
-    "forEach-exec": "./build-tools/forEach-exec",
-    "ts-ignore-decorator": "./build-tools/ts-ignore-decorator"
+    "ts-loader": "^8.0.17"
   },
   "dependencies": {
     "typescript": "^4.2.3"

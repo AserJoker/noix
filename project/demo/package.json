@@ -7,5 +7,10 @@
   },
   "dependencies": {
     "@noix/core": "0.0.1"
+  },
+  "devDependencies": {
+    "single-tsc": "^0.0.1",
+    "foreach-exec": "^0.0.1",
+    "ts-ignore-decorator": "^0.0.1"
   }
 }

@@ -5,6 +5,9 @@
   "bin": {
     "single-tsc": "./bin.js"
   },
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "typescript": "^4.2.3"
   },

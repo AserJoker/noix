@@ -1,3 +1,3 @@
 #!/usr/bin/env node
-const { main } = require('./dist/main');
-main(process.argv);
+const { singleTSC } = require('./dist/main');
+singleTSC(process.argv);
