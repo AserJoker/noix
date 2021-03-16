@@ -5,11 +5,21 @@ export class NoixEvent {
     (<T extends BaseEvent>(event: T) => boolean | void)[]
   > = new Map();
 
+  private __linkers: NoixEvent[] = [];
+
   public Trigger = <T extends BaseEvent>(event: T) => {
-    const handles = this.__listeners.get(event.GetEventName()) || [];
+    const _handles = this.__listeners.get(event.GetEventName()) || [];
+    let handles = [..._handles];
+    this.__linkers.forEach(
+      (link) =>
+        (handles = [
+          ...handles,
+          ...(link.__listeners.get(event.GetEventName()) || [])
+        ])
+    );
     const next = (index: number) => {
-      const handle = handles[index];
       if (index < handles.length) {
+        const handle = handles[index];
         Promise.resolve(handle(event)).then(
           (result) => result && next(index + 1)
         );
@@ -36,4 +46,18 @@ export class NoixEvent {
     _listeners.splice(index, 1);
     this.__listeners.set(eventName, _listeners);
   };
+
+  public LinkTo(eventBus: NoixEvent) {
+    if (eventBus.__linkers.find((l) => l === this)) {
+      return false;
+    }
+    eventBus.__linkers.push(this);
+  }
+
+  public UnlinkTo(eventBus: NoixEvent) {
+    const index = eventBus.__linkers.findIndex((l) => l === this);
+    if (index !== -1) {
+      eventBus.__linkers.splice(index, 1);
+    }
+  }
 }
