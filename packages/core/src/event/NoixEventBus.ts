@@ -1,4 +1,3 @@
-import { NoixObject } from '../base';
 import { BaseEvent } from './BaseEvent';
 export class NoixEventBus {
   private __listeners: Map<
@@ -62,68 +61,3 @@ export class NoixEventBus {
     }
   }
 }
-NoixObject.DefineDecorator(
-  'EventListener',
-  (eventName: string | Symbol) => {
-    return <T extends NoixObject>(target: T, name: string) => {
-      let listeners: {
-        name: string;
-        listeners: Map<string | Symbol, string>;
-      } = Reflect.get(target.GetClassObject(), '__listeners');
-      if (!listeners || listeners.name !== target.GetClassObject().name) {
-        Reflect.set(target.GetClassObject(), '__listeners', {
-          name: target.GetClassObject().name,
-          listeners: new Map()
-        });
-        const oldl = listeners;
-        listeners = Reflect.get(target.GetClassObject(), '__listeners');
-        oldl && oldl.listeners.forEach((v, k) => listeners.listeners.set(k, v));
-      }
-      listeners.listeners.set(eventName, name);
-    };
-  },
-  (name: string, instance: NoixObject) => {
-    const listeners: {
-      name: string;
-      listeners: Map<string | Symbol, string>;
-    } = Reflect.get(instance.GetClassObject(), '__listeners');
-    const EVENT_BUS: NoixEventBus = Reflect.get(
-      instance.GetClassObject(),
-      'EVENT_BUS'
-    );
-    if (EVENT_BUS) {
-      listeners &&
-        listeners.listeners.forEach((name, event) => {
-          const handle: Function = Reflect.get(instance, name);
-          Reflect.set(instance, name, handle.bind(instance));
-          EVENT_BUS.RegisterEventListener(event, Reflect.get(instance, name));
-        });
-    }
-  },
-  (name: string, instance: NoixObject) => {
-    const listeners: {
-      name: string;
-      listeners: Map<string | Symbol, string>;
-    } = Reflect.get(instance.GetClassObject(), '__listeners');
-    const EVENT_BUS: NoixEventBus = Reflect.get(
-      instance.GetClassObject(),
-      'EVENT_BUS'
-    );
-    if (
-      !EVENT_BUS ||
-      !listeners ||
-      listeners.name !== instance.GetClassObject().name
-    ) {
-      listeners.listeners.forEach((name: string, event: string | Symbol) => {
-        const handle = Reflect.get(instance, name);
-        EVENT_BUS.UnregisterEventListener(event, handle);
-      });
-    }
-  }
-);
-export const EventListener: (
-  event: string | Symbol
-) => <T extends NoixObject>(target: T, name: string) => void = Reflect.get(
-  NoixObject,
-  'EventListener'
-);

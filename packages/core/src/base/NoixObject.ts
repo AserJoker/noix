@@ -144,35 +144,9 @@ export class NoixObject {
         }
       });
     });
-    NoixObject.__decorators.forEach(
-      (d) => d.initHandle && d.initHandle(d.name, this)
-    );
   }
 
   public GetClassObject<T extends typeof NoixObject>(): T {
     return this.constructor as T;
   }
-
-  public dispose() {
-    NoixObject.__decorators.forEach(
-      (d) => d.disposeHandle && d.disposeHandle(d.name, this)
-    );
-  }
-
-  public static DefineDecorator(
-    name: string,
-    handle: Function,
-    initHandle?: <T extends NoixObject>(name: string, instance: T) => void,
-    disposeHandle?: <T extends NoixObject>(name: string, instance: T) => void
-  ) {
-    Reflect.set(NoixObject, name, handle);
-    this.__decorators.push({ name, handle, initHandle, disposeHandle });
-  }
-
-  private static __decorators: {
-    name: string;
-    handle: Function;
-    initHandle?: <T extends NoixObject>(name: string, instance: T) => void;
-    disposeHandle?: <T extends NoixObject>(name: string, instance: T) => void;
-  }[] = [];
 }
