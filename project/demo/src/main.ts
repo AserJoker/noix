@@ -1,6 +1,7 @@
-import { NoixObject, NoixEvent, BaseEvent } from '@noix/core';
+import { NoixObject, NoixEventBus, BaseEvent, EventListener } from '@noix/core';
+
 class Base extends NoixObject {
-  public static EVENT_BUS: NoixEvent = new NoixEvent();
+  public static EVENT_BUS: NoixEventBus = new NoixEventBus();
 }
 class A extends Base {
   public tri() {
@@ -15,13 +16,17 @@ class A extends Base {
 class B extends Base {
   constructor() {
     super();
-    Base.EVENT_BUS.RegisterEventListener(
-      BaseEvent.EVENT_NAME,
-      (event: BaseEvent) => console.log(event)
-    );
+    console.log('base');
+  }
+
+  @EventListener(BaseEvent.EVENT_NAME)
+  public onevent(e: BaseEvent) {
+    console.log(e);
   }
 }
 const a = new A();
 const b = new B();
 b.GetClassObject();
 a.tri();
+b.dispose();
+a.dispose();

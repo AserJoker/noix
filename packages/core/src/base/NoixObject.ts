@@ -18,7 +18,7 @@ export class NoixObject {
     }[];
   } = { name: NoixObject.name, hooks: [] };
 
-  public static Metadata = (name: string, value?: unknown) => <
+  private static Metadata = (name: string, value?: unknown) => <
     T extends NoixObject,
     K extends typeof NoixObject
   >(
@@ -54,7 +54,7 @@ export class NoixObject {
     }
   };
 
-  public static GetMetadata<T extends typeof NoixObject>(
+  private static GetMetadata<T extends typeof NoixObject>(
     classObject: T,
     fieldName: string,
     name?: string
@@ -72,11 +72,11 @@ export class NoixObject {
     }
   }
 
-  public static AfterHook(host: string) {
+  private static AfterHook(host: string) {
     return NoixObject._Hook(host, 'after');
   }
 
-  public static BeforeHook(host: string) {
+  private static BeforeHook(host: string) {
     return NoixObject._Hook(host, 'before');
   }
 
@@ -90,6 +90,28 @@ export class NoixObject {
         hook = classObject.__hook;
       }
       hook.hooks.push({ name, type, host });
+    };
+  }
+
+  private static ExtLoader = {
+    get: (token: string | Symbol) => {
+      return NoixObject.__classList.get(token);
+    },
+    set: <T extends typeof NoixObject>(token: string | Symbol, target: T) => {
+      NoixObject.__classList.set(token, target);
+    }
+  };
+
+  private static Provide(token: string | Symbol) {
+    return <T extends typeof NoixObject>(target: T) => {
+      // NoixObject.__classList.set(token, target);
+      NoixObject.ExtLoader.set(token, target);
+    };
+  }
+
+  private static Instance(token: string | Symbol) {
+    return <T extends NoixObject>(target: T, name: string) => {
+      Reflect.set(target, name, new (NoixObject.ExtLoader.get(token)!)());
     };
   }
 
@@ -122,21 +144,35 @@ export class NoixObject {
         }
       });
     });
+    NoixObject.__decorators.forEach(
+      (d) => d.initHandle && d.initHandle(d.name, this)
+    );
   }
 
   public GetClassObject<T extends typeof NoixObject>(): T {
     return this.constructor as T;
   }
 
-  public static Provide(token: string | Symbol) {
-    return <T extends typeof NoixObject>(target: T) => {
-      NoixObject.__classList.set(token, target);
-    };
+  public dispose() {
+    NoixObject.__decorators.forEach(
+      (d) => d.disposeHandle && d.disposeHandle(d.name, this)
+    );
   }
 
-  public static Instance(token: string | Symbol) {
-    return <T extends NoixObject>(target: T, name: string) => {
-      Reflect.set(target, name, new (NoixObject.__classList.get(token)!)());
-    };
+  public static DefineDecorator(
+    name: string,
+    handle: Function,
+    initHandle?: <T extends NoixObject>(name: string, instance: T) => void,
+    disposeHandle?: <T extends NoixObject>(name: string, instance: T) => void
+  ) {
+    Reflect.set(NoixObject, name, handle);
+    this.__decorators.push({ name, handle, initHandle, disposeHandle });
   }
+
+  private static __decorators: {
+    name: string;
+    handle: Function;
+    initHandle?: <T extends NoixObject>(name: string, instance: T) => void;
+    disposeHandle?: <T extends NoixObject>(name: string, instance: T) => void;
+  }[] = [];
 }

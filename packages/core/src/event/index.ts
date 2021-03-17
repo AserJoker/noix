@@ -1,2 +1,2 @@
 export * from './BaseEvent';
-export * from './NoixEvent';
+export * from './NoixEventBus';
