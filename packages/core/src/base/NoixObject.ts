@@ -1,3 +1,5 @@
+import { BaseEvent, NoixEventBus } from '../event';
+
 export class NoixObject {
   private static __classList: Map<
     string | Symbol,
@@ -17,6 +19,13 @@ export class NoixObject {
       host: string;
     }[];
   } = { name: NoixObject.name, hooks: [] };
+
+  public static EVENT_BUS: NoixEventBus = new NoixEventBus();
+
+  private static __listeners: {
+    name: string;
+    listeners: Map<string | Symbol, string>;
+  } = { name: NoixObject.name, listeners: new Map() };
 
   private static Metadata = (name: string, value?: unknown) => <
     T extends NoixObject,
@@ -115,6 +124,29 @@ export class NoixObject {
     };
   }
 
+  private static EventListener(event: string | Symbol) {
+    return <T extends NoixObject>(
+      target: T,
+      name: string,
+      decorator: TypedPropertyDescriptor<
+        <T extends BaseEvent>(e: T) => void | Promise<void>
+      >
+    ) => {
+      const classObject = target.GetClassObject();
+      const _listeners = classObject.__listeners;
+      if (_listeners.name !== target.GetClassObject().name) {
+        classObject.__listeners = {
+          name: classObject.name,
+          listeners: new Map()
+        };
+        _listeners.listeners.forEach((v, k) =>
+          classObject.__listeners.listeners.set(k, v)
+        );
+      }
+      classObject.__listeners.listeners.set(event, name);
+    };
+  }
+
   protected constructor() {
     const _hook = this.GetClassObject().__hook;
     _hook.hooks.forEach((hook) => {
@@ -143,6 +175,17 @@ export class NoixObject {
           return handle.apply(this, [res]);
         }
       });
+    });
+    this.GetClassObject().__listeners.listeners.forEach((name, event) => {
+      const eventBus = this.GetClassObject().EVENT_BUS;
+      const handle: <T extends BaseEvent>(
+        e: T
+      ) => void | Promise<void> | boolean | Promise<boolean> = Reflect.get(
+        this,
+        name
+      ).bind(this);
+      Reflect.set(this, name, handle);
+      eventBus.RegisterEventListener(event, handle);
     });
   }
 

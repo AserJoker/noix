@@ -2,7 +2,9 @@ import { BaseEvent } from './BaseEvent';
 export class NoixEventBus {
   private __listeners: Map<
     string | Symbol,
-    (<T extends BaseEvent>(event: T) => boolean | void)[]
+    (<T extends BaseEvent>(
+      event: T
+    ) => boolean | void | Promise<void> | Promise<boolean>)[]
   > = new Map();
 
   private __linkers: NoixEventBus[] = [];
@@ -30,7 +32,9 @@ export class NoixEventBus {
 
   public RegisterEventListener = (
     eventName: string | Symbol,
-    handle: <T extends BaseEvent>(event: T) => boolean | void
+    handle: <T extends BaseEvent>(
+      event: T
+    ) => boolean | void | Promise<boolean> | Promise<void>
   ) => {
     const _listeners = this.__listeners.get(eventName) || [];
     _listeners.push(handle);

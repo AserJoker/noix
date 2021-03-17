@@ -1,11 +1,9 @@
-import { NoixObject } from '../base';
 
-export class BaseEvent extends NoixObject {
+export class BaseEvent<T = unknown> {
   public static EVENT_NAME: string | Symbol = Symbol('EVENT.BASE');
-  private target?: NoixObject;
+  private target?: T;
   private name: string | Symbol;
-  public constructor(name: string | Symbol, target?: NoixObject) {
-    super();
+  public constructor(name: string | Symbol, target?: T) {
     this.name = name;
     this.target = target;
   }
