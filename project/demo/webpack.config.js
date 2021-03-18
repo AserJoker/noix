@@ -21,7 +21,5 @@ module.exports = {
     alias: {
       '@src': path.resolve(__dirname, 'src')
     }
-  },
-
-  target: 'async-node'
+  }
 };

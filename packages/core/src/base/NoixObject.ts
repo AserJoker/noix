@@ -192,4 +192,20 @@ export class NoixObject {
   public GetClassObject<T extends typeof NoixObject>(): T {
     return this.constructor as T;
   }
+
+  public Release() {
+    this.GetClassObject().__listeners.listeners.forEach((name, event) => {
+      const eventBUS = this.GetClassObject().EVENT_BUS;
+      eventBUS.UnregisterEventListener(event, Reflect.get(this, name));
+    });
+  }
 }
+export const EventListener: (
+  event: string | Symbol
+) => <T extends NoixObject>(
+  target: T,
+  name: string,
+  decorator: TypedPropertyDescriptor<
+    <T extends BaseEvent<unknown>>(e: T) => void | Promise<void>
+  >
+) => void = Reflect.get(NoixObject, 'EventListener');

@@ -8,15 +8,13 @@ class A extends Base {
     Base.EVENT_BUS.Trigger(new BaseEvent(BaseEvent.EVENT_NAME, this));
   }
 
-  constructor() {
+  public constructor() {
     super();
-    this.GetClassObject();
   }
 }
 class B extends Base {
-  constructor() {
+  public constructor() {
     super();
-    console.log('base');
   }
 
   @EventListener(BaseEvent.EVENT_NAME)
@@ -26,7 +24,6 @@ class B extends Base {
 }
 const a = new A();
 const b = new B();
-b.GetClassObject();
 a.tri();
-b.dispose();
-a.dispose();
+b.Release();
+a.Release();
