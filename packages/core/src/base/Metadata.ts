@@ -1,5 +1,5 @@
 class _Metadata {
-  private static _meta: WeakMap<
+  private static _meta: Map<
     Function,
     Record<string, Map<string | Symbol, unknown>>
   > = new Map();

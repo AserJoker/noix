@@ -1,5 +1,5 @@
 class _Hook {
-  private static _afterHooks: WeakMap<
+  private static _afterHooks: Map<
     Function,
     { name: string; type: 'after' | 'before' }[]
   > = new Map();
