@@ -25,5 +25,4 @@ module.exports = {
       '@src': path.resolve(__dirname, 'src')
     }
   },
-  Plugin: [new webpack.ProvidePlugin({})]
 };
