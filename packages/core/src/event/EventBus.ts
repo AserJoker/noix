@@ -24,15 +24,30 @@ export class EventBus {
     }
   }
 
-  public Trigger<T extends BaseEvent>(event: T) {
+  private _SyncTrigger<T extends BaseEvent>(event: T) {
     const handles = this._eventListener.get(event.GetEventType());
     if (handles) {
-      const next = (index: number) => {
-        if (index < handles.length) {
-          Promise.resolve(handles[index](event)).then(() => next(index + 1));
-        }
-      };
-      next(0);
+      return new Promise<void>((resolve) => {
+        const next = (index: number) => {
+          if (index < handles.length) {
+            Promise.resolve(handles[index](event)).then(() => next(index + 1));
+          } else resolve();
+        };
+        next(0);
+      });
     }
+    return Promise.resolve();
+  }
+
+  private _AsyncTrigger<T extends BaseEvent>(event: T): Promise<void[]> {
+    const handles = this._eventListener.get(event.GetEventType());
+    if (handles) {
+      return Promise.all(
+        handles.map((handle) => handle(event) as Promise<void>)
+      );
+    } else return Promise.resolve([]);
+  }
+  public Trigger<T extends BaseEvent>(event: T, sync: boolean = true) {
+    return sync ? this._SyncTrigger(event) : this._AsyncTrigger(event);
   }
 }
