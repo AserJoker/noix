@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack')
 const packageName = 'noix.core';
 module.exports = {
   mode: 'development',
@@ -23,5 +24,6 @@ module.exports = {
     alias: {
       '@src': path.resolve(__dirname, 'src')
     }
-  }
+  },
+  Plugin: [new webpack.ProvidePlugin({})]
 };
