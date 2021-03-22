@@ -1,0 +1,13 @@
+{
+  "name": "@noix/client",
+  "version": "0.0.1",
+  "main": "dist/noix.client.js",
+  "typings": "dist/typings/index.d.ts",
+  "dependencies": {
+    "@noix/core": "0.0.1"
+  },
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  }
+}

@@ -47,6 +47,7 @@ export class EventBus {
       );
     } else return Promise.resolve([]);
   }
+
   public Trigger<T extends BaseEvent>(event: T, sync: boolean = true) {
     return sync ? this._SyncTrigger(event) : this._AsyncTrigger(event);
   }

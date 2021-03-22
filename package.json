@@ -4,8 +4,7 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
-    "build": "lerna exec npm run build --scope @noix/core",
-    "lerna:dev": "lerna exec npm run dev --scope",
+    "build": "lerna exec npm run build --scope '@noix/{core,client}'",
     "lerna:build": "lerna exec npm run build --scope",
     "lerna:start": "lerna exec npm run start --scope",
     "build-tools": "npm run lerna:build ts-ignore-decorator"
@@ -20,13 +19,15 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
+    "html-webpack-plugin": "^5.3.1",
     "lerna": "^3.22.1",
     "ts-loader": "^8.0.17",
-    "webpack": "^5.25.1"
+    "webpack": "^5.25.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "typescript": "^4.2.3",
-    "webpack-cli": "^4.5.0"
+    "typescript": "^4.2.3"
   },
   "prettier": {
     "singleQuote": true,

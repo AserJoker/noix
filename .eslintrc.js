@@ -15,7 +15,8 @@ module.exports = {
     'space-before-function-paren': 'off',
     semi: 'off',
     indent: 'off',
-    'no-useless-constructor': 'off'
+    'no-useless-constructor': 'off',
+    'keyword-spacing': 'off'
   },
   settings: {}
 };
