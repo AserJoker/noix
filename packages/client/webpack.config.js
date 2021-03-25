@@ -1,15 +1,14 @@
 const path = require('path');
-const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 const packageName = 'noix.client';
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
-  entry: path.resolve(__dirname, 'src/index.ts'),
+  entry: path.resolve(__dirname, 'src/ClientApplication.ts'),
   output: {
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/',
-    libraryTarget: 'commonjs',
-    filename: `${packageName}.lib.js`
+    filename: `${packageName}.js`
   },
   module: {
     rules: [
@@ -20,9 +19,17 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts'],
+    extensions: ['.ts', '.js'],
     alias: {
       '@src': path.resolve(__dirname, 'src')
     }
   },
+  devServer: {
+    contentBase: './dist',
+    port: 8001
+  },
+  plugins: [
+    new HtmlWebpackPlugin(),
+    new webpack.ProvidePlugin({ $core: '@noix/core' })
+  ]
 };

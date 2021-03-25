@@ -1,18 +1,18 @@
-export class BaseEvent<T extends unknown = unknown> {
-    private _type:string|Symbol;
+export class BaseEvent {
+  private _type: string | Symbol;
 
-    private _target:T|null;
+  private _target: unknown | null;
 
-    protected constructor(type:string|Symbol, target:T|null = null) {
-        this._type = type;
-        this._target = target;
-    }
+  protected constructor(type: string | Symbol, target: unknown | null = null) {
+    this._type = type;
+    this._target = target;
+  }
 
-    public GetEventType() {
-        return this._type;
-    }
+  public GetEventType() {
+    return this._type;
+  }
 
-    public GetEventTarget() {
-        return this._target;
-    }
+  public GetEventTarget<T>() {
+    return this._target as T;
+  }
 }
