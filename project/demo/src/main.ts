@@ -33,6 +33,6 @@ ebc.AddEventListener(EVENT_PREINITIALIZATION, async () => {
     }, 100)
   );
 });
-Promise.all(eba.Trigger(new PreInitializationEvent(null), false)).then(() => {
+Promise.all(eba.Trigger(new PreInitializationEvent(null))).then(() => {
   console.log('end');
 });

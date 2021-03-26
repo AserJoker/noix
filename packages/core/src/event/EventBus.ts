@@ -73,17 +73,16 @@ export class EventBus {
 
   private _AsyncTrigger<T extends BaseEvent>(event: T): Promise<void>[] {
     const handles = this._eventListener.get(event.GetEventType());
+    let promiseArr: Promise<void>[] = [];
     if (handles) {
-      const promiseArr: Promise<void>[] = [
-        ...handles.map((handle) => handle(event) as Promise<void>)
-      ];
-      console.log(handles);
-      this._links
-        .map((link) => link.Trigger(event, false))
-        .map((p) => (!Array.isArray(p) ? [p] : p))
-        .forEach((p) => promiseArr.push(...p));
-      return promiseArr;
-    } else return [];
+      promiseArr = [...handles.map((handle) => handle(event) as Promise<void>)];
+    }
+
+    this._links
+      .map((link) => link.Trigger(event, false))
+      .map((p) => (!Array.isArray(p) ? [p] : p))
+      .forEach((p) => promiseArr.push(...p));
+    return promiseArr;
   }
 
   public Trigger<T extends BaseEvent>(event: T, sync: boolean = true) {
