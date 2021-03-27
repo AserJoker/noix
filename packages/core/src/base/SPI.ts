@@ -3,7 +3,7 @@ class _SPI {
   private static _instance: Map<string | Symbol, Object> = new Map();
 
   public static Provide(token: string | Symbol) {
-    return <T extends { new (): unknown }>(target: T) => {
+    return <T extends Function>(target: T) => {
       _SPI._provider.set(token, target);
     };
   }
