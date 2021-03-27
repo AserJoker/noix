@@ -19,13 +19,14 @@ const formatValue = (value) => {
 };
 fs.writeFileSync(
   path.resolve(__dirname, './dist/noix.core.api.js'),
-  `let _QueryInterface = window.QueryInterface;
+  `let _$ = window.QueryInterface;
+  if(!_$)throw new Error('Error:cannot find QueryInterface') 
 ${functions
   .map((fun) => {
     const apiName = package.GetMetadata(fun, undefined, 'API').split('.');
-    return `export const ${
-      apiName[apiName.length - 1]
-    }=_QueryInterface&&_QueryInterface('${apiName.join('.')}');`;
+    return `export const ${apiName[apiName.length - 1]}=_$('${apiName.join(
+      '.'
+    )}');`;
   })
   .join('\n')}
 ${Object.keys(values)
