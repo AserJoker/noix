@@ -7,6 +7,7 @@
     "build": "lerna exec npm run build --scope '@noix/{core,client}'",
     "lerna:build": "lerna exec npm run build --scope",
     "lerna:start": "lerna exec npm run start --scope",
+    "lerna:api": "lerna exec npm run api --scope",
     "build-tools": "npm run lerna:build ts-ignore-decorator"
   },
   "author": "",

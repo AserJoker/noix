@@ -1,5 +1,7 @@
+import { API } from '@src/base';
 import { BaseEvent } from './BaseEvent';
 
+@API('core', 'EventBus')
 export class EventBus {
   private _eventListener: Map<string | Symbol, Function[]> = new Map();
 

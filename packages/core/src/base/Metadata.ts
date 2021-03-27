@@ -47,6 +47,15 @@ class _Metadata {
       return _Metadata.Get(extendsClassObject, field, name);
     }
   }
+  public static GetClasses(name: string | Symbol): Function[] {
+    const result: Function[] = [];
+    _Metadata._meta.forEach((v, fun) => {
+      const meta = v['class:' + fun.name];
+      if (meta && meta.has(name)) result.push(fun);
+    });
+    return result;
+  }
 }
 export const Metadata = _Metadata.Meta;
 export const GetMetadata = _Metadata.Get;
+export const GetClasses = _Metadata.GetClasses;

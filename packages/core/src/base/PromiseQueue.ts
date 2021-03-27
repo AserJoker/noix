@@ -1,3 +1,5 @@
+import { API } from './API';
+
 export const PromiseQueue = <T>(arr: Promise<T>[]) => {
   const result: T[] = [];
   return new Promise<T[]>((resolve) => {
@@ -11,3 +13,4 @@ export const PromiseQueue = <T>(arr: Promise<T>[]) => {
     _next(0);
   });
 };
+API('core', 'PromiseQueue')(PromiseQueue);

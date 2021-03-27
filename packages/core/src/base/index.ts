@@ -4,3 +4,4 @@ export * from './Hook';
 export * from './Rename';
 export * from './Side';
 export * from './PromiseQueue';
+export * from './API';

@@ -1,0 +1,12 @@
+{
+    "name": "@noix/demo-device",
+    "version": "0.0.1",
+    "scripts": {
+        "build":"webpack"
+    },
+    "main": "dist/noix.demo-device.js",
+    "typings": "dist/typings/index.d.ts",
+    "devDependencies": {
+        "@noix/core":"0.0.1"
+    }
+}

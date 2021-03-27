@@ -1,13 +1,14 @@
 {
-  "name": "@noix/demo",
+  "name": "@noix/demo-plugin",
   "version": "0.0.1",
   "main": "dist/noix.demo.js",
   "scripts": {
-    "start": "node ./dist/noix.demo.js",
+    "start": "noix-client",
     "build": "webpack"
   },
   "dependencies": {
-    "@noix/core": "0.0.1"
+    "@noix/core": "0.0.1",
+    "@noix/client":"0.0.1"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1"

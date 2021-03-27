@@ -25,11 +25,11 @@ module.exports = {
     }
   },
   devServer: {
-    contentBase: './dist',
+    contentBase: path.resolve(__dirname, './dist'),
     port: 8001
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({ template: './dist/index.html' }),
     new webpack.ProvidePlugin({ $core: '@noix/core' })
   ]
 };

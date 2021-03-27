@@ -1,5 +1,5 @@
 const path = require('path');
-const packageName = 'noix.demo';
+const packageName = 'noix.demo-device';
 module.exports = {
   mode: 'development',
   devtool: 'source-map',

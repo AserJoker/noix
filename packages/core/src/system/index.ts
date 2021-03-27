@@ -1,3 +1,4 @@
 export * from './Application';
-export * from './Bootstrap';
+export * from './Device';
 export * from './event';
+export * from './Loader';

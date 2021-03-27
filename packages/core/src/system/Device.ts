@@ -1,4 +1,4 @@
-import { ExtLoader, Provide } from '@src/base';
+import { ExtLoader, Provide } from '../base';
 
 export const TOKEN_DEVICE_SERVICE = 'base.device.service';
 @Provide(TOKEN_DEVICE_SERVICE)
