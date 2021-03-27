@@ -1,0 +1,34 @@
+<block render="form">
+    <meta model="base.user"/>
+    <block render="layout">
+        <meta col="2"/>
+        <block render="layout-item">
+            <meta col="2"/>
+            <block render="form-item">
+                <meta type="field"/>
+                <field name="username"/>
+            </block>
+        </block>
+        <block render="layout-item">
+            <meta col="2"/>
+            <block render="form-item">
+                <meta type="field"/>
+                <field name="password"/>
+            </block>
+        </block>
+        <block render="layout-item">
+            <meta col="1"/>
+            <block render="button">
+                <meta type="action"/>
+                <action name="username"/>
+            </block>
+        </block>
+        <block render="layout-item">
+            <meta col="1"/>
+            <block render="button">
+                <meta type="action"/>
+                <action name="password"/>
+            </block>
+        </block>
+    </block>
+</block>

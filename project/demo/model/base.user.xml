@@ -1,0 +1,7 @@
+<model name="base.user">
+    <field name="name" type="string"/>
+    <field name="password" type="string" />
+    <action name="submit"/>
+    <action name="cancel"/>
+    <action name="register"/>
+</model>
