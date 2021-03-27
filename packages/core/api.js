@@ -19,7 +19,8 @@ const formatValue = (value) => {
 };
 fs.writeFileSync(
   path.resolve(__dirname, './dist/noix.core.api.js'),
-  `let _$ = window.QueryInterface;
+  `let _$ = QueryInterface;
+  export const initAPI = (QueryInterface)=>_$=QueryInterface;
   if(!_$)throw new Error('Error:cannot find QueryInterface') 
 ${functions
   .map((fun) => {
