@@ -36,8 +36,6 @@ class _SPI {
 }
 export const Provide = _SPI.Provide;
 export const Instance = _SPI.Instance;
-export const ExtLoader = {
-  QueryInterface: _SPI.QueryInterface,
-  CreateInstance: _SPI.CreateInstance,
-  GetInstance: _SPI.GetInstance
-};
+export const QueryInterface = _SPI.QueryInterface;
+export const CreateInstance = _SPI.CreateInstance;
+export const GetInstance = _SPI.GetInstance;
