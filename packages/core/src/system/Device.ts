@@ -1,4 +1,4 @@
-import { ExtLoader, Provide } from '../base';
+import { Provide, QueryInterface } from '../base';
 
 export const TOKEN_DEVICE_SERVICE = 'base.device.service';
 @Provide(TOKEN_DEVICE_SERVICE)
@@ -7,11 +7,12 @@ export class Device {
   public static QueryDevice(token: string | Symbol) {
     const localDevice = Device._enableDevices.get(token);
     if (localDevice) return localDevice;
-    const ClassObject = ExtLoader.QueryInterface(token) as typeof Device;
+    const ClassObject = QueryInterface(token) as typeof Device;
     const instance = new ClassObject();
     Device._enableDevices.set(token, instance);
     return instance;
   }
+
   protected constructor() {}
 
   public Release() {

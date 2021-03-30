@@ -1,10 +1,4 @@
-import {
-  ClientSide,
-  ExtLoader,
-  PromiseQueue,
-  Provide,
-  ServerSide
-} from '../base';
+import { GetInstance, PromiseQueue, Provide } from '../base';
 import { EventObject } from '../event';
 import {
   InitializationEvent,
@@ -12,27 +6,28 @@ import {
   PreInitializationEvent
 } from './event';
 
-let _instance: Application | null = null;
-
 export const TOKEN_APPLICATION = 'base.application';
 export class Application extends EventObject {
-  public main(): Promise<void> | void {}
+  protected async LoadPlugins() {}
+  public async main(): Promise<void> {
+    await this.LoadPlugins();
+    await PromiseQueue(
+      this.EVENT_BUS.Trigger(new PreInitializationEvent(this))
+    );
+    await PromiseQueue(this.EVENT_BUS.Trigger(new InitializationEvent(this)));
+    await PromiseQueue(
+      this.EVENT_BUS.Trigger(new PostInitializationEvent(this))
+    );
+  }
+
   public static GetInstance() {
     return _instance;
   }
 }
 export const Bootstrap = <T extends typeof Application>(ClassObject: T) => {
   Provide(TOKEN_APPLICATION)(ClassObject);
-  _instance = ExtLoader.GetInstance(TOKEN_APPLICATION)!;
-  PromiseQueue(
-    _instance!.EVENT_BUS.Trigger(new PreInitializationEvent(null))
-  ).then(() =>
-    PromiseQueue(
-      _instance!.EVENT_BUS.Trigger(new InitializationEvent(null))
-    ).then(() =>
-      PromiseQueue(
-        _instance!.EVENT_BUS.Trigger(new PostInitializationEvent(null))
-      ).then(() => _instance!.main())
-    )
-  );
+  _instance = GetInstance(TOKEN_APPLICATION)!;
+  _instance.main();
 };
+
+let _instance: Application | null = null;

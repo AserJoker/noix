@@ -1,5 +1,11 @@
 import { GetClasses, GetMetadata, Metadata } from './Metadata';
-import { ExtLoader, Instance, Provide } from './SPI';
+import {
+  CreateInstance,
+  GetInstance,
+  Instance,
+  Provide,
+  QueryInterface
+} from './SPI';
 const APIValues: Record<string, unknown> = {};
 export const API = (packageName: string, interfaceName?: string) => <
   T extends Function
@@ -25,6 +31,6 @@ API('core', 'GetClasses')(GetClasses);
 API('core', 'GetMetadata')(GetMetadata);
 API('core', 'Provide')(Provide);
 API('core', 'Instance')(Instance);
-API('core', 'QueryInterface')(ExtLoader.QueryInterface);
-API('core', 'CreateInterface')(ExtLoader.CreateInstance);
-API('core', 'GetInstance')(ExtLoader.GetInstance);
+API('core', 'QueryInterface')(QueryInterface);
+API('core', 'CreateInterface')(CreateInstance);
+API('core', 'GetInstance')(GetInstance);
