@@ -1,17 +1,14 @@
 import {
-  Application,
+  SystemApplication,
   Bootstrap,
-  QueryInterface,
   EventListener,
   EVENT_PREINITIALIZATION
 } from '@noix/core';
+import { LoadClientPlugins } from './Plugin';
 @Bootstrap
-export class ClientApplication extends Application {
+export class ClientApplication extends SystemApplication {
   protected async LoadPlugins() {
-    Reflect.set(window, 'QueryInterface', QueryInterface);
-    const script = document.createElement('script');
-    script.src = 'noix.demo-plugin.js';
-    document.head.append(script);
+    return LoadClientPlugins();
   }
 
   public async main() {

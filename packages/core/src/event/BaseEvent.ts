@@ -1,4 +1,4 @@
-import { API } from '@src/base';
+import { API } from '../base';
 
 @API('core', 'BaseEvent')
 export class BaseEvent {

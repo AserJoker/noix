@@ -28,9 +28,15 @@ class _SPI {
     return undefined;
   }
 
-  public static Instance(token: string | Symbol) {
+  public static Instance(token?: string | Symbol) {
     return <T extends Object>(target: T, name: string) => {
-      Reflect.set(target, name, _SPI.CreateInstance(token));
+      if (!token) {
+        const ClassObject =
+          typeof target === 'function' ? target : target.constructor;
+        Reflect.set(target, name, new (ClassObject as { new (): unknown })());
+      } else {
+        Reflect.set(target, name, _SPI.CreateInstance(token));
+      }
     };
   }
 }

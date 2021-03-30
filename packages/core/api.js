@@ -10,18 +10,15 @@ const formatValue = (value) => {
       return `[${value.map((v) => formatValue(v)).join(',')}]`;
     }
     return `{${Object.keys(value)
-      .map((name) => {
-        `${name}:${formatValue(value[name])}`;
-      })
+      .map((name) => `${name}:${formatValue(value[name])}`)
       .join('\n')}}`;
   }
   return String(value);
 };
 fs.writeFileSync(
   path.resolve(__dirname, './dist/noix.core.api.js'),
-  `let _$ = QueryInterface;
+  `let _$ = window.QueryInterface;
   export const initAPI = (QueryInterface)=>_$=QueryInterface;
-  if(!_$)throw new Error('Error:cannot find QueryInterface') 
 ${functions
   .map((fun) => {
     const apiName = package.GetMetadata(fun, undefined, 'API').split('.');

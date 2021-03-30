@@ -1,4 +1,4 @@
-import { API } from '@src/base';
+import { API } from '../base';
 import { BaseEvent } from './BaseEvent';
 
 @API('core', 'EventBus')

@@ -1,4 +1,4 @@
-import { API, API_VALUE } from '@src/base';
+import { API, API_VALUE } from '../../base';
 import { BaseEvent } from '../../event';
 export const EVENT_POSTINITIALIZATION = 'event.postInitialization';
 @API('core', 'PostInitializationEvent')
