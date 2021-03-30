@@ -2,7 +2,9 @@ import {
   SystemApplication,
   Bootstrap,
   EventListener,
-  EVENT_PREINITIALIZATION
+  EVENT_PREINITIALIZATION,
+  EVENT_INITIALIZATION,
+  EVENT_POSTINITIALIZATION
 } from '@noix/core';
 import { LoadClientPlugins } from './Plugin';
 @Bootstrap
@@ -20,12 +22,12 @@ export class ClientApplication extends SystemApplication {
     console.log('pre');
   }
 
-  @EventListener(EVENT_PREINITIALIZATION)
+  @EventListener(EVENT_INITIALIZATION)
   public async OnInitialize() {
     console.log('init');
   }
 
-  @EventListener(EVENT_PREINITIALIZATION)
+  @EventListener(EVENT_POSTINITIALIZATION)
   public async OnPostInitialize() {
     console.log('post');
   }
