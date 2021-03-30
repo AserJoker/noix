@@ -1,4 +1,4 @@
-import { GetInstance, PromiseQueue, Provide } from '../base';
+import { API_VALUE, GetInstance, PromiseQueue, Provide } from '../base';
 import { EventObject } from '../event';
 import {
   InitializationEvent,
@@ -7,6 +7,7 @@ import {
 } from './event';
 
 export const TOKEN_APPLICATION = 'base.application';
+
 export class Application extends EventObject {
   protected async LoadPlugins() {}
   public async main(): Promise<void> {
@@ -19,10 +20,6 @@ export class Application extends EventObject {
       this.EVENT_BUS.Trigger(new PostInitializationEvent(this))
     );
   }
-
-  public static GetInstance() {
-    return _instance;
-  }
 }
 export const Bootstrap = <T extends typeof Application>(ClassObject: T) => {
   Provide(TOKEN_APPLICATION)(ClassObject);
@@ -31,3 +28,4 @@ export const Bootstrap = <T extends typeof Application>(ClassObject: T) => {
 };
 
 let _instance: Application | null = null;
+API_VALUE('TOKEN_APPLICATION', TOKEN_APPLICATION);

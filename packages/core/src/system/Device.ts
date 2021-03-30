@@ -1,7 +1,8 @@
-import { Provide, QueryInterface } from '../base';
+import { API, Provide, QueryInterface } from '../base';
 
 export const TOKEN_DEVICE_SERVICE = 'base.device.service';
 @Provide(TOKEN_DEVICE_SERVICE)
+@API('core', 'Device')
 export class Device {
   private static _enableDevices: Map<string | Symbol, Device> = new Map();
   public static QueryDevice(token: string | Symbol) {

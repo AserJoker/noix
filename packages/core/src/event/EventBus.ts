@@ -13,6 +13,9 @@ export class EventBus {
     const handles = this._eventListener.get(event);
     if (handles) handles.push(handle);
     else this._eventListener.set(event, [handle]);
+    return {
+      Release: () => this.RemoveEventListener(event, handle)
+    };
   }
 
   public RemoveEventListener<T extends Function>(
@@ -93,6 +96,9 @@ export class EventBus {
 
   public LinkTo(parent: EventBus) {
     parent._links.push(this);
+    return {
+      Release: () => this.UnlinkTo(parent)
+    };
   }
 
   public UnlinkTo(parent: EventBus) {
@@ -102,3 +108,4 @@ export class EventBus {
     }
   }
 }
+export type ReleaseCallback = { Release: () => void };
