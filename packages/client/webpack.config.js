@@ -29,7 +29,9 @@ module.exports = {
     port: 8001
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: './dist/index.html' }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, './public/index.html')
+    }),
     new webpack.ProvidePlugin({ $core: '@noix/core' })
   ]
 };

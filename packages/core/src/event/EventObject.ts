@@ -43,10 +43,10 @@ export class EventObject extends BaseObject {
   }
 
   public static EventListener(event: string | Symbol) {
-    return <T extends EventObject>(
+    return <T extends EventObject, K extends Function>(
       target: T,
       name: string,
-      description: TypedPropertyDescriptor<Function>
+      description: TypedPropertyDescriptor<K>
     ) => {
       const ClassObject = target.GetClassObject<typeof EventObject>();
       if (ClassObject._listeners.name === ClassObject.name) {
