@@ -5,9 +5,10 @@
   "typings": "dist/typings/index.d.ts",
   "scripts": {
     "build": "webpack",
-    "api":"node ./api.js"
+    "api": "build-api noix.core"
   },
   "devDependencies": {
-    "ts-ignore-decorator": "^0.0.1"
+    "ts-ignore-decorator": "^0.0.1",
+    "build-api": "^0.0.1"
   }
 }

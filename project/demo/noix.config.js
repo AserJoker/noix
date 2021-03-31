@@ -3,7 +3,7 @@ module.exports = {
   plugins: [
     {
       name: 'demo',
-      main: path.resolve(__dirname, 'src/main')
+      main: path.resolve(__dirname, 'src/main.ts')
     }
   ]
 };

@@ -1,5 +1,5 @@
 {
-  "name": "@noix/demo-plugin",
+  "name": "@noix/demo",
   "version": "0.0.1",
   "main": "dist/noix.demo.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@noix/core": "0.0.1",
-    "@noix/client":"0.0.1"
+    "@noix/client": "0.0.1"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1"
