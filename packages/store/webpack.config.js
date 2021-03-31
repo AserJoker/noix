@@ -1,5 +1,5 @@
 const path = require('path');
-const packageName = 'noix.core';
+const packageName = 'noix.store';
 module.exports = {
   mode: 'development',
   devtool: 'source-map',

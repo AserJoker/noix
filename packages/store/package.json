@@ -1,11 +1,14 @@
 {
-  "name": "@noix/core",
+  "name": "@noix/store",
   "version": "0.0.1",
   "main": "src/index.ts",
   "typings": "dist/typings/index.d.ts",
   "scripts": {
     "build": "webpack",
     "api": "build-api noix.store"
+  },
+  "dependencies": {
+    "@noix/core": "^0.0.1"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1",
