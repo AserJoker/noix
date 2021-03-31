@@ -1,33 +1,28 @@
 import { EventObject } from '@noix/core';
-import { ValueChangeEvent } from './event';
-export class Store<T = unknown> extends EventObject {
-  private _value: T | null = null;
+export abstract class Store<T = unknown> extends EventObject {
+  private _Attrs: Record<string, unknown> = {};
 
-  private _readonly: boolean = false;
+  public abstract GetValue(): T | null;
 
-  public GetValue(): T | null {
-    return this._value;
+  public abstract SetValue(newValue: T | null): boolean;
+
+  public IsNull() {
+    return this.GetValue() === null;
   }
 
-  public SetValue(newValue: T | null) {
-    if (newValue === this._value) return true;
-    this.EVENT_BUS.TriggerSync(
-      new ValueChangeEvent(this, newValue, this._value)
-    );
-    if (this._readonly) return false;
-    this._value = newValue;
-    return true;
+  protected _SetAttr(name: string, value: unknown) {
+    this._Attrs[name] = value;
+  }
+
+  protected _GetAttr(name: string) {
+    return this._Attrs[name];
   }
 
   public SetReadonly(readonly: boolean) {
-    this._readonly = readonly;
+    this._SetAttr('readonly', readonly);
   }
 
   public IsReadonly() {
-    return this._readonly;
-  }
-
-  public IsNull() {
-    return this._value === null;
+    return this._GetAttr('readonly') as boolean;
   }
 }

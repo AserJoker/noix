@@ -90,16 +90,19 @@ export class EventBus {
     return promiseArr;
   }
 
-  public Trigger<T extends BaseEvent>(event: T, sync: boolean = true) {
-    return sync ? this._SyncTrigger(event) : this._AsyncTrigger(event);
+  public Trigger<T extends BaseEvent>(event: T, sync?: boolean) {
+    if (sync) return this._SyncTrigger(event);
+    else if (sync === false) return this._AsyncTrigger(event);
+    return this._Trigger(event);
   }
 
-  public TriggerSync<T extends BaseEvent>(event: T) {
+  public _Trigger<T extends BaseEvent>(event: T) {
     const handles = this._eventListener.get(event.GetEventType());
     if (handles) {
       handles.forEach((h) => h(event));
     }
-    this._links.forEach((l) => l.TriggerSync(event));
+    this._links.forEach((l) => l.Trigger(event));
+    return [];
   }
 
   public LinkTo(parent: EventBus) {
