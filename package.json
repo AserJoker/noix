@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
-    "build": "lerna exec npm run build --scope '@noix/{core,client}'",
+    "build": "lerna exec npm run build --scope '@noix/{core,store}'",
     "lerna:build": "lerna exec npm run build --scope",
     "lerna:start": "lerna exec npm run start --scope",
     "lerna:api": "lerna exec npm run api --scope",

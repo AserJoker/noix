@@ -94,6 +94,14 @@ export class EventBus {
     return sync ? this._SyncTrigger(event) : this._AsyncTrigger(event);
   }
 
+  public TriggerSync<T extends BaseEvent>(event: T) {
+    const handles = this._eventListener.get(event.GetEventType());
+    if (handles) {
+      handles.forEach((h) => h(event));
+    }
+    this._links.forEach((l) => l.TriggerSync(event));
+  }
+
   public LinkTo(parent: EventBus) {
     parent._links.push(this);
     return {
