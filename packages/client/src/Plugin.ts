@@ -1,11 +1,14 @@
-import { QueryInterface } from '@noix/core';
 
-export const LoadClientPlugins = async () => {
-  return new Promise<void>((resolve) => {
-    Reflect.set(window, 'QueryInterface', QueryInterface);
-    const script = document.createElement('script');
-    script.src = 'noix.demo-plugin.js';
-    script.onload = () => resolve();
-    document.head.append(script);
-  });
-};
+    import { QueryInterface } from '@noix/core';
+    export const LoadClientPlugins = async () => {
+      return new Promise<void>((resolve) => {
+        try {
+          Reflect.set(window, 'QueryInterface', QueryInterface);
+          Promise.all([import('/Users/apple/Projects/noix/plugins/demo/src/main')]).then(() => resolve());
+        } catch (e) {
+          resolve();
+        }
+      });
+    };
+    
+  

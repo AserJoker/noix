@@ -2,6 +2,9 @@
   "name": "@noix/client",
   "version": "0.0.1",
   "main": "dist/noix.client.js",
+  "bin": {
+    "noix-client": "./noix-client.js"
+  },
   "dependencies": {
     "@noix/core": "0.0.1"
   },
