@@ -40,6 +40,7 @@ export class EventObject extends BaseObject {
     }
     this._listenersLinks.forEach((l) => l.Release());
     this._listenersLinks = [];
+    super.Release();
   }
 
   public static EventListener(event: string | Symbol) {
