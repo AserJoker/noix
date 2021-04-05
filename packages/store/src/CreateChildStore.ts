@@ -15,6 +15,9 @@ export const CreateChildStore = <P extends Object, C>(
       return ((parentValue && parentValue[name]) as C) || null;
     },
     set: (newValue: C | null) => {
+      if (parentStore.IsLocked()) {
+        return;
+      }
       if (parentStore.GetState() === 'released') {
         childStore.Release();
         return;

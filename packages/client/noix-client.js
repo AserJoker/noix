@@ -16,7 +16,7 @@ if (!fs.existsSync(path.resolve(process.cwd(), 'noix.config.js'))) {
         try {
           Reflect.set(window, 'QueryInterface', QueryInterface);
           Promise.all([${plugins
-            .map((p) => `import('${p.main}')`)
+            .map((p) => `import('${p.main.replace(/\\/g, '/')}')`)
             .join(',')}]).then(() => resolve());
         } catch (e) {
           resolve();

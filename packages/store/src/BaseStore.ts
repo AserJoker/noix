@@ -21,6 +21,9 @@ export class BaseStore<T = unknown> extends EventObject {
   }
 
   public set value(newValue: T | null) {
+    if (this.IsLocked()) {
+      return;
+    }
     if (newValue !== this.value) {
       this.EVENT_BUS.Trigger(new ValueChangeEvent(this, newValue, this.value));
       this._store.set && this._store.set(newValue);
@@ -59,5 +62,21 @@ export class BaseStore<T = unknown> extends EventObject {
     );
     this.watchers.push(watcher);
     return watcher;
+  }
+
+  public Lock() {
+    if (this._storeState === 'ready') {
+      this._storeState = 'locked';
+    }
+  }
+
+  public Unlock() {
+    if (this._storeState === 'locked') {
+      this._storeState = 'ready';
+    }
+  }
+
+  public IsLocked() {
+    return this._storeState === 'locked';
   }
 }
