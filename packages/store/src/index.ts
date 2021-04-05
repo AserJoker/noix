@@ -1,4 +1,5 @@
 export * from './event';
 export * from './BaseStore';
 export * from './SimpleStore';
-export * from './CreateChildStore';
+export * from './ChildStore';
+export * from './ReferenceStore';
