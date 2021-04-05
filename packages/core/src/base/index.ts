@@ -6,3 +6,5 @@ export * from './Side';
 export * from './PromiseQueue';
 export * from './API';
 export * from './BaseObject';
+export * from './DeepCopy';
+export * from './DeepPatch';

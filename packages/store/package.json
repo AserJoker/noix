@@ -1,7 +1,7 @@
 {
   "name": "@noix/store",
   "version": "0.0.1",
-  "main": "src/index.ts",
+  "main": "dist/noix.store.lib.js",
   "typings": "dist/typings/index.d.ts",
   "scripts": {
     "build": "webpack",
