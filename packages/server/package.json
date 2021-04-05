@@ -1,0 +1,9 @@
+{
+    "name": "@noix/server",
+    "version": "0.0.1",
+    "main": "src/main.ts",
+    "dependencies": {
+        "@noix/core":"0.0.1",
+        "@noix/store":"0.0.1"
+    }
+}

@@ -1,12 +1,14 @@
 const path = require('path');
-const packageName = 'noix.demo-device';
+const packageName = 'noix.server';
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
   entry: path.resolve(__dirname, 'src/main.ts'),
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: `${packageName}.js`
+    publicPath: '/dist/',
+    libraryTarget: 'commonjs',
+    filename: `${packageName}.lib.js`
   },
   module: {
     rules: [
@@ -17,9 +19,6 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts'],
-    alias: {
-      '@src': path.resolve(__dirname, 'src')
-    }
+    extensions: ['.ts']
   }
 };

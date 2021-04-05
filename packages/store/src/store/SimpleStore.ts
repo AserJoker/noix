@@ -3,7 +3,7 @@ import { DeepCopy, DeepPatch } from '@noix/core';
 
 export class SimpleStore<T> extends BaseStore<T> {
   private _value: T | null = null;
-  public constructor(defaultValue: T | null, store?: IStoreValue<T>) {
+  public constructor(defaultValue: T | null = null, store?: IStoreValue<T>) {
     super(
       store || {
         get: () => this._value,
