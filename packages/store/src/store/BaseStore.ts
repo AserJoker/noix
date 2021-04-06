@@ -16,8 +16,54 @@ export class BaseStore<T = unknown> extends EventObject {
     this._store = store;
   }
 
+  private caches = new WeakMap();
+
   public get value() {
-    return this._store.get();
+    const ToProxy = <K, T extends Object | Array<K>>(
+      store: BaseStore<T>,
+      obj: T
+    ) => {
+      const proxy = new Proxy(obj, {
+        get: (target, name: string): unknown => {
+          const kvmap = target as Record<string, unknown>;
+          const raw = kvmap[name];
+          if (typeof raw === 'object' && raw) {
+            return (
+              (this.caches.get(raw as Object) as T) ||
+              ToProxy<K, T>(store, raw as T)
+            );
+          } else {
+            if (name === 'splice' && Array.isArray(target)) {
+              return (
+                ...args: [start: number, deleteCount: number, ...items: T[]]
+              ) => {
+                const backup: Array<K> = [];
+                backup.push(...target);
+                target[name].apply(backup, args);
+                store.value = backup as T;
+              };
+            }
+            return raw;
+          }
+        },
+        set: (target: T, name: string, value: unknown): boolean => {
+          const kvmap = target as Record<string, unknown>;
+          const backup: Record<string, unknown> = {};
+          Object.keys(kvmap).forEach((_name) => (backup[_name] = kvmap[_name]));
+          backup[name] = value;
+          store.value = backup as T;
+          return true;
+        }
+      });
+      this.caches.set(raw as Object, proxy);
+      return proxy;
+    };
+    const raw = this._store.get();
+    if (typeof raw === 'object' && raw) {
+      return (this.caches.get(raw as Object) as T) || ToProxy(this, raw);
+    } else {
+      return raw;
+    }
   }
 
   public set value(newValue: T | null) {
@@ -78,5 +124,9 @@ export class BaseStore<T = unknown> extends EventObject {
 
   public IsLocked() {
     return this._storeState === 'locked';
+  }
+
+  public get raw() {
+    return (this.value && (this.caches.get(this.value as Object) as T)) || null;
   }
 }

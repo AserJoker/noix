@@ -1,5 +1,5 @@
 import { BaseStore } from './BaseStore';
-import { ValueChangeEvent } from './event';
+import { ValueChangeEvent } from '../event';
 
 export class ChildStore<T, K extends Object> extends BaseStore<T> {
   public constructor(

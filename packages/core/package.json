@@ -1,7 +1,7 @@
 {
   "name": "@noix/core",
   "version": "0.0.1",
-  "main": "src/index.ts",
+  "main": "dist/noix.core.lib.js",
   "typings": "dist/typings/index.d.ts",
   "scripts": {
     "build": "webpack",
