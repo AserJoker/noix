@@ -26,10 +26,13 @@ export class ChildStore<T, K extends Object> extends BaseStore<T> {
         }
         const parentValue = parentStore.value as Record<string, unknown>;
         const oldRecord: Record<string, unknown> = {};
-        Object.keys(parentValue).forEach(
-          (key) => (oldRecord[key] = parentValue[key])
-        );
-        oldRecord[name] = newValue;
+        Object.keys(parentValue).forEach((key) => {
+          if (key !== name) {
+            oldRecord[key] = parentValue[key];
+          } else {
+            oldRecord[name] = newValue;
+          }
+        });
         parentStore.value = oldRecord as K;
       }
     });

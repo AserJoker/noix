@@ -17,14 +17,15 @@ export class DemoApplication extends PluginApplication {
 
   @EventListener(EVENT_INITIALIZATION)
   public OnInitialize() {
-    const list = new SimpleStore<Array<string>>();
-    const record = new ChildStore<string, Array<string>>(list, 0);
-    record.watch((a, b) => {
-      console.log(a, b);
-    });
-    list.value = [];
-    list.value!.unshift('aaa');
-    list.value!.splice(0);
+    const obj = new SimpleStore<{ user: { name: string } }>();
+    obj.value = { user: { name: 'aa' } };
+    const record = new ChildStore<{ name: string }, { user: { name: string } }>(
+      obj,
+      'user'
+    );
+    obj.watch((a, b) => console.log(a!.user, b!.user, 'object'));
+    record.watch((a, b) => console.log(a, b, 'record'));
+    obj.value = { user: { name: '333' } };
   }
 
   @EventListener(EVENT_POSTINITIALIZATION)

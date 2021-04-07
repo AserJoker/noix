@@ -28,10 +28,8 @@ export class BaseStore<T = unknown> extends EventObject {
           const kvmap = target as Record<string, unknown>;
           const raw = kvmap[name];
           if (typeof raw === 'object' && raw) {
-            return (
-              (this.caches.get(raw as Object) as T) ||
-              ToProxy<K, T>(store, raw as T)
-            );
+            const res = raw;
+            return res;
           } else {
             if (name === 'splice' && Array.isArray(target)) {
               return (
@@ -55,7 +53,6 @@ export class BaseStore<T = unknown> extends EventObject {
           return true;
         }
       });
-      this.caches.set(raw as Object, proxy);
       return proxy;
     };
     const raw = this._store.get();
