@@ -1,4 +1,5 @@
 const path = require('path');
+const { VueLoaderPlugin } = require('vue-loader');
 const packageName = 'noix.widget';
 module.exports = {
   mode: 'development',
@@ -15,10 +16,15 @@ module.exports = {
       {
         test: /\.ts$/,
         use: ['ts-loader']
+      },
+      {
+        test: /\.vue$/,
+        use: ['vue-loader']
       }
     ]
   },
   resolve: {
     extensions: ['.ts']
-  }
+  },
+  plugins: [new VueLoaderPlugin()]
 };

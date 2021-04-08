@@ -9,7 +9,8 @@
   "dependencies": {
     "@noix/core": "0.0.1",
     "@noix/client": "0.0.1",
-    "@noix/store":"0.0.1"
+    "@noix/store": "0.0.1",
+    "@noix/widget": "0.0.1"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1"

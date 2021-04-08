@@ -1,1 +1,1 @@
-export const widget = {};
+export * from './component';
