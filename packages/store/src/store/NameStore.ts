@@ -1,10 +1,10 @@
 import { BaseStore } from './BaseStore';
 import { ValueChangeEvent } from '../event';
 
-export class ChildStore<T, K extends Object> extends BaseStore<T> {
+export class NameStore<T, K extends Object> extends BaseStore<T> {
   public constructor(
     parentStore: BaseStore<K>,
-    name: string | number,
+    name: string,
     defaultValue: T | null = null
   ) {
     super({

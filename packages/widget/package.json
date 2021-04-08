@@ -1,14 +1,15 @@
 {
-  "name": "@noix/store",
+  "name": "@noix/widget",
   "version": "0.0.1",
-  "main": "dist/noix.store.lib.js",
+  "main": "dist/noix.widget.lib.js",
   "typings": "dist/typings/index.d.ts",
   "scripts": {
     "build": "webpack",
-    "api": "build-api noix.store"
+    "api": "build-api noix.widget"
   },
   "dependencies": {
-    "@noix/core": "^0.0.1"
+    "@noix/core": "^0.0.1",
+    "@noix/store": "^0.0.1"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1",
