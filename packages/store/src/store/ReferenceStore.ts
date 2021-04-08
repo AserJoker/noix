@@ -1,6 +1,8 @@
 import { BaseStore } from './BaseStore';
 import { ValueChangeEvent } from '../event';
+import { API } from '@noix/core';
 
+@API('store', 'ReferenceStore')
 export class ReferenceStore<T> extends BaseStore<T> {
   public constructor(sourceStore: BaseStore<T>) {
     super({

@@ -1,6 +1,7 @@
-import { BaseEvent } from '@noix/core';
+import { API, API_VALUE, BaseEvent } from '@noix/core';
 
 export const EVENT_VALUECHANGE = 'event.valueChange';
+@API('store', 'ValueChangeEvent')
 export class ValueChangeEvent extends BaseEvent {
   private _newValue: unknown;
   private _oldValue: unknown;
@@ -18,3 +19,4 @@ export class ValueChangeEvent extends BaseEvent {
     return this._newValue;
   }
 }
+API_VALUE('EVENT_VALUECHANGE', EVENT_VALUECHANGE);

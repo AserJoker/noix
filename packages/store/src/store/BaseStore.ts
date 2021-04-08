@@ -1,9 +1,11 @@
-import { EventObject } from '@noix/core';
+import { API, EventObject } from '@noix/core';
 import { EVENT_VALUECHANGE, ValueChangeEvent } from '../event';
 export interface IStoreValue<T> {
   get: () => T | null;
   set?: (newValue: T | null) => void;
 }
+
+@API('core', 'BaseStore')
 export class BaseStore<T = unknown> extends EventObject {
   protected watchers: { Release: () => void }[] = [];
 

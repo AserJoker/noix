@@ -1,6 +1,8 @@
+import { API } from '@noix/core';
 import { BaseStore } from './BaseStore';
 import { SimpleStore } from './SimpleStore';
 
+@API('core', 'BackupStore')
 export class BackupStore<T> extends SimpleStore<T> {
   private _sourceStore: BaseStore<T>;
   public constructor(sourceStore: BaseStore<T>) {

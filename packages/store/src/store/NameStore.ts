@@ -1,6 +1,8 @@
 import { BaseStore } from './BaseStore';
 import { ValueChangeEvent } from '../event';
+import { API } from '@noix/core';
 
+@API('core', 'NameStore')
 export class NameStore<T, K extends Object> extends BaseStore<T> {
   public constructor(
     parentStore: BaseStore<K>,
