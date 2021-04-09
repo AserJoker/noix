@@ -6,30 +6,17 @@ import {
   PluginApplication,
   Plugin
 } from '@noix/core';
-import { ChildStore, SimpleStore } from '@noix/store';
+import { Button } from '@noix/widget';
 const TOKEN_DEMOAPPLICATION = Symbol('demo.application');
 @Plugin(TOKEN_DEMOAPPLICATION)
 export class DemoApplication extends PluginApplication {
   @EventListener(EVENT_PREINITIALIZATION)
-  public OnPreInitialize() {
-    console.log('demo pre');
-  }
+  public OnPreInitialize() {}
 
   @EventListener(EVENT_INITIALIZATION)
-  public OnInitialize() {
-    const obj = new SimpleStore<{ user: { name: string } }>();
-    obj.value = { user: { name: 'aa' } };
-    const record = new ChildStore<{ name: string }, { user: { name: string } }>(
-      obj,
-      'user'
-    );
-    obj.watch((a, b) => console.log(a!.user, b!.user, 'object'));
-    record.watch((a, b) => console.log(a, b, 'record'));
-    obj.value = { user: { name: '333' } };
-  }
+  public OnInitialize() {}
 
   @EventListener(EVENT_POSTINITIALIZATION)
-  public OnPostInitialize() {
-    console.log('demo post');
-  }
+  public OnPostInitialize() {}
 }
+console.log(Button);
