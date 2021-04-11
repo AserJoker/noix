@@ -1,20 +1,24 @@
-import { ref } from '@vue/reactivity';
-import { BaseWidget, Component, Watch } from '../../base';
+import { Attribute, BaseWidget, Component, Prop, Watch } from '../../base';
 @Component
 export default class Button extends BaseWidget {
-  private value = ref(0);
-  private obj = ref({ num: 1 });
+  @Attribute({ reactive: true })
+  private get value() {
+    return this.obj.num;
+  }
 
-  @Watch('obj.num')
+  @Attribute({ reactive: true })
+  private obj = { num: 0 };
+
+  @Watch('obj', { handle: (obj) => obj.num })
   private onValueChange(newValue: number, oldValue: number) {
     console.log(newValue, oldValue);
   }
 
-  protected setup() {
-    return {
-      value: this.value,
-      click: () => this.obj.value.num++,
-      obj: this.obj
-    };
+  @Prop()
+  private text!: string;
+
+  @Attribute()
+  private click() {
+    this.obj.num++;
   }
 }
