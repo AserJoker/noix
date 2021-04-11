@@ -1,5 +1,5 @@
 import { GetMetadata, Metadata } from '@noix/core';
-import { isRef, ref, SetupContext, watch } from 'vue';
+import { isRef, ref, SetupContext, watch, computed } from 'vue';
 export interface IWatcher {
   path: string;
   name: string;
@@ -7,10 +7,12 @@ export interface IWatcher {
   immediate: boolean;
   handle?: (value: Record<string, unknown>) => unknown;
 }
-export interface IAttribute {
+export interface IAttribute<T = unknown> {
   name: string;
   displayName?: string;
   reactive?: boolean;
+  get?: () => T;
+  set?: (newValue: T) => void;
 }
 export class BaseWidget {
   private static _instance: BaseWidget;
@@ -23,12 +25,26 @@ export class BaseWidget {
     attributes.forEach((attr) => {
       const raw = Reflect.get(this._instance, attr.name) as unknown;
       if (attr.reactive) {
-        const refValue = ref(raw);
-        Object.defineProperty(this._instance, attr.name, {
-          get: () => refValue.value,
-          set: (newValue) => (refValue.value = newValue)
-        });
-        Reflect.set(res, attr.name, refValue);
+        if (!attr.get) {
+          const refValue = ref(raw);
+          Object.defineProperty(this._instance, attr.name, {
+            get: () => refValue.value,
+            set: (newValue) => (refValue.value = newValue)
+          });
+          Reflect.set(res, attr.name, refValue);
+        } else {
+          const computedValue = attr.set
+            ? computed({
+                get: () => attr.get!.apply(this._instance),
+                set: (newValue) => attr.set!.call(this._instance, newValue)
+              })
+            : computed(() => attr.get!.apply(this._instance));
+          Object.defineProperty(this._instance, attr.name, {
+            get: () => computedValue.value,
+            set: (newValue) => (computedValue.value = newValue)
+          });
+          Reflect.set(res, attr.name, computedValue);
+        }
       } else {
         if (typeof raw === 'function') {
           Reflect.set(res, attr.name, (...args: unknown[]) =>
@@ -141,7 +157,11 @@ export class BaseWidget {
   public static Attribute(
     opt: { reactive?: boolean; displayName?: string } = {}
   ) {
-    return <T extends BaseWidget>(target: T, name: string) => {
+    return <T extends BaseWidget, K>(
+      target: T,
+      name: string,
+      descriptor?: TypedPropertyDescriptor<K>
+    ) => {
       const attributes =
         (GetMetadata(
           target.constructor as typeof BaseWidget,
@@ -152,8 +172,10 @@ export class BaseWidget {
         attributes.push({
           name,
           displayName: opt.displayName || name,
-          reactive: opt.reactive || false
-        });
+          reactive: opt.reactive || false,
+          get: descriptor?.get,
+          set: descriptor?.set
+        } as IAttribute<unknown>);
       }
       return Metadata(
         'attributes',
