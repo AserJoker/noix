@@ -1,5 +1,5 @@
 import { Attribute, BaseWidget, Component, Prop, Watch } from '../../base';
-@Component
+@Component()
 export default class Button extends BaseWidget {
   @Attribute({ reactive: true })
   private get value() {
@@ -21,4 +21,6 @@ export default class Button extends BaseWidget {
   private click() {
     this.obj.num++;
   }
+
+  // protected static render = comp.render;
 }

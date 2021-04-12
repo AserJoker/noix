@@ -1,4 +1,10 @@
 <template>
-  <button @click="click">{{ value }}</button>
+  <button class="n-button" @click="click">{{ value }}</button>
 </template>
-<script lang="ts" src="./button.ts" />
+<style>
+.n-button {
+  background: #fff;
+  margin: 0;
+}
+</style>
+<script lang="ts" src="./button.ts"></script>

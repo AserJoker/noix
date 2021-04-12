@@ -16,6 +16,8 @@
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1",
     "build-api": "^0.0.1",
-    "vue-loader": "^16.2.0"
+    "vue-loader": "^16.2.0",
+    "css-loader": "^5.2.1",
+    "vue-style-loader": "^4.1.3"
   }
 }

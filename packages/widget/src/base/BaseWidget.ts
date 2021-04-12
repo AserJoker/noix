@@ -1,5 +1,14 @@
 import { GetMetadata, Metadata } from '@noix/core';
-import { isRef, ref, SetupContext, watch, computed } from 'vue';
+import {
+  isRef,
+  ref,
+  SetupContext,
+  watch,
+  computed,
+  DefineComponent,
+  onMounted,
+  VNode
+} from 'vue';
 export interface IWatcher {
   path: string;
   name: string;
@@ -14,12 +23,17 @@ export interface IAttribute<T = unknown> {
   get?: () => T;
   set?: (newValue: T) => void;
 }
+
+export interface INameMap {
+  displayName: string;
+  name: string;
+}
 export class BaseWidget {
   private static _instance: BaseWidget;
   public constructor() {}
 
   private static setup(props: Record<string, unknown>, ctx: SetupContext) {
-    const res = {};
+    const res: Record<string, unknown> = {};
     const attributes =
       (GetMetadata(this, undefined, 'attributes') as IAttribute[]) || [];
     attributes.forEach((attr) => {
@@ -81,6 +95,14 @@ export class BaseWidget {
         get: () => props[name]
       });
     });
+    this.refs.forEach((_ref) => {
+      const $ref = ref();
+      Object.defineProperty(this._instance, _ref.name, {
+        get: () => $ref.value
+      });
+      res[_ref.displayName] = $ref;
+    });
+    onMounted(() => this._instance.mounted());
     return res;
   }
 
@@ -88,7 +110,11 @@ export class BaseWidget {
 
   private static wachers: IWatcher[] = [];
 
-  public static Component<T extends typeof BaseWidget>(Widget: T) {
+  public static Component = (
+    options: {
+      components?: Record<string, DefineComponent>;
+    } = {}
+  ) => <T extends typeof BaseWidget>(Widget: T) => {
     Widget._instance = new Widget();
     const oldProps = Widget.props;
     const newProps = GetMetadata(Widget, undefined, 'props') as string[];
@@ -104,12 +130,19 @@ export class BaseWidget {
       newWachers.forEach(
         (w) => !Widget.wachers.includes(w) && Widget.wachers.push(w)
       );
+    Widget.refs = (GetMetadata(Widget, undefined, 'refs') as INameMap[]) || [];
     return {
       ...Widget,
       setup: (props: Record<string, unknown>, ctx: SetupContext) =>
-        Widget.setup(props, ctx)
+        Widget.setup(props, ctx),
+      components: options.components || {},
+      render: Widget.render
     };
-  }
+  };
+
+  private static refs: INameMap[] = [];
+
+  protected static render: (slotScopes: unknown[]) => VNode;
 
   public static Prop = (opt = {}) => <T extends BaseWidget>(
     target: T,
@@ -183,8 +216,44 @@ export class BaseWidget {
       )(target.constructor as typeof BaseWidget);
     };
   }
+
+  public static Ref(refName?: string) {
+    return <T extends BaseWidget>(target: T, name: string) => {
+      const refs =
+        (GetMetadata(
+          target.constructor as typeof BaseWidget,
+          undefined,
+          'refs'
+        ) as INameMap[]) || [];
+      if (!refs.find((ref) => ref.name === name)) {
+        refs.push({
+          name,
+          displayName: refName || name
+        } as INameMap);
+      }
+      return Metadata('refs', refs)(target.constructor as typeof BaseWidget);
+    };
+  }
+
+  public static Provide = (displayName?: string) => <T extends BaseWidget>(
+    target: T,
+    name: string
+  ) => {};
+
+  public static Inject = (displayName?: string) => <T extends BaseWidget>(
+    target: T,
+    name: string
+  ) => {};
+
+  public static Emit = (displayName?: string) => <T extends BaseWidget>(
+    target: T,
+    name: string
+  ) => {};
+
+  protected mounted(): void | Promise<void> {}
 }
 export const Component = BaseWidget.Component;
 export const Prop = BaseWidget.Prop;
 export const Watch = BaseWidget.Watch;
 export const Attribute = BaseWidget.Attribute;
+export const Ref = BaseWidget.Ref;

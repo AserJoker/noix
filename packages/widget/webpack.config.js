@@ -20,11 +20,15 @@ module.exports = {
       {
         test: /\.vue$/,
         use: ['vue-loader']
+      },
+      {
+        test: /\.css$/,
+        use: ['vue-style-loader', 'css-loader']
       }
     ]
   },
   resolve: {
-    extensions: ['.ts']
+    extensions: ['.ts', '.js']
   },
   plugins: [new VueLoaderPlugin()]
 };
