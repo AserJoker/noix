@@ -1,5 +1,14 @@
 #!/usr/bin/env node
 const path = require('path');
+const { JSDOM } = require('jsdom');
+const jsdom = new JSDOM();
+global.window = jsdom.window;
+Object.keys(jsdom.window).forEach((name) => {
+  if (name !== 'localStorage' && name !== 'sessionStorage') {
+    global[name] = jsdom.window[name];
+  }
+});
+global.localStorage = {};
 if (process.argv[2]) {
   const packageName = process.argv[2];
   const package = require(path.resolve(
@@ -25,6 +34,10 @@ if (process.argv[2]) {
     path.resolve(process.cwd(), './dist/' + packageName + '.api.js'),
     `let _$ = window?window.QueryInterface:global.QueryInterface;
 ${functions
+  .filter((fun) => {
+    const apiName = package.GetMetadata(fun, undefined, 'API');
+    return String(apiName).startsWith('api.' + process.argv[3]);
+  })
   .map((fun) => {
     const apiName = package.GetMetadata(fun, undefined, 'API').split('.');
     return `export const ${apiName[apiName.length - 1]}=_$('${apiName.join(
@@ -33,7 +46,11 @@ ${functions
   })
   .join('\n')}
 ${Object.keys(values)
-  .map((name) => `export const ${name} = ${formatValue(values[name])}`)
+  .filter((name) => name.startsWith(process.argv[3]))
+  .map(
+    (name) =>
+      `export const ${name.split('.')[1]} = ${formatValue(values[name])}`
+  )
   .join('\n')}
 `
   );

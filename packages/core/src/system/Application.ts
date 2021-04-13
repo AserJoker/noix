@@ -14,4 +14,4 @@ export const Bootstrap = <T extends typeof Application>(ClassObject: T) => {
 };
 
 let _instance: Application | null = null;
-API_VALUE('TOKEN_APPLICATION', TOKEN_APPLICATION);
+API_VALUE('core', 'TOKEN_APPLICATION', TOKEN_APPLICATION);

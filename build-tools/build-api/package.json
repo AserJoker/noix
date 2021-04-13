@@ -3,5 +3,8 @@
   "version": "0.0.1",
   "bin": {
     "build-api": "./api.js"
+  },
+  "devDependencies": {
+    "jsdom": "^16.5.3"
   }
 }

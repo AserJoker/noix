@@ -8,4 +8,4 @@ export class InitializationEvent extends BaseEvent {
     super(EVENT_INITIALIZATION, target);
   }
 }
-API_VALUE('EVENT_INITIALIZATION', EVENT_INITIALIZATION);
+API_VALUE('core', 'EVENT_INITIALIZATION', EVENT_INITIALIZATION);

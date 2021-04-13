@@ -19,4 +19,4 @@ export class ValueChangeEvent extends BaseEvent {
     return this._newValue;
   }
 }
-API_VALUE('EVENT_VALUECHANGE', EVENT_VALUECHANGE);
+API_VALUE('store', 'EVENT_VALUECHANGE', EVENT_VALUECHANGE);

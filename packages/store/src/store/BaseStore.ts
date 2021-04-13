@@ -5,7 +5,7 @@ export interface IStoreValue<T> {
   set?: (newValue: T | null) => void;
 }
 
-@API('core', 'BaseStore')
+@API('store', 'BaseStore')
 export class BaseStore<T = unknown> extends EventObject {
   protected watchers: { Release: () => void }[] = [];
 

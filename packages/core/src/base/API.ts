@@ -22,8 +22,12 @@ export const API = (packageName: string, interfaceName?: string) => <
       target.prototype.constructor.name
   )(target);
 };
-export const API_VALUE = (name: string, value: unknown) => {
-  APIValues[name] = value;
+export const API_VALUE = (
+  packageName: string,
+  name: string,
+  value: unknown
+) => {
+  APIValues[packageName + '.' + name] = value;
 };
 export const GET_API_VALUES = () => APIValues;
 API('core', 'Metadata')(Metadata);

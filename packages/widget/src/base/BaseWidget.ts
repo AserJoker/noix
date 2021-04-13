@@ -1,4 +1,4 @@
-import { GetMetadata, Metadata } from '@noix/core';
+import { API, GetMetadata, Metadata } from '@noix/core';
 import {
   isRef,
   ref,
@@ -30,6 +30,7 @@ export interface INameMap {
   name: string;
 }
 
+@API('widget', 'BaseWidget')
 export class BaseWidget {
   private static _instance: BaseWidget;
   public constructor() {}
@@ -339,3 +340,11 @@ export const Ref = BaseWidget.Ref;
 export const Emit = BaseWidget.Emit;
 export const Provide = BaseWidget.Provide;
 export const Inject = BaseWidget.Inject;
+API('widget', 'Component')(Component);
+API('widget', 'Prop')(Prop);
+API('widget', 'Watch')(Watch);
+API('widget', 'Attribute')(Attribute);
+API('widget', 'Ref')(Ref);
+API('widget', 'Emit')(Emit);
+API('widget', 'Provide')(Provide);
+API('widget', 'Inject')(Inject);
