@@ -7,9 +7,7 @@ import {
 import { Application } from './Application';
 
 export class SystemApplication extends Application {
-  protected async LoadPlugins() {}
   public async main(): Promise<void> {
-    await this.LoadPlugins();
     await PromiseQueue(
       Application.EVENT_BUS.Trigger(new PreInitializationEvent(this))
     );

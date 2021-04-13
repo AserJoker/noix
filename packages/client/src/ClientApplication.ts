@@ -7,13 +7,8 @@ import {
   EVENT_POSTINITIALIZATION
 } from '@noix/core';
 import '@noix/widget';
-import { LoadClientPlugins } from './Plugin';
 @Bootstrap
 export class ClientApplication extends SystemApplication {
-  protected async LoadPlugins() {
-    return LoadClientPlugins();
-  }
-
   public async main() {
     super.main();
   }
