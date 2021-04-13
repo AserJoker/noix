@@ -8,7 +8,6 @@ Object.keys(jsdom.window).forEach((name) => {
     global[name] = jsdom.window[name];
   }
 });
-global.localStorage = {};
 if (process.argv[2]) {
   const packageName = process.argv[2];
   const package = require(path.resolve(
