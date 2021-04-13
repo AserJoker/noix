@@ -7,7 +7,8 @@ import {
   computed,
   DefineComponent,
   onMounted,
-  VNode
+  VNode,
+  defineComponent
 } from 'vue';
 export interface IWatcher {
   path: string;
@@ -28,6 +29,13 @@ export interface INameMap {
   displayName: string;
   name: string;
 }
+
+class Base {
+  public static setup() {
+    return {};
+  }
+}
+defineComponent({ ...Base });
 export class BaseWidget {
   private static _instance: BaseWidget;
   public constructor() {}
