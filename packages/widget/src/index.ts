@@ -1,6 +1,4 @@
-import { createApp, defineComponent, h } from 'vue';
-import { Button } from './component';
+import { createApp } from 'vue';
+import Root from './component/root.vue';
 export * from './component';
-createApp({
-  render: () => h(defineComponent(Button as any), { text: 'hello world' })
-}).mount(document.body);
+createApp(Root).mount(document.body);

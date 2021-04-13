@@ -7,8 +7,8 @@ import {
   computed,
   DefineComponent,
   onMounted,
-  VNode,
-  defineComponent
+  inject,
+  provide
 } from 'vue';
 export interface IWatcher {
   path: string;
@@ -30,18 +30,25 @@ export interface INameMap {
   name: string;
 }
 
-class Base {
-  public static setup() {
-    return {};
-  }
-}
-defineComponent({ ...Base });
 export class BaseWidget {
   private static _instance: BaseWidget;
   public constructor() {}
 
   private static setup(props: Record<string, unknown>, ctx: SetupContext) {
     const res: Record<string, unknown> = {};
+    this.injections.forEach((injection) => {
+      const $inject = inject(injection.displayName);
+      Object.defineProperty(this._instance, injection.name, {
+        get: () => (isRef($inject) ? $inject.value : $inject)
+      });
+    });
+    this.emits.forEach((emit) => {
+      const handle = Reflect.get(this._instance, emit.name) as Function;
+      Reflect.set(this._instance, emit.name, (...args: unknown[]) => {
+        handle.apply(this._instance, args);
+        ctx.emit.apply(null, [emit.displayName, ...args]);
+      });
+    });
     const attributes =
       (GetMetadata(this, undefined, 'attributes') as IAttribute[]) || [];
     attributes.forEach((attr) => {
@@ -110,6 +117,13 @@ export class BaseWidget {
       });
       res[_ref.displayName] = $ref;
     });
+    this.providers.forEach((provider) => {
+      provide(
+        provider.displayName,
+        Reflect.get(res, provider.name) ||
+          Reflect.get(this._instance, provider.name)
+      );
+    });
     onMounted(() => this._instance.mounted());
     return res;
   }
@@ -118,9 +132,17 @@ export class BaseWidget {
 
   private static wachers: IWatcher[] = [];
 
+  private static refs: INameMap[] = [];
+
+  private static emits: INameMap[] = [];
+
+  private static injections: INameMap[] = [];
+
+  private static providers: INameMap[] = [];
+
   public static Component = (
     options: {
-      components?: Record<string, DefineComponent>;
+      components?: Record<string, DefineComponent | typeof BaseWidget>;
     } = {}
   ) => <T extends typeof BaseWidget>(Widget: T) => {
     Widget._instance = new Widget();
@@ -139,18 +161,19 @@ export class BaseWidget {
         (w) => !Widget.wachers.includes(w) && Widget.wachers.push(w)
       );
     Widget.refs = (GetMetadata(Widget, undefined, 'refs') as INameMap[]) || [];
+    Widget.providers =
+      (GetMetadata(Widget, undefined, 'providers') as INameMap[]) || [];
+    Widget.injections =
+      (GetMetadata(Widget, undefined, 'injections') as INameMap[]) || [];
+    Widget.emits =
+      (GetMetadata(Widget, undefined, 'emits') as INameMap[]) || [];
     return {
       ...Widget,
       setup: (props: Record<string, unknown>, ctx: SetupContext) =>
         Widget.setup(props, ctx),
-      components: options.components || {},
-      render: Widget.render
+      components: (options.components as Record<string, DefineComponent>) || {}
     };
   };
-
-  private static refs: INameMap[] = [];
-
-  protected static render: (slotScopes: unknown[]) => VNode;
 
   public static Prop = (opt = {}) => <T extends BaseWidget>(
     target: T,
@@ -246,17 +269,65 @@ export class BaseWidget {
   public static Provide = (displayName?: string) => <T extends BaseWidget>(
     target: T,
     name: string
-  ) => {};
+  ) => {
+    const providers =
+      (GetMetadata(
+        target.constructor as typeof BaseWidget,
+        undefined,
+        'providers'
+      ) as INameMap[]) || [];
+    if (!providers.find((provider) => provider.name === name)) {
+      providers.push({
+        name,
+        displayName: displayName || name
+      } as INameMap);
+    }
+    return Metadata(
+      'providers',
+      providers
+    )(target.constructor as typeof BaseWidget);
+  };
 
   public static Inject = (displayName?: string) => <T extends BaseWidget>(
     target: T,
     name: string
-  ) => {};
+  ) => {
+    const injections =
+      (GetMetadata(
+        target.constructor as typeof BaseWidget,
+        undefined,
+        'injections'
+      ) as INameMap[]) || [];
+    if (!injections.find((injection) => injection.name === name)) {
+      injections.push({
+        name,
+        displayName: displayName || name
+      } as INameMap);
+    }
+    return Metadata(
+      'injections',
+      injections
+    )(target.constructor as typeof BaseWidget);
+  };
 
-  public static Emit = (displayName?: string) => <T extends BaseWidget>(
+  public static Emit = (event: string) => <T extends BaseWidget>(
     target: T,
     name: string
-  ) => {};
+  ) => {
+    const emits =
+      (GetMetadata(
+        target.constructor as typeof BaseWidget,
+        undefined,
+        'emits'
+      ) as INameMap[]) || [];
+    if (!emits.find((emit) => emit.name === name)) {
+      emits.push({
+        name,
+        displayName: event
+      } as INameMap);
+    }
+    return Metadata('emits', emits)(target.constructor as typeof BaseWidget);
+  };
 
   protected mounted(): void | Promise<void> {}
 }
@@ -265,3 +336,6 @@ export const Prop = BaseWidget.Prop;
 export const Watch = BaseWidget.Watch;
 export const Attribute = BaseWidget.Attribute;
 export const Ref = BaseWidget.Ref;
+export const Emit = BaseWidget.Emit;
+export const Provide = BaseWidget.Provide;
+export const Inject = BaseWidget.Inject;

@@ -1,5 +1,5 @@
 <template>
-  <button class="n-button" @click="click">{{ value }}</button>
+  <button class="n-button" @click="onClick">{{ value }}</button>
 </template>
 <style scoped>
 .n-button {
@@ -8,28 +8,27 @@
 }
 </style>
 <script lang="ts">
-import { Attribute, BaseWidget, Component, Prop, Watch } from '../../base';
+import {
+  Attribute,
+  BaseWidget,
+  Component,
+  Prop,
+  Watch,
+  Emit,
+  Inject
+} from '../../base';
 @Component()
 export default class Button extends BaseWidget {
   @Attribute({ reactive: true })
   private get value() {
-    return this.obj.num;
+    return this.text + '';
   }
 
-  @Attribute({ reactive: true })
-  private obj = { num: 0 };
+  @Inject()
+  private text!: number;
 
-  @Watch('obj', { handle: (obj) => obj.num })
-  private onValueChange(newValue: number, oldValue: number) {
-    console.log(newValue, oldValue);
-  }
-
-  @Prop()
-  private text!: string;
-
+  @Emit('buttonClick')
   @Attribute()
-  private click() {
-    this.obj.num++;
-  }
+  private onClick() {}
 }
 </script>
