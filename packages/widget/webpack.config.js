@@ -1,6 +1,5 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const packageName = 'noix.widget';
 module.exports = {
   mode: 'development',
@@ -28,22 +27,12 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          process.env.NODE_ENV !== 'production'
-            ? 'vue-style-loader'
-            : MiniCssExtractPlugin.loader,
-          'css-loader'
-        ]
+        use: ['vue-style-loader', 'css-loader']
       }
     ]
   },
   resolve: {
     extensions: ['.ts', '.js', '.vue']
   },
-  plugins: [
-    new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({
-      filename: `${packageName}.css`
-    })
-  ]
+  plugins: [new VueLoaderPlugin()]
 };
