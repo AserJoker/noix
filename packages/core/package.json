@@ -4,11 +4,9 @@
   "main": "dist/noix.core.lib.js",
   "typings": "dist/typings/index.d.ts",
   "scripts": {
-    "build": "webpack",
-    "api": "build-api noix.store store"
+    "build": "webpack"
   },
   "devDependencies": {
-    "ts-ignore-decorator": "^0.0.1",
-    "build-api": "^0.0.1"
+    "ts-ignore-decorator": "^0.0.1"
   }
 }
