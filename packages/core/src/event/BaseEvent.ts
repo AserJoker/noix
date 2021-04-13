@@ -1,6 +1,3 @@
-import { API } from '../base';
-
-@API('core', 'BaseEvent')
 export class BaseEvent {
   private _type: string | Symbol;
 

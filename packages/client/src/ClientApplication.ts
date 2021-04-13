@@ -6,6 +6,7 @@ import {
   EVENT_INITIALIZATION,
   EVENT_POSTINITIALIZATION
 } from '@noix/core';
+import '@noix/widget';
 import { LoadClientPlugins } from './Plugin';
 @Bootstrap
 export class ClientApplication extends SystemApplication {

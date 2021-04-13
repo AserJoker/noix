@@ -1,5 +1,3 @@
-import { API } from './API';
-
 interface ICopyCache<T> {
   originObject: T;
   copyObject: T;
@@ -33,4 +31,3 @@ export const DeepCopy = <T>(originObject: T) => {
   const result = _DeepCopy(originObject, caches);
   return result;
 };
-API('core', 'DeepCopy')(DeepCopy);

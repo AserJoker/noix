@@ -1,7 +1,6 @@
-import { API, BaseObject } from '../base';
+import { BaseObject } from '../base';
 import { EventBus, ReleaseCallback } from './EventBus';
 
-@API('core', 'EventObject')
 export class EventObject extends BaseObject {
   protected static EVENT_BUS = new EventBus();
   private static _listeners: {
@@ -62,4 +61,3 @@ export class EventObject extends BaseObject {
   }
 }
 export const EventListener = EventObject.EventListener;
-API('core', 'EventListener')(EventListener);

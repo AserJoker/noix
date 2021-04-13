@@ -3,13 +3,12 @@ import {
   EVENT_PREINITIALIZATION,
   EVENT_INITIALIZATION,
   EVENT_POSTINITIALIZATION,
-  PluginApplication,
-  Plugin
+  Bootstrap,
+  SystemApplication
 } from '@noix/core';
 import { Button } from '@noix/widget';
-const TOKEN_DEMOAPPLICATION = Symbol('demo.application');
-@Plugin(TOKEN_DEMOAPPLICATION)
-export class DemoApplication extends PluginApplication {
+@Bootstrap
+export class DemoApplication extends SystemApplication {
   @EventListener(EVENT_PREINITIALIZATION)
   public OnPreInitialize() {}
 

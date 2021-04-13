@@ -1,7 +1,6 @@
 import { BaseStore, IStoreValue } from './BaseStore';
-import { API, DeepCopy, DeepPatch } from '@noix/core';
+import { DeepCopy, DeepPatch } from '@noix/core';
 
-@API('store', 'SimpleStore')
 export class SimpleStore<T> extends BaseStore<T> {
   private _value: T | null = null;
   public constructor(defaultValue: T | null = null, store?: IStoreValue<T>) {

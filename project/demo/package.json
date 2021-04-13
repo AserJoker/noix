@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "dist/noix.demo.js",
   "scripts": {
-    "start": "noix-client",
+    "start": "webpack-dev-server",
     "build": "webpack"
   },
   "dependencies": {

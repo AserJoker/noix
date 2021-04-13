@@ -1,9 +1,8 @@
-import { API, API_VALUE, GetInstance, Provide } from '../base';
+import { GetInstance, Provide } from '../base';
 import { EventObject } from '../event';
 
 export const TOKEN_APPLICATION = 'base.application';
 
-@API('core', 'Application')
 export abstract class Application extends EventObject {
   public abstract main(): void | Promise<void>;
 }
@@ -14,4 +13,3 @@ export const Bootstrap = <T extends typeof Application>(ClassObject: T) => {
 };
 
 let _instance: Application | null = null;
-API_VALUE('core', 'TOKEN_APPLICATION', TOKEN_APPLICATION);

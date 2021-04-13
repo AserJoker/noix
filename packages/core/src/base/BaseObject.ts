@@ -1,6 +1,3 @@
-import { API } from './API';
-
-@API('core', 'BaseObject')
 export class BaseObject {
   private _state: 'released' | 'ready' = 'ready';
 

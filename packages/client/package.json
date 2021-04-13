@@ -6,7 +6,8 @@
     "noix-client": "./noix-client.js"
   },
   "dependencies": {
-    "@noix/core": "0.0.1"
+    "@noix/core": "0.0.1",
+    "@noix/widget": "0.0.1"
   },
   "scripts": {
     "build": "webpack",
