@@ -1,5 +1,5 @@
 const path = require('path');
-const packageName = 'noix.demo-plugin';
+const packageName = 'noix.demo.client';
 const clientWebpack = require('@noix/client/webpack.config');
 module.exports = {
   ...clientWebpack,
