@@ -8,7 +8,8 @@
     "lerna:build": "lerna exec npm run build --scope",
     "lerna:start": "lerna exec npm run start --scope",
     "lerna:api": "lerna exec npm run api --scope",
-    "build-tools": "npm run lerna:build ts-ignore-decorator"
+    "build-tools": "npm run lerna:build ts-ignore-decorator",
+    "clean": "lerna clean -y&&lerna run clean"
   },
   "author": "",
   "license": "MIT",
@@ -25,7 +26,8 @@
     "ts-loader": "^8.0.17",
     "webpack": "^5.25.1",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "typescript": "^4.2.3"

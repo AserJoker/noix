@@ -7,6 +7,7 @@
     "@noix/widget": "0.0.1"
   },
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "clean": "rimraf  dist"
   }
 }

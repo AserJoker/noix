@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "start": "node dist/noix.server.bin.js"
+    "start": "node dist/noix.server.bin.js",
+    "clean": "rimraf  dist"
   }
 }

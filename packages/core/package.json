@@ -4,7 +4,8 @@
   "main": "dist/noix.core.lib.js",
   "typings": "dist/typings/index.d.ts",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "clean": "rimraf  dist"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1"
