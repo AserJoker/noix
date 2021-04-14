@@ -8,7 +8,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
     libraryTarget: 'commonjs',
-    filename: `${packageName}.lib.js`
+    filename: `${packageName}.bin.js`
   },
   module: {
     rules: [
@@ -19,6 +19,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts']
-  }
+    extensions: ['.ts', '.js']
+  },
+  target: 'node'
 };
