@@ -1,0 +1,4 @@
+<class name="user">
+    <field name="name" type="string"/>
+    <field name="password" type="string" />
+</class>
