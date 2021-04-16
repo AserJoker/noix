@@ -1,0 +1,12 @@
+{
+  "name": "@noix/engine",
+  "version": "0.0.1",
+  "dependencies": {
+    "@noix/core": "0.0.1"
+  },
+  "scripts": {
+    "build": "webpack"
+  },
+  "main": "dist/noix.engine.lib.js",
+  "typings": "dist/typings/index.d.ts"
+}

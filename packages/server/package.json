@@ -1,10 +1,12 @@
 {
   "name": "@noix/server",
   "version": "0.0.1",
-  "main": "src/main.ts",
+  "main": "dist/ServerApplication.js",
   "dependencies": {
     "@noix/core": "0.0.1",
     "@noix/store": "0.0.1",
+    "@noix/http": "0.0.1",
+    "@noix/engine": "0.0.1",
     "commander": "^7.2.0"
   },
   "devDependencies": {
@@ -15,7 +17,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "nodemon -e ts,tsx --exec ts-node ./src/main.ts",
+    "start": "nodemon -e ts,tsx --exec ts-node ./src/ServerApplication.ts",
     "clean": "rimraf  dist"
   }
 }
