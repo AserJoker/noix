@@ -45,6 +45,7 @@ export class ServerApplication extends SystemApplication {
     baseModule.responseHandles = {};
     const classes = BaseModel.GetAllDataModeles();
     classes.forEach((name) => {
+      console.log('INFO [@noix/server] load model ' + name);
       const DataModel = BaseModel.GetDataModel(name);
       baseModule.responseHandles![name] = async (req, res) => {
         const queryBody = req.query;
@@ -83,6 +84,17 @@ export class ServerApplication extends SystemApplication {
             reject(error);
           }
         });
+        await next();
+      },
+      async (ctx, next) => {
+        console.log(
+          'INFO [@noix/server]: ' +
+            ctx.request.method +
+            ' ' +
+            ctx.request.path +
+            ' with IP:' +
+            ctx.request.ip
+        );
         await next();
       }
     ];
