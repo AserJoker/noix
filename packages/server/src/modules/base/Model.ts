@@ -16,15 +16,21 @@ export class Model extends StoreModel {
   })
   public fields: Field[] = [];
 
-  public static async query(record: BaseModel): Promise<BaseModel> {
+  public static async query(record: BaseModel): Promise<BaseModel | null> {
     const model = record as Model;
     const res = new Model();
     res.name = model.name;
     res.module = model.module;
     const dataModel = BaseModel.GetDataModel(res.module, res.name)!;
+    if (!dataModel) {
+      return null;
+    }
     res.fields = BaseModel.GetFields(dataModel).map((field) => {
       const f = new Field();
       f.name = field.name;
+      f.model = dataModel.GetModelName();
+      f.array = field.array || false;
+      f.ref = field.ref || false;
       const _type = field.type;
       if (typeof _type === 'string') {
         f.type = _type;

@@ -109,7 +109,8 @@ export class BaseModel extends EventObject {
         index,
         array: info.array || false,
         name: info.name,
-        type: info.type
+        type: info.type,
+        ref: info.ref || false
       });
       funs.set(name, params);
       BaseModel._params.set(target, funs);

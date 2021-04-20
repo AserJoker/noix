@@ -1,7 +1,7 @@
-import { BaseModel, StoreModel } from '@noix/engine';
+import { BaseModel } from '@noix/engine';
 
 @BaseModel.DataModel({ module: 'base', name: 'Field' })
-export class Field extends StoreModel {
+export class Field extends BaseModel {
   @BaseModel.DataField({ type: 'string' })
   public name = '';
 
@@ -10,4 +10,10 @@ export class Field extends StoreModel {
 
   @BaseModel.DataField({ type: 'string' })
   public model = '';
+
+  @BaseModel.DataField({ type: 'boolean' })
+  public array = false;
+
+  @BaseModel.DataField({ type: 'boolean' })
+  public ref = true;
 }
