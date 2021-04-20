@@ -9,11 +9,11 @@ export class Field extends BaseModel {
   public type = '';
 
   @BaseModel.DataField({ type: 'string' })
-  public model = '';
+  public model: string = '';
 
   @BaseModel.DataField({ type: 'boolean' })
   public array = false;
 
-  @BaseModel.DataField({ type: 'boolean' })
-  public ref = true;
+  @BaseModel.DataField({ type: 'string' })
+  public ref: string | null = '';
 }

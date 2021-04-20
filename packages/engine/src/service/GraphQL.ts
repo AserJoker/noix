@@ -60,7 +60,7 @@ export class GraphQL {
   }
 
   private static ResolveType(
-    type: string | ITemplateType,
+    type: string | ITemplateType | typeof BaseModel,
     ClassObject: typeof BaseModel,
     input: boolean = false
   ) {
@@ -68,23 +68,19 @@ export class GraphQL {
       if (type === 'this') {
         return (input ? 'Input' : '') + ClassObject.GetModelName();
       }
-      const _type = type.charAt(0).toUpperCase() + type.slice(1);
-      if (
-        _type === 'String' ||
-        _type === 'Boolean' ||
-        _type === 'Float' ||
-        _type === 'Int'
-      ) {
-        return _type;
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+    if (typeof type === 'function') {
+      return (input ? 'Input' : '') + type.GetModelName();
+    }
+    if (typeof type === 'object') {
+      const types = this.templateType.get(ClassObject) || [];
+      if (!types.find((t) => t.name === type.name)) {
+        types.push(type);
       }
-      return (input ? 'Input' : '') + _type;
+      this.templateType.set(ClassObject, types);
+      return (input ? 'Input' : '') + ClassObject.GetModelName() + type.name;
     }
-    const types = this.templateType.get(ClassObject) || [];
-    if (!types.find((t) => t.name === type.name)) {
-      types.push(type);
-    }
-    this.templateType.set(ClassObject, types);
-    return (input ? 'Input' : '') + ClassObject.GetModelName() + type.name;
   }
 
   private static FlatTemplateType(ClassObject: typeof BaseModel) {

@@ -10,9 +10,10 @@ export class Model extends StoreModel {
   public module = '';
 
   @BaseModel.DataField({
-    type: Field.GetModelName(),
+    type: Field,
     name: 'fields',
-    array: true
+    array: true,
+    ref: 'model'
   })
   public fields: Field[] = [];
 
@@ -30,12 +31,16 @@ export class Model extends StoreModel {
       f.name = field.name;
       f.model = dataModel.GetModelName();
       f.array = field.array || false;
-      f.ref = field.ref || false;
+      f.ref = field.ref || null;
       const _type = field.type;
       if (typeof _type === 'string') {
         f.type = _type;
       } else {
-        f.type = dataModel.GetModelName() + _type.name;
+        if (typeof _type === 'object') {
+          f.type = dataModel.GetModelName() + _type.name;
+        } else {
+          f.type = _type.GetModelName();
+        }
       }
       return f;
     });

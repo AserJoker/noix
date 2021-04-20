@@ -1,9 +1,17 @@
+import { BaseModel } from '../base';
 import { ITemplateType } from './ITemplateType';
 
 export interface IDataField {
   name: string;
-  type: string | ITemplateType;
+  type:
+    | 'int'
+    | 'string'
+    | 'boolean'
+    | 'float'
+    | 'this'
+    | ITemplateType
+    | typeof BaseModel;
   array: boolean;
   required?: boolean;
-  ref?: boolean;
+  ref?: string;
 }
