@@ -5,4 +5,5 @@ export interface IDataField {
   type: string | ITemplateType;
   array: boolean;
   required?: boolean;
+  ref?: boolean;
 }

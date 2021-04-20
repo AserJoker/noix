@@ -199,6 +199,10 @@ export class BaseModel extends EventObject {
     return this.info.name;
   }
 
+  public static GetModuleName() {
+    return this.info.module;
+  }
+
   public static GetAllModule() {
     const result: string[] = [];
     BaseModel._classes.forEach((c, module) => result.push(module));

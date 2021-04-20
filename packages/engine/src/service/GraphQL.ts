@@ -68,7 +68,16 @@ export class GraphQL {
       if (type === 'this') {
         return (input ? 'Input' : '') + ClassObject.GetModelName();
       }
-      return type.charAt(0).toUpperCase() + type.slice(1);
+      const _type = type.charAt(0).toUpperCase() + type.slice(1);
+      if (
+        _type === 'String' ||
+        _type === 'Boolean' ||
+        _type === 'Float' ||
+        _type === 'Int'
+      ) {
+        return _type;
+      }
+      return (input ? 'Input' : '') + _type;
     }
     const types = this.templateType.get(ClassObject) || [];
     if (!types.find((t) => t.name === type.name)) {
@@ -97,6 +106,16 @@ export class GraphQL {
     type: ITemplateType,
     ClassObject: typeof BaseModel
   ) {
+    const tmpClass = (() => {
+      return class extends BaseModel {};
+    })();
+    type.types.forEach((field) => {
+      BaseModel.DataField(field)(tmpClass.prototype, field.name);
+    });
+    BaseModel.DataModel({
+      module: ClassObject.GetModuleName(),
+      name: ClassObject.GetModelName() + type.name
+    })(tmpClass);
     return `type ${ClassObject.GetModelName()}${type.name} {
        ${type.types.map((t) => this.ResolveField(t, ClassObject)).join(' ')} 
     }
