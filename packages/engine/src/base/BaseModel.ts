@@ -160,8 +160,8 @@ export class BaseModel extends EventObject {
   @BaseModel.QueryFunction('this')
   public static async query<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T,
-    parent: T,
-    root: T
+    parent: BaseModel,
+    root: BaseModel
   ): Promise<BaseModel | null> {
     return null;
   }
@@ -175,13 +175,13 @@ export class BaseModel extends EventObject {
       { name: 'list', type: 'this', array: true }
     ]
   } as ITemplateType)
-  public static async queryList<T extends BaseModel>(
+  public static async queryList(
     @BaseModel.QueryParam({ name: 'size', type: 'int' }) size: number,
     @BaseModel.QueryParam({ name: 'page', type: 'int' }) page: number,
     @BaseModel.QueryParam({ name: 'condition', type: 'string' })
     condition: string,
-    parent: T,
-    root: T
+    parent: BaseModel,
+    root: BaseModel
   ): Promise<IQueryResult<BaseModel>> {
     return {
       size: 0,
@@ -191,8 +191,8 @@ export class BaseModel extends EventObject {
     };
   }
 
-  public static async init<T extends BaseModel>(): Promise<BaseModel> {
-    return new BaseModel() as T;
+  public static async init(): Promise<BaseModel> {
+    return new BaseModel();
   }
 
   public static GetModelName() {
