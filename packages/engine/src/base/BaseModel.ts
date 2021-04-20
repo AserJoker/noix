@@ -139,21 +139,21 @@ export class BaseModel extends EventObject {
   public static async insert<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' })
     record: T
-  ): Promise<T> {
+  ): Promise<BaseModel> {
     return new BaseModel() as T;
   }
 
   @BaseModel.QueryFunction('this')
   public static async update<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
-  ): Promise<T> {
+  ): Promise<BaseModel> {
     return new BaseModel() as T;
   }
 
   @BaseModel.QueryFunction('this')
   public static async delete<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
-  ): Promise<T> {
+  ): Promise<BaseModel> {
     return new BaseModel() as T;
   }
 
@@ -162,7 +162,7 @@ export class BaseModel extends EventObject {
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T,
     parent: T,
     root: T
-  ): Promise<T | null> {
+  ): Promise<BaseModel | null> {
     return null;
   }
 
@@ -182,7 +182,7 @@ export class BaseModel extends EventObject {
     condition: string,
     parent: T,
     root: T
-  ): Promise<IQueryResult<T>> {
+  ): Promise<IQueryResult<BaseModel>> {
     return {
       size: 0,
       page: 1,
@@ -191,7 +191,7 @@ export class BaseModel extends EventObject {
     };
   }
 
-  public static async init<T extends BaseModel>(): Promise<T> {
+  public static async init<T extends BaseModel>(): Promise<BaseModel> {
     return new BaseModel() as T;
   }
 

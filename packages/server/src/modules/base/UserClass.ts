@@ -1,6 +1,6 @@
 import { BaseModel, StoreModel } from '@noix/engine';
 @BaseModel.DataModel({ module: 'base', name: 'User' })
-export class UserModel2 extends StoreModel {
+export class UserModel extends StoreModel {
   @BaseModel.DataField({ type: 'string' })
   public username: string = '';
 
@@ -18,8 +18,8 @@ export class UserModel2 extends StoreModel {
   })
   public test: { a: string; b: string } = { a: '', b: '' };
 
-  public static async init<T extends BaseModel>(): Promise<T> {
-    return (new UserModel2() as BaseModel) as T;
+  public static async init(): Promise<BaseModel> {
+    return new UserModel();
   }
 
   public constructor() {
@@ -27,7 +27,9 @@ export class UserModel2 extends StoreModel {
     this.username = 'init';
   }
 
-  public static async query<T extends BaseModel>(record: T): Promise<T> {
+  public static async query<T extends BaseModel>(
+    record: T
+  ): Promise<BaseModel> {
     return record;
   }
 }
