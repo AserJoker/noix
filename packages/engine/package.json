@@ -2,7 +2,8 @@
   "name": "@noix/engine",
   "version": "0.0.1",
   "dependencies": {
-    "@noix/core": "0.0.1"
+    "@noix/core": "0.0.1",
+    "graphql": "^15.5.0"
   },
   "scripts": {
     "build": "webpack"

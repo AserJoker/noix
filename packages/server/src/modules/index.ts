@@ -1,1 +1,2 @@
-export * from './UserClass';
+export * from './base';
+export * from './mock';

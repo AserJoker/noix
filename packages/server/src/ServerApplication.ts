@@ -4,12 +4,14 @@ import path from 'path';
 import fs from 'fs';
 import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
-import { BaseModel } from '@noix/engine';
+import { BaseModel, GraphQL } from '@noix/engine';
+import { buildSchema, graphql, GraphQLSchema } from 'graphql';
 @Bootstrap
 export class ServerApplication extends SystemApplication {
   private _config: Record<string, unknown> = {};
 
   private _serverInstance!: HttpServer;
+  private _schemes: Record<string, GraphQLSchema> = {};
   public async main() {
     const commandLine = this.ResolveCommandLine();
     if (commandLine.config) {
@@ -39,69 +41,88 @@ export class ServerApplication extends SystemApplication {
     }
   }
 
-  public LoadBaseModule() {
+  public LoadModule(module: string) {
     const baseModule = {} as IResponseModule;
-    baseModule.module = 'base';
+    baseModule.module = module;
     baseModule.responseHandles = {};
-    const classes = BaseModel.GetAllDataModeles();
+    const classes = BaseModel.GetAllDataModeles(module);
+    let str = '';
+
+    const root: Record<string, Function> = {};
     classes.forEach((name) => {
       console.log('INFO [@noix/server] load model ' + name);
-      const DataModel = BaseModel.GetDataModel(name);
-      baseModule.responseHandles![name] = async (req, res) => {
-        const queryBody = req.query;
-        if (Object.keys(queryBody).length) {
-          const query = queryBody;
-          const handle = Reflect.get(
-            DataModel,
-            query.query as string
-          ) as Function;
-          // FIXME: query.query 应当使用GraphQL进行解析运行
-          const _ = await handle.apply(DataModel);
-          const _r = _.map((d: any) => {
-            const fields = BaseModel.GetFields(DataModel);
-            const res: Record<string, unknown> = {};
-            fields.forEach((finfo) => {
-              res[finfo.name] = d[finfo.name];
-            });
-            return res;
+      const DataModel = BaseModel.GetDataModel(module, name)!;
+      const funs = BaseModel.GetFunctions(DataModel);
+      const fields = BaseModel.GetFields(DataModel);
+      str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
+      root[name.toLowerCase()] = async () => {
+        const init = await DataModel.init();
+        const initResponse: Record<string, Function> = {};
+        if (init) {
+          fields.forEach((field) => {
+            initResponse[field.name] = () => Reflect.get(init, field.name);
           });
-          res.body = _r;
         }
+        funs.forEach((fun) => {
+          initResponse[fun.name] = (param: Record<string, unknown>) => {
+            const args: unknown[] = [];
+            fun.params.forEach((p) => {
+              args[p.index!] = param[p.name];
+            });
+            const handle = Reflect.get(DataModel, fun.name) as Function;
+            return handle.apply(DataModel, args);
+          };
+        });
+        return initResponse;
+      };
+      baseModule.responseHandles![name] = async (req, res) => {
+        const graphqlResult = await graphql(
+          this._schemes[module],
+          req.query.query as string,
+          root
+        );
+        res.body = graphqlResult;
       };
     });
-    baseModule.middlewareHandles = [
-      async (ctx, next) => {
-        ctx.query = await new Promise((resolve, reject) => {
-          try {
-            let postdata = '';
-            ctx.req.on('data', (data: any) => {
-              postdata += data;
-            });
-            ctx.req.on('end', function () {
-              resolve(postdata === '' ? {} : JSON.parse(postdata));
-            });
-          } catch (error) {
-            reject(error);
-          }
-        });
-        await next();
-      },
-      async (ctx, next) => {
-        console.log(
-          'INFO [@noix/server]: ' +
-            ctx.request.method +
-            ' ' +
-            ctx.request.path +
-            ' with IP:' +
-            ctx.request.ip
-        );
-        await next();
-      }
-    ];
+    str += `type Query{
+      ${classes.map((c) => `${c.toLowerCase()}:${c}`).join(' ')}
+    }`;
+    this._schemes[module] = buildSchema(str);
+    if (module === 'base') {
+      baseModule.middlewareHandles = [
+        async (ctx, next) => {
+          ctx.query = await new Promise((resolve, reject) => {
+            try {
+              let postdata = '';
+              ctx.req.on('data', (data: any) => {
+                postdata += data;
+              });
+              ctx.req.on('end', function () {
+                resolve(postdata === '' ? {} : JSON.parse(postdata));
+              });
+            } catch (error) {
+              reject(error);
+            }
+          });
+          await next();
+        },
+        async (ctx, next) => {
+          console.log(
+            'INFO [@noix/server]: ' +
+              ctx.request.method +
+              ' ' +
+              ctx.request.path +
+              ' with IP:' +
+              ctx.request.ip
+          );
+          await next();
+        }
+      ];
+    }
     this._serverInstance.RegisterModule(baseModule);
   }
 
   public LoadModules() {
-    this.LoadBaseModule();
+    BaseModel.GetAllModule().forEach((module) => this.LoadModule(module));
   }
 }

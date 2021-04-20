@@ -1,5 +1,8 @@
+import { ITemplateType } from './ITemplateType';
+
 export interface IDataField {
   name: string;
-  type: 'string' | 'number' | 'boolean' | string;
+  type: string | ITemplateType;
   array: boolean;
+  required?: boolean;
 }

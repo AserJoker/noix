@@ -40,9 +40,11 @@ export class HttpServer extends EventObject {
     this._modules.forEach((module) => {
       module.responseHandles &&
         Object.keys(module.responseHandles).forEach((name) => {
-          app.use(async (ctx) => {
-            if (ctx.path === '/' + module.module + '/' + name) {
+          app.use(async (ctx, next) => {
+            if (ctx.path === '/' + module.module) {
               await module.responseHandles![name](ctx.request, ctx.response);
+            } else {
+              await next();
             }
           });
         });
