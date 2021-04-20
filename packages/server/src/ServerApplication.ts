@@ -20,6 +20,39 @@ export class ServerApplication extends SystemApplication {
       );
     }
     this._serverInstance = new HttpServer(this._config.port as number);
+    const systemModule = {
+      module: 'system'
+    } as IResponseModule;
+    systemModule.middlewareHandles = [
+      async (ctx, next) => {
+        ctx.query = await new Promise((resolve, reject) => {
+          try {
+            let postdata = '';
+            ctx.req.on('data', (data: any) => {
+              postdata += data;
+            });
+            ctx.req.on('end', function () {
+              resolve(postdata === '' ? {} : JSON.parse(postdata));
+            });
+          } catch (error) {
+            reject(error);
+          }
+        });
+        await next();
+      },
+      async (ctx, next) => {
+        console.log(
+          'INFO [@noix/server]: ' +
+            ctx.request.method +
+            ' ' +
+            ctx.request.path +
+            ' with IP:' +
+            ctx.request.ip
+        );
+        await next();
+      }
+    ];
+    this._serverInstance.RegisterModule(systemModule);
     this.LoadModules();
     this._serverInstance.Bootstrap();
   }
@@ -88,37 +121,6 @@ export class ServerApplication extends SystemApplication {
       ${classes.map((c) => `${c.toLowerCase()}:${c}`).join(' ')}
     }`;
     this._schemes[module] = buildSchema(str);
-    if (module === 'base') {
-      baseModule.middlewareHandles = [
-        async (ctx, next) => {
-          ctx.query = await new Promise((resolve, reject) => {
-            try {
-              let postdata = '';
-              ctx.req.on('data', (data: any) => {
-                postdata += data;
-              });
-              ctx.req.on('end', function () {
-                resolve(postdata === '' ? {} : JSON.parse(postdata));
-              });
-            } catch (error) {
-              reject(error);
-            }
-          });
-          await next();
-        },
-        async (ctx, next) => {
-          console.log(
-            'INFO [@noix/server]: ' +
-              ctx.request.method +
-              ' ' +
-              ctx.request.path +
-              ' with IP:' +
-              ctx.request.ip
-          );
-          await next();
-        }
-      ];
-    }
     this._serverInstance.RegisterModule(baseModule);
   }
 
