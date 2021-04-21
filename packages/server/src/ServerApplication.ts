@@ -86,24 +86,26 @@ export class ServerApplication extends SystemApplication {
       console.log('INFO [@noix/server] load model ' + name);
       const DataModel = BaseModel.GetDataModel(module, name)!;
       const funs = BaseModel.GetFunctions(DataModel);
-      const fields = BaseModel.GetFields(DataModel);
       str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
       root[name.toLowerCase()] = async () => {
         const init = await DataModel.init();
         const initResponse: Record<string, Function> = {};
         if (init) {
-          fields.forEach((field) => {
-            initResponse[field.name] = () => Reflect.get(init, field.name);
+          const resolved = DataModel.ResolveFields(init);
+          Object.keys(resolved).forEach((name) => {
+            initResponse[name] = resolved[name];
           });
         }
         funs.forEach((fun) => {
-          initResponse[fun.name] = (param: Record<string, unknown>) => {
+          initResponse[fun.name] = async (param: Record<string, unknown>) => {
             const args: unknown[] = [];
             fun.params.forEach((p) => {
               args[p.index!] = param[p.name];
             });
             const handle = Reflect.get(DataModel, fun.name) as Function;
-            return handle.apply(DataModel, args);
+            const res = await handle.apply(DataModel, args);
+            const resolved = DataModel.ResolveFields(res);
+            return resolved;
           };
         });
         return initResponse;

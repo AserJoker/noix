@@ -43,7 +43,7 @@ export class BaseModel extends EventObject {
         parentFields.forEach(
           (field) =>
             !resFields.find((rf) => rf.name === field.name) &&
-            resFields.push(field)
+            resFields.push({ ...field, model: info.name })
         );
         tmp = Object.getPrototypeOf(tmp);
       }
@@ -68,6 +68,7 @@ export class BaseModel extends EventObject {
       const fieldInfo = BaseModel._fields.get(dataModel) || [];
       const realInfo = info as IDataField;
       realInfo.name = name;
+      realInfo.model = dataModel.GetModelName();
       fieldInfo.push(realInfo);
       BaseModel._fields.set(dataModel, fieldInfo);
     };
@@ -110,7 +111,8 @@ export class BaseModel extends EventObject {
         array: info.array || false,
         name: info.name,
         type: info.type,
-        ref: info.ref || ''
+        ref: info.ref || '',
+        model: ''
       });
       funs.set(name, params);
       BaseModel._params.set(target, funs);
@@ -118,6 +120,15 @@ export class BaseModel extends EventObject {
   }
 
   public static GetDataModel(module: string, name: string) {
+    if (module === '*') {
+      let resModel: typeof BaseModel | null = null;
+      BaseModel._classes.forEach((models) => {
+        if (models[name]) {
+          resModel = models[name];
+        }
+      });
+      return resModel;
+    }
     const classes = BaseModel._classes.get(module);
     return classes && classes[name];
   }
@@ -208,5 +219,75 @@ export class BaseModel extends EventObject {
     const result: string[] = [];
     BaseModel._classes.forEach((c, module) => result.push(module));
     return result;
+  }
+
+  public static ResolveFields(data: BaseModel) {
+    const res: Record<string, Function> = {};
+    const fields = BaseModel.GetFields(this);
+    fields.forEach((field) => {
+      let val = Reflect.get(data, field.name);
+      const fieldType = field.type;
+      if (typeof fieldType === 'function') {
+        // 关联字段
+        if (!val || val.length === 0) {
+          const rel = Reflect.get(data, field.rel!);
+          if (rel) {
+            val = fieldType.queryByRelation(field, rel);
+          }
+        }
+        if (field.array) {
+          res[field.name] = () => {
+            const vals = val as BaseModel[];
+            return vals.map((_v) => {
+              return _v && fieldType.ResolveFields(_v);
+            });
+          };
+        } else {
+          res[field.name] = () => {
+            return val && fieldType.ResolveFields(val);
+          };
+        }
+      } else if (typeof fieldType === 'object') {
+        // 临时模型
+        res[field.name] = () => {
+          if (field.array) {
+            const _res: Record<string, unknown>[] = [];
+            if (val) {
+              const vals = val as Record<string, unknown>[];
+              vals.forEach((_v) => {
+                const _r: Record<string, unknown> = {};
+                fieldType.types.forEach((type) => {
+                  _r[type.name!] = () => _v && Reflect.get(_v, type.name!);
+                });
+                _res.push(_r);
+              });
+            }
+            return _res;
+          } else {
+            const _res: Record<string, unknown> = {};
+            fieldType.types.forEach((type) => {
+              _res[type.name!] = () => val && Reflect.get(val, type.name!);
+            });
+            return _res;
+          }
+        };
+      } else {
+        res[field.name] = () => {
+          return Reflect.get(data, field.name);
+        };
+      }
+    });
+    return res;
+  }
+
+  public static queryByRelation(
+    field: IDataField,
+    value: unknown
+  ): BaseModel | BaseModel[] {
+    if (field.array) {
+      return [] as BaseModel[];
+    } else {
+      return {} as BaseModel;
+    }
   }
 }

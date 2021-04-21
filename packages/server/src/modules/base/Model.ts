@@ -13,9 +13,10 @@ export class Model extends StoreModel {
     type: Field,
     name: 'fields',
     array: true,
-    ref: 'model'
+    ref: 'model',
+    rel: 'name'
   })
-  public fields: Field[] = [];
+  public fields: Field[] | null = null;
 
   public static async query(record: BaseModel): Promise<BaseModel | null> {
     const model = record as Model;
@@ -26,24 +27,6 @@ export class Model extends StoreModel {
     if (!dataModel) {
       return null;
     }
-    res.fields = BaseModel.GetFields(dataModel).map((field) => {
-      const f = new Field();
-      f.name = field.name;
-      f.model = dataModel.GetModelName();
-      f.array = field.array || false;
-      f.ref = field.ref || null;
-      const _type = field.type;
-      if (typeof _type === 'string') {
-        f.type = _type;
-      } else {
-        if (typeof _type === 'object') {
-          f.type = dataModel.GetModelName() + _type.name;
-        } else {
-          f.type = _type.GetModelName();
-        }
-      }
-      return f;
-    });
     return res;
   }
 }

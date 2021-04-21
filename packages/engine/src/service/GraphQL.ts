@@ -106,18 +106,20 @@ export class GraphQL {
       return class extends BaseModel {};
     })();
     type.types.forEach((field) => {
-      BaseModel.DataField(field)(tmpClass.prototype, field.name);
+      BaseModel.DataField(field)(tmpClass.prototype, field.name!);
     });
     BaseModel.DataModel({
       module: ClassObject.GetModuleName(),
       name: ClassObject.GetModelName() + type.name
     })(tmpClass);
     return `type ${ClassObject.GetModelName()}${type.name} {
-       ${type.types.map((t) => this.ResolveField(t, ClassObject)).join(' ')} 
+       ${type.types
+         .map((t) => this.ResolveField(t as IDataField, ClassObject))
+         .join(' ')} 
     }
     input Input${ClassObject.GetModelName()}${type.name} {
       ${type.types
-        .map((t) => this.ResolveField(t, ClassObject, true))
+        .map((t) => this.ResolveField(t as IDataField, ClassObject, true))
         .join(' ')} 
    }`;
   }

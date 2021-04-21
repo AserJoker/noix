@@ -14,4 +14,6 @@ export interface IDataField {
   array: boolean;
   required?: boolean;
   ref?: string;
+  rel?: string;
+  model: string;
 }

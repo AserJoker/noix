@@ -11,12 +11,13 @@ export class UserModel extends StoreModel {
     type: {
       name: 'Test',
       types: [
-        { name: 'a', type: 'string', array: false },
-        { name: 'b', type: 'string', array: false }
+        { name: 'a', type: 'string', array: false, model: 'Test' },
+        { name: 'b', type: 'string', array: false, model: 'Test' }
       ]
-    }
+    },
+    array: true
   })
-  public test: { a: string; b: string } = { a: '', b: '' };
+  public test: { a: string; b: string }[] = [{ a: 'aaa', b: 'bbb' }];
 
   public static async init(): Promise<BaseModel> {
     return new UserModel();
@@ -30,6 +31,6 @@ export class UserModel extends StoreModel {
   public static async query<T extends BaseModel>(
     record: T
   ): Promise<BaseModel> {
-    return record;
+    return new UserModel();
   }
 }
