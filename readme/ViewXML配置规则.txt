@@ -1,0 +1,33 @@
+xml控制页面渲染，xml结构中的每一个节点应当控制页面上每一个相对独立的块
+例：登陆
+<block render="FORM">
+  <model name="User"/>
+  <config layout="flex"/>
+  <block render="form-item">
+    <config label="username"/>
+    <field name="username"/>
+  </block>
+  <block render="form-item">
+    <config label="password" type="password"/>
+    <field name="password"/>
+  </block>
+  <block render="form-item">
+    <block render="actionBar">
+      <block render="button">
+        <action name="login"/>
+      </block>
+      <block render="button">
+        <config label="regist"/>
+        <action name="gotoRegistPage">
+        </action>
+      </block>
+    </block>
+  </block>
+</block>
+
+在ViewXML中节点是可枚举的
+block: 可渲染节点，render 指明当前block使用的渲染器(组件)
+config: 紧跟block，只能是block的第一个子节点，用于配置渲染器的可变特性
+model:声明视图的模型
+field:声明block的字段
+action:声明block的动作
