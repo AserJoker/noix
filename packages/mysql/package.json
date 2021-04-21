@@ -1,0 +1,16 @@
+{
+  "name": "@noix/mysql",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "typings": "dist/typings/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@noix/core": "0.0.1",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.18"
+  }
+}

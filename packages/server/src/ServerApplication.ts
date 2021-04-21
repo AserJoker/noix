@@ -6,6 +6,7 @@ import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
 import { BaseModel, GraphQL } from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
+import { MysqlClient } from '@noix/mysql';
 @Bootstrap
 export class ServerApplication extends SystemApplication {
   private _config: Record<string, unknown> = {};
@@ -20,6 +21,15 @@ export class ServerApplication extends SystemApplication {
       );
     }
     this._serverInstance = new HttpServer(this._config.port as number);
+    MysqlClient.ConnectToServer(
+      '192.168.1.242',
+      3306,
+      'admin',
+      'admin',
+      'noix'
+    );
+    const res = await MysqlClient.query('show tables;');
+    console.log(res);
     const systemModule = {
       module: 'system'
     } as IResponseModule;
