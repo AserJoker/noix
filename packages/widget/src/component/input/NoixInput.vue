@@ -12,7 +12,7 @@ export default class NoixInput extends BaseWidget {
   @Prop()
   private type!: string;
 
-  @Emit('change:value')
+  @Emit('change')
   private change(newValue: string) {}
 }
 </script>

@@ -14,7 +14,6 @@ export class DemoApplication extends SystemApplication {
 
   @EventListener(EVENT_INITIALIZATION)
   public OnInitialize() {
-    // console.log(NoixInput);
     WidgetApplication.Bootstrap(document.body);
   }
 

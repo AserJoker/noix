@@ -178,7 +178,8 @@ export class BaseWidget {
       setup: (props: Record<string, unknown>, ctx: SetupContext) =>
         Widget.setup(props, ctx),
       components: (options.components as Record<string, DefineComponent>) || {},
-      props: Widget.__$props
+      props: Widget.__$props,
+      emits: Widget.__$emits.map((e) => e.displayName)
     };
   };
 

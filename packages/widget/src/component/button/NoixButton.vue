@@ -1,12 +1,13 @@
 <template>
-  <a-button @click="OnButtonClick"><slot /></a-button>
+  <a-button @click="OnClick"><slot /></a-button>
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Emit } from '../../base';
+import { NoixBlock } from '../block';
 import { Button as AButton } from 'ant-design-vue';
 @Component({ components: { AButton } })
 export default class NoixButton extends BaseWidget {
-  @Emit('button:click')
-  private OnButtonClick() {}
+  @Emit('click')
+  private OnClick() {}
 }
 </script>

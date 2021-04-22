@@ -1,17 +1,17 @@
 <template>
   <noix-form>
     <noix-form-item label="username">
-      <noix-input :value="store.username" @change:value="OnUsernameChange" />
+      <noix-input :value="store.username" @change="OnUsernameChange" />
     </noix-form-item>
     <noix-form-item label="password">
       <noix-input
         type="password"
         :value="store.password"
-        @change:value="OnPasswordChange"
+        @change="OnPasswordChange"
       />
     </noix-form-item>
     <noix-form-item label=" ">
-      <noix-button @button:click="OnLogin">login</noix-button>
+      <noix-button @click="OnLogin">login</noix-button>
     </noix-form-item>
   </noix-form>
 </template>
