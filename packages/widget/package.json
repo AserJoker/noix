@@ -10,7 +10,8 @@
   "dependencies": {
     "@noix/core": "^0.0.1",
     "@noix/store": "^0.0.1",
-    "vue": "^3.0.11"
+    "vue": "^3.0.11",
+    "ant-design-vue": "^2.1.2"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1",

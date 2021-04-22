@@ -1,2 +1,2 @@
-import Button from './button.vue';
-export { Button };
+import NoixButton from './NoixButton.vue';
+export { NoixButton };

@@ -6,16 +6,18 @@ import {
   Bootstrap,
   SystemApplication
 } from '@noix/core';
-import { Button } from '@noix/widget';
+import { WidgetApplication } from '@noix/widget';
 @Bootstrap
 export class DemoApplication extends SystemApplication {
   @EventListener(EVENT_PREINITIALIZATION)
   public OnPreInitialize() {}
 
   @EventListener(EVENT_INITIALIZATION)
-  public OnInitialize() {}
+  public OnInitialize() {
+    // console.log(NoixInput);
+    WidgetApplication.Bootstrap(document.body);
+  }
 
   @EventListener(EVENT_POSTINITIALIZATION)
   public OnPostInitialize() {}
 }
-console.log(Button);

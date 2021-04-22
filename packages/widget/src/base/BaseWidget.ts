@@ -8,7 +8,8 @@ import {
   DefineComponent,
   onMounted,
   inject,
-  provide
+  provide,
+  Component as VueComponent
 } from 'vue';
 export interface IWatcher {
   path: string;
@@ -31,32 +32,35 @@ export interface INameMap {
 }
 
 export class BaseWidget {
-  private static _instance: BaseWidget;
+  // private static _instance: BaseWidget;
+
   public constructor() {}
 
   private static setup(props: Record<string, unknown>, ctx: SetupContext) {
+    const instance = new this();
     const res: Record<string, unknown> = {};
-    this.injections.forEach((injection) => {
+    this.__$injections.forEach((injection) => {
       const $inject = inject(injection.displayName);
-      Object.defineProperty(this._instance, injection.name, {
+      Object.defineProperty(instance, injection.name, {
         get: () => (isRef($inject) ? $inject.value : $inject)
       });
     });
-    this.emits.forEach((emit) => {
-      const handle = Reflect.get(this._instance, emit.name) as Function;
-      Reflect.set(this._instance, emit.name, (...args: unknown[]) => {
-        handle.apply(this._instance, args);
+    this.__$emits.forEach((emit) => {
+      const handle = Reflect.get(instance, emit.name) as Function;
+      Reflect.set(instance, emit.name, (...args: unknown[]) => {
+        handle.apply(instance, args);
         ctx.emit.apply(null, [emit.displayName, ...args]);
       });
+      res[emit.name] = Reflect.get(instance, emit.name);
     });
     const attributes =
       (GetMetadata(this, undefined, 'attributes') as IAttribute[]) || [];
     attributes.forEach((attr) => {
-      const raw = Reflect.get(this._instance, attr.name) as unknown;
+      const raw = Reflect.get(instance, attr.name) as unknown;
       if (attr.reactive) {
         if (!attr.get) {
           const refValue = ref(raw);
-          Object.defineProperty(this._instance, attr.name, {
+          Object.defineProperty(instance, attr.name, {
             get: () => refValue.value,
             set: (newValue) => (refValue.value = newValue)
           });
@@ -64,11 +68,11 @@ export class BaseWidget {
         } else {
           const computedValue = attr.set
             ? computed({
-                get: () => attr.get!.apply(this._instance),
-                set: (newValue) => attr.set!.call(this._instance, newValue)
+                get: () => attr.get!.apply(instance),
+                set: (newValue) => attr.set!.call(instance, newValue)
               })
-            : computed(() => attr.get!.apply(this._instance));
-          Object.defineProperty(this._instance, attr.name, {
+            : computed(() => attr.get!.apply(instance));
+          Object.defineProperty(instance, attr.name, {
             get: () => computedValue.value,
             set: (newValue) => (computedValue.value = newValue)
           });
@@ -77,15 +81,15 @@ export class BaseWidget {
       } else {
         if (typeof raw === 'function') {
           Reflect.set(res, attr.name, (...args: unknown[]) =>
-            raw.apply(this._instance, args)
+            raw.apply(instance, args)
           );
         } else {
           Reflect.set(res, attr.name, raw);
         }
       }
     });
-    this.wachers.forEach((w) => {
-      const handle = Reflect.get(this._instance, w.name) as Function;
+    this.__$wachers.forEach((w) => {
+      const handle = Reflect.get(instance, w.name) as Function;
       const name = w.path;
       const refValue = Reflect.get(res, name);
       if (isRef(refValue)) {
@@ -94,7 +98,7 @@ export class BaseWidget {
             const value = refValue.value as Record<string, unknown>;
             return w.handle ? w.handle(value) : value;
           },
-          (...args: unknown[]) => handle.apply(this._instance, args),
+          (...args: unknown[]) => handle.apply(instance, args),
           {
             deep: w.deep,
             immediate: w.immediate
@@ -105,73 +109,76 @@ export class BaseWidget {
       }
     });
 
-    this.props.forEach((name) => {
-      Object.defineProperty(this._instance, name, {
+    this.__$props.forEach((name) => {
+      Object.defineProperty(instance, name, {
         get: () => props[name]
       });
     });
-    this.refs.forEach((_ref) => {
+    this.__$refs.forEach((_ref) => {
       const $ref = ref();
-      Object.defineProperty(this._instance, _ref.name, {
+      Object.defineProperty(instance, _ref.name, {
         get: () => $ref.value
       });
       res[_ref.displayName] = $ref;
     });
-    this.providers.forEach((provider) => {
+    this.__$providers.forEach((provider) => {
       provide(
         provider.displayName,
-        Reflect.get(res, provider.name) ||
-          Reflect.get(this._instance, provider.name)
+        Reflect.get(res, provider.name) || Reflect.get(instance, provider.name)
       );
     });
-    onMounted(() => this._instance.mounted());
+    onMounted(() => instance.mounted());
     return res;
   }
 
-  private static props: string[] = [];
+  private static __$props: string[] = [];
 
-  private static wachers: IWatcher[] = [];
+  private static __$wachers: IWatcher[] = [];
 
-  private static refs: INameMap[] = [];
+  private static __$refs: INameMap[] = [];
 
-  private static emits: INameMap[] = [];
+  private static __$emits: INameMap[] = [];
 
-  private static injections: INameMap[] = [];
+  private static __$injections: INameMap[] = [];
 
-  private static providers: INameMap[] = [];
+  private static __$providers: INameMap[] = [];
 
   public static Component = (
     options: {
-      components?: Record<string, DefineComponent | typeof BaseWidget>;
+      components?: Record<
+        string,
+        DefineComponent | VueComponent | typeof BaseWidget
+      >;
     } = {}
   ) => <T extends typeof BaseWidget>(Widget: T) => {
-    Widget._instance = new Widget();
-    const oldProps = Widget.props;
+    const oldProps = Widget.__$props;
     const newProps = GetMetadata(Widget, undefined, 'props') as string[];
-    Widget.props = [...oldProps];
+    Widget.__$props = [...oldProps];
     newProps &&
       newProps.forEach(
-        (p) => !Widget.props.includes(p) && Widget.props.push(p)
+        (p) => !Widget.__$props.includes(p) && Widget.__$props.push(p)
       );
-    const oldWachers = Widget.wachers;
+    const oldWachers = Widget.__$wachers;
     const newWachers = GetMetadata(Widget, undefined, 'watchers') as IWatcher[];
-    Widget.wachers = [...oldWachers];
+    Widget.__$wachers = [...oldWachers];
     newWachers &&
       newWachers.forEach(
-        (w) => !Widget.wachers.includes(w) && Widget.wachers.push(w)
+        (w) => !Widget.__$wachers.includes(w) && Widget.__$wachers.push(w)
       );
-    Widget.refs = (GetMetadata(Widget, undefined, 'refs') as INameMap[]) || [];
-    Widget.providers =
+    Widget.__$refs =
+      (GetMetadata(Widget, undefined, 'refs') as INameMap[]) || [];
+    Widget.__$providers =
       (GetMetadata(Widget, undefined, 'providers') as INameMap[]) || [];
-    Widget.injections =
+    Widget.__$injections =
       (GetMetadata(Widget, undefined, 'injections') as INameMap[]) || [];
-    Widget.emits =
+    Widget.__$emits =
       (GetMetadata(Widget, undefined, 'emits') as INameMap[]) || [];
     return {
       ...Widget,
       setup: (props: Record<string, unknown>, ctx: SetupContext) =>
         Widget.setup(props, ctx),
-      components: (options.components as Record<string, DefineComponent>) || {}
+      components: (options.components as Record<string, DefineComponent>) || {},
+      props: Widget.__$props
     };
   };
 
