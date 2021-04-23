@@ -1,5 +1,5 @@
 <template>
-  <a-breadcrumb-item :click="change" :href="value"><slot /></a-breadcrumb>
+  <a-breadcrumb-item :click="OnClick" :href="value"><slot /></a-breadcrumb>
 </template>
 <script lang="ts">
 import { Breadcrumb as ABreadcrumb } from 'ant-design-vue';
@@ -8,7 +8,7 @@ import { BaseWidget, Component, Emit, Prop } from '../../base';
 export default class NoixAlert extends BaseWidget {
   @Prop()
   private value!:string;
-  @Emit('change')
-  private change() {}
+  @Emit('click')
+  private OnClick() {}
 }
 </script>

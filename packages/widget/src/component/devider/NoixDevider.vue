@@ -8,6 +8,7 @@ import { BaseWidget, Component, Prop } from '../../base';
 export default class NoixDivider extends BaseWidget {
   @Prop()
   private orientation!: string[];
+  
   @Prop()
   private type!:string[];
 }

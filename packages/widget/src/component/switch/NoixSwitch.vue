@@ -8,6 +8,7 @@ import { BaseWidget, Emit, Component, Prop } from '../../base';
 export default class NoixSwitch extends BaseWidget {
   @Prop()
   private value!: boolean;
+
   @Emit('change')
   private change(newValue: boolean) {}
 }
