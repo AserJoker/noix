@@ -11,7 +11,7 @@
       />
     </noix-form-item>
     <noix-form-item label=" ">
-      <noix-button @click="OnLogin">login</noix-button>
+      <noix-button @click="OnLogin" type="primary">login</noix-button>
     </noix-form-item>
   </noix-form>
 </template>
