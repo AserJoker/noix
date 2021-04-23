@@ -1,15 +1,15 @@
 <template>
-  <a-button @click="OnClick" :type="type"><slot /></a-button>
+  <a-autocomplete :value="value" @change="change"><slot /></a-button>
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Emit, Prop } from '../../base';
 import { Button as AButton } from 'ant-design-vue';
 @Component({ components: { AButton } })
 export default class NoixButton extends BaseWidget {
-  @Emit('click')
-  private OnClick() {}
-
   @Prop()
-  private type!: string;
+  private value!: string;
+
+  @Emit('change')
+  private change() {}
 }
 </script>
