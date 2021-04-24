@@ -1,5 +1,5 @@
 <template>
-  <a-divider :orientation="orientation" :type="type"></slot></a-divider>
+  <a-divider :orientation="orientation" :type="type"><slot /></a-divider>
 </template>
 <script lang="ts">
 import { Divider as ADivider } from 'ant-design-vue';
@@ -8,8 +8,8 @@ import { BaseWidget, Component, Prop } from '../../base';
 export default class NoixDivider extends BaseWidget {
   @Prop()
   private orientation!: string[];
-  
+
   @Prop()
-  private type!:string[];
+  private type!: string[];
 }
 </script>
