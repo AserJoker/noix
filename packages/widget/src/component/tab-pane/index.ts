@@ -1,2 +1,2 @@
 import NoixTabPane from './NoixTabPane.vue';
-export { NoixPane };
+export { NoixTabPane };

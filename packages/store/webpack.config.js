@@ -20,5 +20,8 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts']
+  },
+  externals: {
+    '@noix/core': '@noix/core'
   }
 };

@@ -1,4 +1,5 @@
-import { createApp, h } from '@vue/runtime-dom';
+import { createApp, h } from 'vue';
+
 import Root from './Root.vue';
 export class WidgetApplication {
   public static Bootstrap(dom: HTMLElement) {

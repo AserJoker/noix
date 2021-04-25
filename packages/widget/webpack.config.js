@@ -41,5 +41,8 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js', '.vue']
   },
-  plugins: [new VueLoaderPlugin()]
+  plugins: [new VueLoaderPlugin()],
+  externals: {
+    '@noix/core': '@noix/core'
+  }
 };
