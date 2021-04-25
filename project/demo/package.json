@@ -9,8 +9,10 @@
   "dependencies": {
     "@noix/core": "0.0.1",
     "@noix/store": "0.0.1",
+    "html-webpack-plugin": "^5.3.1",
     "@noix/widget": "0.0.1",
-    "html-webpack-plugin": "^5.3.1"
+    "vue": "^3.0.0",
+    "ant-design-vue": "^2.1.2"
   },
   "devDependencies": {
     "ts-ignore-decorator": "^0.0.1",

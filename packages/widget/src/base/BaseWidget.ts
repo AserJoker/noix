@@ -34,8 +34,6 @@ export interface INameMap {
 export class BaseWidget {
   // private static _instance: BaseWidget;
 
-  public constructor() {}
-
   private static setup(props: Record<string, unknown>, ctx: SetupContext) {
     const instance = new this();
     const res: Record<string, unknown> = {};
@@ -46,7 +44,9 @@ export class BaseWidget {
       });
     });
     this.__$emits.forEach((emit) => {
-      const handle = Reflect.get(instance, emit.name) as Function;
+      const handle = Reflect.get(instance, emit.name) as (
+        ...args: unknown[]
+      ) => void;
       Reflect.set(instance, emit.name, (...args: unknown[]) => {
         handle.apply(instance, args);
         ctx.emit.apply(null, [emit.displayName, ...args]);
@@ -89,7 +89,9 @@ export class BaseWidget {
       }
     });
     this.__$wachers.forEach((w) => {
-      const handle = Reflect.get(instance, w.name) as Function;
+      const handle = Reflect.get(instance, w.name) as (
+        ...args: unknown[]
+      ) => void;
       const name = w.path;
       const refValue = Reflect.get(res, name);
       if (isRef(refValue)) {
@@ -337,7 +339,9 @@ export class BaseWidget {
     return Metadata('emits', emits)(target.constructor as typeof BaseWidget);
   };
 
-  protected mounted(): void | Promise<void> {}
+  protected mounted(): void | Promise<void> {
+    // do nothing.
+  }
 }
 export const Component = BaseWidget.Component;
 export const Prop = BaseWidget.Prop;
