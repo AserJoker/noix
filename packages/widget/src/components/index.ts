@@ -15,3 +15,4 @@ export * from './slider';
 export * from './steps';
 export * from './switch';
 export * from './tabs';
+import 'ant-design-vue/dist/antd.less';
