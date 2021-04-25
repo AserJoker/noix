@@ -14,14 +14,35 @@
       <noix-button @click="OnLogin" type="primary">login</noix-button>
     </noix-form-item>
   </noix-form>
+  <noix-radio @change="OnRadioChange" :options="options" />
+  <noix-checkbox @change="OnCheckboxChange" :options="options" />
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Attribute } from './base';
-import { NoixForm, NoixFormItem, NoixInput, NoixButton } from './component';
-@Component({ components: { NoixForm, NoixFormItem, NoixInput, NoixButton } })
+import {
+  NoixForm,
+  NoixFormItem,
+  NoixInput,
+  NoixButton,
+  NoixRadio,
+  NoixCheckbox
+} from './component';
+@Component({
+  components: {
+    NoixForm,
+    NoixFormItem,
+    NoixInput,
+    NoixButton,
+    NoixRadio,
+    NoixCheckbox
+  }
+})
 export default class NoixRoot extends BaseWidget {
   @Attribute({ reactive: true })
   private store = { password: '', username: '' };
+
+  @Attribute()
+  private options = ['Apple', 'Pear', 'Orange'];
 
   @Attribute()
   private OnUsernameChange(newValue: string) {
@@ -37,6 +58,16 @@ export default class NoixRoot extends BaseWidget {
     console.log(
       `username:${this.store.username}\n password:${this.store.password}`
     );
+  }
+
+  @Attribute()
+  private OnRadioChange(newValue: string) {
+    console.log(newValue);
+  }
+
+  @Attribute()
+  private OnCheckboxChange(newValue: string) {
+    console.log(newValue);
   }
 }
 </script>
