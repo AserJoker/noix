@@ -7,7 +7,7 @@ if (process.env.NODE_ENV == 'production') {
       }
     },
     css: {
-      css: {
+      loaderOptions: {
         less: {
           javascriptEnabled: true
         }
