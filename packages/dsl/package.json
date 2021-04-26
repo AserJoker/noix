@@ -6,9 +6,6 @@
   "dependencies": {
     "@noix/core": "0.0.1"
   },
-  "devDependencies": {
-    "@types/axios": "^0.14.0"
-  },
   "scripts": {
     "build": "webpack",
     "clean": "rimraf  dist"
