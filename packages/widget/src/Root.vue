@@ -28,9 +28,8 @@ import {
   NoixRadio,
   NoixCheckbox
 } from './components';
+import { NoixTL } from '@noix/dsl';
 import { HttpClient } from '@noix/client';
-const client = new HttpClient();
-client.SetBaseURL('http://localhost:9090');
 @Component({
   components: {
     NoixForm,
@@ -76,6 +75,8 @@ export default class NoixRoot extends BaseWidget {
 
   @Attribute()
   private async Post() {
+    const client = new HttpClient();
+    client.SetBaseURL('http://localhost:9090');
     const res = await client.Query(
       'base',
       'Model',
@@ -98,6 +99,15 @@ export default class NoixRoot extends BaseWidget {
     }`
     );
     console.log(res);
+    const compiler = new NoixTL();
+    console.log(
+      compiler.Compile(`
+      $model[render="FORM",name="User"]
+        $field[render="INPUT",name="username"]#field
+        $field[render="INPUT",name="password"]#field
+      #model
+    `)
+    );
   }
 }
 </script>

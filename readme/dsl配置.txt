@@ -1,0 +1,7 @@
+$model[render="form"]
+  $field[render="input"]
+  #field
+#model
+规则如下:
+  1.标签使用$XXX开始，#XXX闭合
+  2.属性使用[]紧跟开始标签，属性使用AAA="BBBB"表示，使用空格或者,分隔多个标签。简写 [required] 等价于[required="true"]

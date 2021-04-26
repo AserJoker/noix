@@ -13,6 +13,7 @@
     "vue": "^3.0.0",
     "@noix/core": "0.0.1",
     "@noix/client": "0.0.1",
+    "@noix/dsl": "0.0.1",
     "ant-design-vue": "^2.1.2"
   },
   "devDependencies": {
