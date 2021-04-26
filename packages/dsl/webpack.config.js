@@ -1,5 +1,5 @@
 const path = require('path');
-const packageName = 'noix.client';
+const packageName = 'noix.dsl';
 module.exports = {
   mode: 'development',
   devtool: 'source-map',

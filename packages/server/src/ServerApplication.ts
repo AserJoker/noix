@@ -6,7 +6,6 @@ import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
 import { BaseModel, GraphQL } from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
-import { MysqlClient } from '@noix/mysql';
 @Bootstrap
 export class ServerApplication extends SystemApplication {
   private _config: Record<string, unknown> = {};
@@ -21,15 +20,6 @@ export class ServerApplication extends SystemApplication {
       );
     }
     this._serverInstance = new HttpServer(this._config.port as number);
-    MysqlClient.ConnectToServer(
-      '192.168.1.242',
-      3306,
-      'admin',
-      'admin',
-      'noix'
-    );
-    const res = await MysqlClient.query('show tables;');
-    console.log(res);
     const systemModule = {
       module: 'system'
     } as IResponseModule;
@@ -101,7 +91,7 @@ export class ServerApplication extends SystemApplication {
         const init = await DataModel.init();
         const initResponse: Record<string, Function> = {};
         if (init) {
-          const resolved = DataModel.ResolveFields(init);
+          const resolved = await DataModel.ResolveFields(init);
           Object.keys(resolved).forEach((name) => {
             initResponse[name] = resolved[name];
           });
@@ -114,7 +104,7 @@ export class ServerApplication extends SystemApplication {
             });
             const handle = Reflect.get(DataModel, fun.name) as Function;
             const res = await handle.apply(DataModel, args);
-            const resolved = DataModel.ResolveFields(res);
+            const resolved = await DataModel.ResolveFields(res);
             return resolved;
           };
         });

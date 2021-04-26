@@ -1,11 +1,10 @@
 {
-  "name": "@noix/client",
+  "name": "@noix/dsl",
   "version": "0.0.1",
-  "main": "dist/noix.client.js",
+  "main": "dist/noix.dsl.js",
   "typings": "dist/typings/index.d.ts",
   "dependencies": {
-    "@noix/core": "0.0.1",
-    "axios": "^0.21.1"
+    "@noix/core": "0.0.1"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0"

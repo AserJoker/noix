@@ -1,4 +1,4 @@
-import { EventObject } from '@noix/core';
+import { EventObject, PromiseQueue } from '@noix/core';
 import {
   IDataModel,
   IDataField,
@@ -221,69 +221,71 @@ export class BaseModel extends EventObject {
     return result;
   }
 
-  public static ResolveFields(data: BaseModel) {
+  public static async ResolveFields(data: BaseModel) {
     const res: Record<string, Function> = {};
     const fields = BaseModel.GetFields(this);
-    fields.forEach((field) => {
-      let val = Reflect.get(data, field.name);
-      const fieldType = field.type;
-      if (typeof fieldType === 'function') {
-        // 关联字段
-        if (!val || val.length === 0) {
-          const rel = Reflect.get(data, field.rel!);
-          if (rel) {
-            val = fieldType.queryByRelation(field, rel);
+    await PromiseQueue(
+      fields.map(async (field) => {
+        let val = Reflect.get(data, field.name);
+        const fieldType = field.type;
+        if (typeof fieldType === 'function') {
+          // 关联字段
+          if (!val || val.length === 0) {
+            const rel = Reflect.get(data, field.rel!);
+            if (rel) {
+              val = await fieldType.queryByRelation(field, rel);
+            }
           }
-        }
-        if (field.array) {
+          if (field.array) {
+            res[field.name] = () => {
+              const vals = val as BaseModel[];
+              return vals.map((_v) => {
+                return _v && fieldType.ResolveFields(_v);
+              });
+            };
+          } else {
+            res[field.name] = () => {
+              return val && fieldType.ResolveFields(val);
+            };
+          }
+        } else if (typeof fieldType === 'object') {
+          // 临时模型
           res[field.name] = () => {
-            const vals = val as BaseModel[];
-            return vals.map((_v) => {
-              return _v && fieldType.ResolveFields(_v);
-            });
+            if (field.array) {
+              const _res: Record<string, unknown>[] = [];
+              if (val) {
+                const vals = val as Record<string, unknown>[];
+                vals.forEach((_v) => {
+                  const _r: Record<string, unknown> = {};
+                  fieldType.types.forEach((type) => {
+                    _r[type.name!] = () => _v && Reflect.get(_v, type.name!);
+                  });
+                  _res.push(_r);
+                });
+              }
+              return _res;
+            } else {
+              const _res: Record<string, unknown> = {};
+              fieldType.types.forEach((type) => {
+                _res[type.name!] = () => val && Reflect.get(val, type.name!);
+              });
+              return _res;
+            }
           };
         } else {
           res[field.name] = () => {
-            return val && fieldType.ResolveFields(val);
+            return Reflect.get(data, field.name);
           };
         }
-      } else if (typeof fieldType === 'object') {
-        // 临时模型
-        res[field.name] = () => {
-          if (field.array) {
-            const _res: Record<string, unknown>[] = [];
-            if (val) {
-              const vals = val as Record<string, unknown>[];
-              vals.forEach((_v) => {
-                const _r: Record<string, unknown> = {};
-                fieldType.types.forEach((type) => {
-                  _r[type.name!] = () => _v && Reflect.get(_v, type.name!);
-                });
-                _res.push(_r);
-              });
-            }
-            return _res;
-          } else {
-            const _res: Record<string, unknown> = {};
-            fieldType.types.forEach((type) => {
-              _res[type.name!] = () => val && Reflect.get(val, type.name!);
-            });
-            return _res;
-          }
-        };
-      } else {
-        res[field.name] = () => {
-          return Reflect.get(data, field.name);
-        };
-      }
-    });
+      })
+    );
     return res;
   }
 
-  public static queryByRelation(
+  public static async queryByRelation(
     field: IDataField,
     value: unknown
-  ): BaseModel | BaseModel[] {
+  ): Promise<BaseModel | BaseModel[]> {
     if (field.array) {
       return [] as BaseModel[];
     } else {

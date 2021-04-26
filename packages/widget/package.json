@@ -6,12 +6,13 @@
   "typings": "dist/typings/index.d.ts",
   "scripts": {
     "start": "vue-cli-service serve --skip-plugins @vue/cli-plugin-eslint",
-    "build": "vue-cli-service build --target lib --name noix.widget src/index.ts --skip-plugins @vue/cli-plugin-eslint && tsc -d",
+    "build": "vue-cli-service build --target lib --name noix.widget src/index.ts --skip-plugins @vue/cli-plugin-eslint ",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "vue": "^3.0.0",
     "@noix/core": "0.0.1",
+    "@noix/client": "0.0.1",
     "ant-design-vue": "^2.1.2"
   },
   "devDependencies": {

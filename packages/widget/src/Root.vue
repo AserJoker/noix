@@ -16,6 +16,7 @@
   </noix-form>
   <noix-radio @change="OnRadioChange" :options="options" />
   <noix-checkbox @change="OnCheckboxChange" :options="options" />
+  <noix-button @click="Post">click</noix-button>
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Attribute } from './base';
@@ -27,6 +28,9 @@ import {
   NoixRadio,
   NoixCheckbox
 } from './components';
+import { HttpClient } from '@noix/client';
+const client = new HttpClient();
+client.SetBaseURL('http://localhost:9090');
 @Component({
   components: {
     NoixForm,
@@ -68,6 +72,32 @@ export default class NoixRoot extends BaseWidget {
   @Attribute()
   private OnCheckboxChange(newValue: string) {
     console.log(newValue);
+  }
+
+  @Attribute()
+  private async Post() {
+    const res = await client.Query(
+      'base',
+      'Model',
+      'query',
+      {
+        record: {
+          module: 'base',
+          name: 'Model'
+        }
+      },
+      `{
+      fields{
+        name
+        ref
+        array
+        model
+        rel
+        type
+      }
+    }`
+    );
+    console.log(res);
   }
 }
 </script>
