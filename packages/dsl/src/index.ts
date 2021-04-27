@@ -1,2 +1,2 @@
 export * from './NoixTL';
-export * from './NoixTLNode';
+export * from './NoixQLisp';

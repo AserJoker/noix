@@ -1,0 +1,11 @@
+基于lisp语法定义查询语句
+qlsp:
+(AND (EQL model "Model") (EQL module "base"))
+=>
+sql:
+[selec * from base_model where] name='Model' and module='base'
+qlsp:
+(IN id (LIST 1 2 3 4 5))
+=>
+sql:
+[selec * from base_model where] id in (1,2,3,4,5)

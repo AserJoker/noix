@@ -47,8 +47,11 @@ import {
   NoixCheckbox,
   NoixCheckboxGroup
 } from './components';
-import { NoixTL } from '@noix/dsl';
+import { NoixTL, NoixQLisp } from '@noix/dsl';
 import { HttpClient } from '@noix/client';
+console.log(
+  NoixQLisp.ToSQL(NoixQLisp.Compile('(AND (EQU id 123) (GT num 100))'))
+);
 @Component({
   components: {
     NoixForm,
