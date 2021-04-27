@@ -14,9 +14,25 @@
       <noix-button @click="OnLogin" type="primary">login</noix-button>
     </noix-form-item>
   </noix-form>
-  <noix-radio @change="OnRadioChange" :options="options" />
-  <noix-checkbox @change="OnCheckboxChange" :options="options" />
   <noix-button @click="Post">click</noix-button>
+
+  <noix-radio :value="radioValue" @change="radioChange">radioValue</noix-radio>
+  <noix-radio-button :value="radioButtonValue"
+    >radioButtonValue</noix-radio-button
+  >
+  <noix-radio-group
+    :value="radioGroupValue"
+    :options="options"
+    @change="radioGroupChange"
+  ></noix-radio-group>
+  <noix-checkbox @change="checkboxChange" :value="checkboxValue"
+    >Checkbox</noix-checkbox
+  >
+  <noix-checkbox-group
+    @change="checkboxGroupChange"
+    :value="checkboxGroupValue"
+    :options="options"
+  ></noix-checkbox-group>
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Attribute } from './base';
@@ -26,7 +42,10 @@ import {
   NoixInput,
   NoixButton,
   NoixRadio,
-  NoixCheckbox
+  NoixRadioButton,
+  NoixRadioGroup,
+  NoixCheckbox,
+  NoixCheckboxGroup
 } from './components';
 import { NoixTL } from '@noix/dsl';
 import { HttpClient } from '@noix/client';
@@ -37,15 +56,15 @@ import { HttpClient } from '@noix/client';
     NoixInput,
     NoixButton,
     NoixRadio,
-    NoixCheckbox
+    NoixRadioButton,
+    NoixRadioGroup,
+    NoixCheckbox,
+    NoixCheckboxGroup
   }
 })
 export default class NoixRoot extends BaseWidget {
   @Attribute({ reactive: true })
   private store = { password: '', username: '' };
-
-  @Attribute()
-  private options = ['Apple', 'Pear', 'Orange'];
 
   @Attribute()
   private OnUsernameChange(newValue: string) {
@@ -61,16 +80,6 @@ export default class NoixRoot extends BaseWidget {
     console.log(
       `username:${this.store.username}\n password:${this.store.password}`
     );
-  }
-
-  @Attribute()
-  private OnRadioChange(newValue: string) {
-    console.log(newValue);
-  }
-
-  @Attribute()
-  private OnCheckboxChange(newValue: string) {
-    console.log(newValue);
   }
 
   @Attribute()
@@ -108,6 +117,40 @@ export default class NoixRoot extends BaseWidget {
       #model
     `)
     );
+  }
+
+  @Attribute({ reactive: true })
+  private radioValue = false;
+  @Attribute({ reactive: true })
+  private radioButtonValue = false;
+  @Attribute({ reactive: true })
+  private radioGroupValue = '';
+  @Attribute()
+  private options = [
+    { value: '1', displayName: '1' },
+    { value: '2', displayName: '2' },
+    { value: '3', displayName: '3' }
+  ];
+  @Attribute()
+  private radioGroupChange(newValue: string) {
+    console.log(newValue);
+  }
+  @Attribute({ reactive: true })
+  private checkboxValue = false;
+  @Attribute({ reactive: true })
+  private checkboxGroupValue = ['1'];
+  @Attribute()
+  private radioChange(newValue: string) {
+    console.log(newValue);
+  }
+  @Attribute()
+  private checkboxChange(newValue: boolean) {
+    this.checkboxValue = newValue;
+  }
+  @Attribute()
+  private checkboxGroupChange(newValue: string[]) {
+    this.checkboxGroupValue = newValue;
+    console.log(newValue);
   }
 }
 </script>
