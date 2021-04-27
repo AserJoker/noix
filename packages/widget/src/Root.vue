@@ -17,7 +17,7 @@
   <noix-button @click="Post">click</noix-button>
 
   <noix-radio :value="radioValue" @change="radioChange">radioValue</noix-radio>
-  <noix-radio-button :value="radioButtonValue"
+  <noix-radio-button :value="radioButtonValue" @change="radioButtonChange"
     >radioButtonValue</noix-radio-button
   >
   <noix-radio-group
@@ -130,8 +130,12 @@ export default class NoixRoot extends BaseWidget {
   @Attribute({ reactive: true })
   private checkboxGroupValue = ['1'];
   @Attribute()
-  private radioChange(newValue: string) {
-    console.log(newValue);
+  private radioChange(newValue: boolean) {
+    this.radioValue = newValue;
+  }
+  @Attribute()
+  private radioButtonChange(newValue: boolean) {
+    this.radioButtonValue = newValue;
   }
   @Attribute()
   private checkboxChange(newValue: boolean) {
@@ -140,7 +144,6 @@ export default class NoixRoot extends BaseWidget {
   @Attribute()
   private checkboxGroupChange(newValue: string[]) {
     this.checkboxGroupValue = newValue;
-    console.log(newValue);
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <a-radio :checked="value"><slot /></a-radio>
+  <a-radio :checked="value" @update:checked="change"><slot /></a-radio>
 </template>
 <script lang="ts">
 import { Radio as ARadio } from 'ant-design-vue';
@@ -9,6 +9,6 @@ export default class NoixRadio extends BaseWidget {
   @Prop()
   private value!: boolean;
   @Emit('change')
-  private change(newValue: string) {}
+  private change(newValue: boolean) {}
 }
 </script>
