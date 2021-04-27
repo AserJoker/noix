@@ -5,7 +5,9 @@ export class HttpClient extends EventObject {
 
   public SetBaseURL(url: string) {
     this._instance = axios.create({
-      baseURL: url
+      baseURL: url,
+      withCredentials: true,
+      responseType: 'json'
     });
   }
 
