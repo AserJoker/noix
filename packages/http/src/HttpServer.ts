@@ -1,4 +1,4 @@
-import { EventObject } from '@noix/core';
+import { EventObject, Logger } from '@noix/core';
 import http, { Server } from 'http';
 import Koa from 'koa';
 import cors from 'koa2-cors';
@@ -20,8 +20,9 @@ export class HttpServer extends EventObject {
     this.InitRequest(app);
     this._serverInstance = http.createServer(app.callback());
     this._serverInstance.listen(this._serverOption.port);
-    console.log(
-      'INFO [@noix/http]: server is listening at ' + this._serverOption.port
+    Logger.Info(
+      '@noix/http',
+      ' server is listening at ' + this._serverOption.port
     );
   }
 
@@ -33,7 +34,7 @@ export class HttpServer extends EventObject {
   public Close() {
     this._serverInstance && this._serverInstance.close();
     this._serverInstance = null;
-    console.log('INFO [@noix/http]: server closed');
+    Logger.Info('@noix/http', 'server closed');
   }
 
   protected InitRequest(app: Koa) {
@@ -65,10 +66,10 @@ export class HttpServer extends EventObject {
     const localModule = this._modules.find((m) => m.module === module.module);
     if (localModule) {
       localModule.responseHandles = module.responseHandles;
-      console.log('INFO [@noix/http]: update module ' + module.module);
+      Logger.Info('@noix/http', 'update module ' + module.module);
     } else {
       this._modules.push(module);
-      console.log('INFO [@noix/http]: register module ' + module.module);
+      Logger.Info('@noix/http', 'register module ' + module.module);
     }
   }
 

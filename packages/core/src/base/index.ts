@@ -7,3 +7,4 @@ export * from './PromiseQueue';
 export * from './BaseObject';
 export * from './DeepCopy';
 export * from './DeepPatch';
+export * from './Logger';

@@ -1,4 +1,4 @@
-import { SystemApplication, Bootstrap } from '@noix/core';
+import { SystemApplication, Bootstrap, Logger } from '@noix/core';
 import commander from 'commander';
 import path from 'path';
 import fs from 'fs';
@@ -6,6 +6,7 @@ import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
 import { BaseModel, GraphQL } from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
+import chalk from 'chalk';
 @Bootstrap
 export class ServerApplication extends SystemApplication {
   private _config: Record<string, unknown> = {};
@@ -41,9 +42,9 @@ export class ServerApplication extends SystemApplication {
         await next();
       },
       async (ctx, next) => {
-        console.log(
-          'INFO [@noix/server]: ' +
-            ctx.request.method +
+        Logger.Info(
+          '@noix/server',
+          ctx.request.method +
             ' ' +
             ctx.request.path +
             ' with IP:' +
@@ -53,6 +54,13 @@ export class ServerApplication extends SystemApplication {
       }
     ];
     this._serverInstance.RegisterModule(systemModule);
+    Logger.use((source, type) => {
+      if (type === 'debug') return chalk.gray(source);
+      if (type === 'info') return chalk.blue(source);
+      if (type === 'error') return chalk.red(source);
+      if (type === 'warn') return chalk.yellow(source);
+      return source;
+    });
     this.LoadModules();
     this._serverInstance.Bootstrap();
   }
@@ -83,7 +91,7 @@ export class ServerApplication extends SystemApplication {
 
     const root: Record<string, Function> = {};
     classes.forEach((name) => {
-      console.log('INFO [@noix/server] load model ' + name);
+      Logger.Info('@noix/server', 'load model ' + name);
       const DataModel = BaseModel.GetDataModel(module, name)!;
       const funs = BaseModel.GetFunctions(DataModel);
       str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
