@@ -1,5 +1,6 @@
 import { BaseModel, StoreModel } from '@noix/engine';
 import { Field } from './Field';
+import { Function } from './Function';
 
 @BaseModel.DataModel({ module: 'base', name: 'Model' })
 export class Model extends StoreModel {
@@ -17,6 +18,15 @@ export class Model extends StoreModel {
     rel: 'name'
   })
   public fields: Field[] | null = null;
+
+  @BaseModel.DataField({
+    type: Function,
+    name: 'functions',
+    array: true,
+    ref: 'model',
+    rel: 'name'
+  })
+  public functions: Function[] | null = null;
 
   public static async query(record: BaseModel): Promise<BaseModel | null> {
     const model = record as Model;

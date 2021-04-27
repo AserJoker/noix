@@ -145,7 +145,12 @@ export class BaseModel extends EventObject {
     return BaseModel._fields.get(dataModel) || [];
   }
 
-  public static GetParams(dataModel: typeof BaseModel, funName: string) {}
+  public static GetParams(dataModel: typeof BaseModel, funName: string) {
+    const fun = BaseModel.GetFunctions(dataModel).find(
+      (f) => f.name === funName
+    );
+    return fun && fun.params;
+  }
 
   @BaseModel.QueryFunction('this')
   public static async insert<T extends BaseModel>(
@@ -233,7 +238,7 @@ export class BaseModel extends EventObject {
           if (!val || val.length === 0) {
             const rel = Reflect.get(data, field.rel!);
             if (rel) {
-              val = await fieldType.queryByRelation(field, rel);
+              val = await fieldType.QueryByRelation(field, rel);
             }
           }
           if (field.array) {
@@ -282,7 +287,7 @@ export class BaseModel extends EventObject {
     return res;
   }
 
-  public static async queryByRelation(
+  public static async QueryByRelation(
     field: IDataField,
     value: unknown
   ): Promise<BaseModel | BaseModel[]> {

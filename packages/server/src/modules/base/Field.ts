@@ -20,7 +20,7 @@ export class Field extends BaseModel {
   @BaseModel.DataField({ type: 'string' })
   public rel: string | null = '';
 
-  public static async queryByRelation(field: IDataField, ref: unknown) {
+  public static async QueryByRelation(field: IDataField, ref: unknown) {
     // FIXME: 从数据库查询 select * from 'xxx' where ${field.ref} = ref
     const model = BaseModel.GetDataModel('*', ref as string);
     let fields: Field[] = [];
