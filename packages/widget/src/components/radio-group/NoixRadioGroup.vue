@@ -1,5 +1,5 @@
 <template>
-  <a-radio-group :value="value" @change="change">
+  <a-radio-group :value="value" @update:value="change">
     <slot>
       <a-radio-button
         v-for="opt in options"
@@ -19,12 +19,12 @@ import { BaseWidget, Component, Emit, Prop } from '../../base';
 })
 export default class NoixRadioGroup extends BaseWidget {
   @Prop()
-  private value!: string[];
+  private value!: string;
 
   @Prop()
   private options!: { value: unknown; displayName: string }[];
 
   @Emit('change')
-  private change(newValue: string[]) {}
+  private change(newValue: string) {}
 }
 </script>

@@ -10,6 +10,7 @@ import { BaseWidget, Component, Prop, Emit } from '../../base';
 export default class NoixRadioButton extends BaseWidget {
   @Prop()
   private value!: boolean;
+
   @Emit('change')
   private change(newValue: boolean) {}
 }
