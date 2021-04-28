@@ -4,6 +4,7 @@
   "dependencies": {
     "@noix/core": "0.0.1",
     "@noix/mysql": "0.0.1",
+    "@noix/dsl": "0.0.1",
     "graphql": "^15.5.0"
   },
   "scripts": {

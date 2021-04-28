@@ -8,6 +8,7 @@ export interface IDataField {
     | 'string'
     | 'boolean'
     | 'float'
+    | 'text'
     | 'this'
     | ITemplateType
     | typeof BaseModel;

@@ -1,7 +1,7 @@
 {
   "name": "@noix/dsl",
   "version": "0.0.1",
-  "main": "src/index.ts",
+  "main": "dist/noix.dsl.lib.js",
   "typings": "dist/typings/index.d.ts",
   "dependencies": {
     "@noix/core": "0.0.1"

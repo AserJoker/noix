@@ -153,7 +153,7 @@ export class BaseModel extends EventObject {
   }
 
   @BaseModel.QueryFunction('this')
-  public static async insert<T extends BaseModel>(
+  public static async Insert<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' })
     record: T
   ): Promise<BaseModel> {
@@ -161,21 +161,21 @@ export class BaseModel extends EventObject {
   }
 
   @BaseModel.QueryFunction('this')
-  public static async update<T extends BaseModel>(
+  public static async Update<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
   ): Promise<BaseModel> {
     return new BaseModel() as T;
   }
 
   @BaseModel.QueryFunction('this')
-  public static async delete<T extends BaseModel>(
+  public static async Delete<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
   ): Promise<BaseModel> {
     return new BaseModel() as T;
   }
 
   @BaseModel.QueryFunction('this')
-  public static async query<T extends BaseModel>(
+  public static async Query<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T,
     parent: BaseModel,
     root: BaseModel
@@ -192,7 +192,7 @@ export class BaseModel extends EventObject {
       { name: 'list', type: 'this', array: true }
     ]
   } as ITemplateType)
-  public static async queryList(
+  public static async QueryList(
     @BaseModel.QueryParam({ name: 'size', type: 'int' }) size: number,
     @BaseModel.QueryParam({ name: 'page', type: 'int' }) page: number,
     @BaseModel.QueryParam({ name: 'condition', type: 'string' })
@@ -208,7 +208,7 @@ export class BaseModel extends EventObject {
     };
   }
 
-  public static async init(): Promise<BaseModel> {
+  public static async Init(): Promise<BaseModel> {
     return new BaseModel();
   }
 

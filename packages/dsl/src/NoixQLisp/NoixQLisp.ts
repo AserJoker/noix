@@ -98,40 +98,95 @@ export class NoixQLisp {
 
   public static ToSQL(qlispNode: NoixQLispNode): string {
     if (qlispNode.name === 'object') {
-      if (qlispNode.children[0].name.startsWith('$')) {
-        const operator = qlispNode.children[0].name.substr(1);
-        const params = qlispNode.children.splice(1).map((q) => this.ToSQL(q));
-        switch (operator) {
-          case 'EQU':
-            return `${params[0]} = ${params[1]}`;
-          case 'NOT_EQU':
-            return `${params[0]} <> ${params[1]}`;
-          case 'GT':
-            return `${params[0]} > ${params[1]}`;
-          case 'LT':
-            return `${params[0]} < ${params[1]}`;
-          case 'GE':
-            return `${params[0]} >= ${params[1]}`;
-          case 'LE':
-            return `${params[0]} <= ${params[1]}`;
-          case 'LIKE':
-            return `${params[0]} LIKE ${params[1]}`;
-          case 'IN':
-            return `${params[0]} IN ${params[1]}`;
-          case 'AND':
-            return `${params[0]} AND ${params[1]}`;
-          case 'OR':
-            return `${params[0]} OR ${params[1]}`;
-        }
-        return '';
-      } else {
-        return `(${qlispNode.children.map((q) => this.ToSQL(q)).join(',')})`;
+      const operator = qlispNode.children[0].name.substr(1);
+      const params = qlispNode.children.splice(1).map((q) => this.ToSQL(q));
+      switch (operator) {
+        case 'EQU':
+          return `${params[0]} = ${params[1]}`;
+        case 'NOT_EQU':
+          return `${params[0]} <> ${params[1]}`;
+        case 'GT':
+          return `${params[0]} > ${params[1]}`;
+        case 'LT':
+          return `${params[0]} < ${params[1]}`;
+        case 'GE':
+          return `${params[0]} >= ${params[1]}`;
+        case 'LE':
+          return `${params[0]} <= ${params[1]}`;
+        case 'LIKE':
+          return `${params[0]} LIKE ${params[1]}`;
+        case 'IN':
+          return `${params[0]} IN ${params[1]}`;
+        case 'AND':
+          return `${params[0]} AND ${params[1]}`;
+        case 'OR':
+          return `${params[0]} OR ${params[1]}`;
+        case 'LIST':
+          return `(${params.join(',')})`;
       }
+      return '';
     } else {
       if (qlispNode.name.startsWith('$')) {
         return qlispNode.name.substr(1);
       }
       return `${qlispNode.value}`;
+    }
+  }
+  public static Exec(
+    qlispNode: NoixQLispNode,
+    record: Record<string, unknown>
+  ): unknown {
+    if (
+      typeof qlispNode.value === 'number' ||
+      typeof qlispNode.value === 'boolean'
+    ) {
+      return qlispNode.value;
+    }
+    if (qlispNode.name.startsWith('$')) {
+      const name = qlispNode.name.substr(1);
+      return record[name];
+    } else if (qlispNode.name !== 'object') {
+      return qlispNode.value;
+    }
+    const opt = qlispNode.children[0].name.substr(1);
+    const params = qlispNode.children.map((c) => this.Exec(c, record));
+    switch (opt) {
+      case 'AND':
+        return params[1] && params[2];
+      case 'OR':
+        return params[1] && params[2];
+      case 'LIST':
+        return params.splice(1);
+      case 'EQU':
+        return params[1] == params[2];
+      case 'NOT_EQU':
+        return params[1] != params[2];
+      case 'GT':
+        return (params[1] as number) > (params[2] as number);
+      case 'LT':
+        return (params[1] as number) < (params[2] as number);
+      case 'GE':
+        return (params[1] as number) >= (params[2] as number);
+      case 'LE':
+        return (params[1] as number) <= (params[2] as number);
+      case 'IN': {
+        const list = params[2] as unknown[];
+        return list.includes(params[1]);
+      }
+      case 'LIKE': {
+        const str = params[2] as string;
+        const strc = params[1] as string;
+        if (str.endsWith('%') && !str.startsWith('%')) {
+          return strc.startsWith(str.substr(0, str.length - 1));
+        }
+        if (!str.endsWith('%') && str.startsWith('%')) {
+          return strc.endsWith(str.substr(1, str.length));
+        }
+        if (str.startsWith('%') && str.endsWith('%')) {
+          return strc.includes(str.substr(1, str.length - 1));
+        }
+        return strc === str;
+      }
     }
   }
 }

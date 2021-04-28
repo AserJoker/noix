@@ -20,5 +20,10 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts']
+  },
+  externals: {
+    '@noix/dsl': '@noix/dsl',
+    '@noix/core': '@noix/core',
+    '@noix/mysql': '@noix/mysql'
   }
 };

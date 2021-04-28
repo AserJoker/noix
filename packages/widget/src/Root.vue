@@ -49,9 +49,7 @@ import {
 } from './components';
 import { NoixTL, NoixQLisp } from '@noix/dsl';
 import { HttpClient } from '@noix/client';
-console.log(
-  NoixQLisp.ToSQL(NoixQLisp.Compile('(AND (EQU id 123) (GT num 100))'))
-);
+console.log(NoixQLisp);
 @Component({
   components: {
     NoixForm,

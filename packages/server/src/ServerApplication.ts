@@ -4,9 +4,13 @@ import path from 'path';
 import fs from 'fs';
 import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
-import { BaseModel, GraphQL } from '@noix/engine';
+import { BaseModel, DataSource, GraphQL } from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
 import chalk from 'chalk';
+import { Model } from './modules';
+
+const ds = new DataSource(Model);
+ds.CreateTable();
 @Bootstrap
 export class ServerApplication extends SystemApplication {
   private _config: Record<string, unknown> = {};
@@ -20,6 +24,13 @@ export class ServerApplication extends SystemApplication {
         path.resolve(process.cwd(), commandLine.config)
       );
     }
+    Logger.use((source, type) => {
+      if (type === 'debug') return chalk.gray(source);
+      if (type === 'info') return chalk.blue(source);
+      if (type === 'error') return chalk.red(source);
+      if (type === 'warn') return chalk.yellow(source);
+      return source;
+    });
     this._serverInstance = new HttpServer(this._config.port as number);
     const systemModule = {
       module: 'system'
@@ -54,13 +65,6 @@ export class ServerApplication extends SystemApplication {
       }
     ];
     this._serverInstance.RegisterModule(systemModule);
-    Logger.use((source, type) => {
-      if (type === 'debug') return chalk.gray(source);
-      if (type === 'info') return chalk.blue(source);
-      if (type === 'error') return chalk.red(source);
-      if (type === 'warn') return chalk.yellow(source);
-      return source;
-    });
     this.LoadModules();
     this._serverInstance.Bootstrap();
   }

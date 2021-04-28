@@ -1,7 +1,7 @@
-import { BaseModel, IDataField } from '@noix/engine';
+import { BaseModel, IDataField, StoreModel } from '@noix/engine';
 
-@BaseModel.DataModel({ name: 'Function', module: 'base' })
-export class Function extends BaseModel {
+@BaseModel.DataModel({ name: 'Function', module: 'base', pamiryKey: 'id' })
+export class Function extends StoreModel {
   @BaseModel.DataField({ type: 'string' })
   public name: string = '';
 
