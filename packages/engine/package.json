@@ -8,8 +8,8 @@
     "graphql": "^15.5.0"
   },
   "scripts": {
-    "build": "webpack"
+    "build": "tsc"
   },
-  "main": "src/index.ts",
-  "typings": "src/index.ts"
+  "main": "dist/index.js",
+  "typings": "dist/typings/index.d.ts"
 }

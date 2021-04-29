@@ -15,7 +15,6 @@ import { buildSchema, graphql, GraphQLSchema } from 'graphql';
 import chalk from 'chalk';
 import { MysqlClient } from '@noix/mysql';
 import { Field, Function as _Function, Model } from './modules';
-
 @Bootstrap
 export class ServerApplication extends SystemApplication {
   private _config: Record<string, unknown> = {};
@@ -24,20 +23,54 @@ export class ServerApplication extends SystemApplication {
   private _schemes: Record<string, GraphQLSchema> = {};
   public async main() {
     const commandLine = this.ResolveCommandLine();
+    this._config = {
+      port: commandLine.port,
+      reset: commandLine.reset
+    };
     if (commandLine.config) {
       this._config = await this.LoadConfigFile(
         path.resolve(process.cwd(), commandLine.config)
       );
+      this._config = {
+        ...this._config
+      };
     }
     Logger.use((source, type) => {
       if (type === 'debug') return chalk.gray(source);
       if (type === 'info') return chalk.blue(source);
       if (type === 'error') return chalk.red(source);
       if (type === 'warn') return chalk.yellow(source);
+      if (type === 'logo') return chalk.redBright(source);
       return source;
     });
-    MysqlClient.ConnectToServer('localhost', 3306, 'admin', 'admin', 'noix');
-    await MysqlClient.ResetDatabase();
+
+    Logger.Log(
+      '@noix',
+      'logo',
+      `
+    NNNNNNNN        NNNNNNNN                   iiii                      
+    N:::::::N       N::::::N                  i::::i                     
+    N::::::::N      N::::::N                   iiii                      
+    N:::::::::N     N::::::N                                             
+    N::::::::::N    N::::::N   ooooooooooo   iiiiiii xxxxxxx      xxxxxxx
+    N:::::::::::N   N::::::N oo:::::::::::oo i:::::i  x:::::x    x:::::x 
+    N:::::::N::::N  N::::::No:::::::::::::::o i::::i   x:::::x  x:::::x  
+    N::::::N N::::N N::::::No:::::ooooo:::::o i::::i    x:::::xx:::::x   
+    N::::::N  N::::N:::::::No::::o     o::::o i::::i     x::::::::::x    
+    N::::::N   N:::::::::::No::::o     o::::o i::::i      x::::::::x     
+    N::::::N    N::::::::::No::::o     o::::o i::::i      x::::::::x     
+    N::::::N     N:::::::::No::::o     o::::o i::::i     x::::::::::x    
+    N::::::N      N::::::::No:::::ooooo:::::oi::::::i   x:::::xx:::::x   
+    N::::::N       N:::::::No:::::::::::::::oi::::::i  x:::::x  x:::::x  
+    N::::::N        N::::::N oo:::::::::::oo i::::::i x:::::x    x:::::x 
+    NNNNNNNN         NNNNNNN   ooooooooooo   iiiiiiiixxxxxxx      xxxxxxx
+    `
+    );
+    MysqlClient.InitServer('localhost', 3306, 'admin', 'admin', 'noix');
+    if (this._config.reset) {
+      await MysqlClient.ResetDatabase();
+    }
+    MysqlClient.Connect();
     this._serverInstance = new HttpServer(this._config.port as number);
     const systemModule = {
       module: 'system'
@@ -79,7 +112,8 @@ export class ServerApplication extends SystemApplication {
   public ResolveCommandLine() {
     return commander
       .option('-M, --module <path>', 'modules path for server', 'modules')
-      .option('-P, -port <port>', 'port for server', parseInt, 9090)
+      .option('-P, --port <port>', 'port for server', parseInt, 9090)
+      .option('-R, --reset', 'reset database', false)
       .version('0.0.1')
       .parse(process.argv)
       .opts();
@@ -105,7 +139,9 @@ export class ServerApplication extends SystemApplication {
       classes.map(async (name) => {
         Logger.Info('@noix/server', 'load model ' + name);
         const DataModel = BaseModel.GetDataModel(module, name)!;
-        await DataModel.InitDataSource();
+        if (this._config.reset) {
+          await DataModel.InitDataSource();
+        }
         const funs = BaseModel.GetFunctions(DataModel);
         str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
         root[name.toLowerCase()] = async () => {
@@ -151,42 +187,44 @@ export class ServerApplication extends SystemApplication {
         };
       })
     );
-    await Promise.all(
-      classes.map(async (name) => {
-        const dataModel = BaseModel.GetDataModel(module, name);
-        const m = new Model();
-        m.module = module;
-        m.name = name;
-        m.fields = BaseModel.GetFields(dataModel!).map((f) => {
-          const field = new Field();
-          field.model = name;
-          field.array = f.array;
-          field.name = f.name;
-          field.ref = f.ref || '';
-          field.rel = f.ref || '';
-          if (typeof f.type === 'string') {
-            if (f.type === 'this') {
-              field.type = name;
+    if (this._config.reset) {
+      await Promise.all(
+        classes.map(async (name) => {
+          const dataModel = BaseModel.GetDataModel(module, name);
+          const m = new Model();
+          m.module = module;
+          m.name = name;
+          m.fields = BaseModel.GetFields(dataModel!).map((f) => {
+            const field = new Field();
+            field.model = name;
+            field.array = f.array;
+            field.name = f.name;
+            field.ref = f.ref || '';
+            field.rel = f.ref || '';
+            if (typeof f.type === 'string') {
+              if (f.type === 'this') {
+                field.type = name;
+              } else {
+                field.type = f.type;
+              }
+            } else if (typeof f.type === 'function') {
+              field.type = f.type.GetModelName();
             } else {
-              field.type = f.type;
+              field.type = name + f.type.name;
             }
-          } else if (typeof f.type === 'function') {
-            field.type = f.type.GetModelName();
-          } else {
-            field.type = name + f.type.name;
-          }
-          return field;
-        });
-        m.functions = BaseModel.GetFunctions(dataModel!).map((funmeta) => {
-          const fun = new _Function();
-          fun.model = name;
-          fun.name = funmeta.name;
-          fun.params = funmeta.params.map((param) => param.name);
-          return fun;
-        });
-        await Model.Insert(m);
-      })
-    );
+            return field;
+          });
+          m.functions = BaseModel.GetFunctions(dataModel!).map((funmeta) => {
+            const fun = new _Function();
+            fun.model = name;
+            fun.name = funmeta.name;
+            fun.params = funmeta.params.map((param) => param.name);
+            return fun;
+          });
+          await Model.Insert(m);
+        })
+      );
+    }
     str += `type Query{
       ${classes.map((c) => `${c.toLowerCase()}:${c}`).join(' ')}
     }`;

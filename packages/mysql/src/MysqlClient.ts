@@ -8,7 +8,7 @@ export class MysqlClient {
     password: 'admin',
     database: 'noix'
   };
-  public static ConnectToServer(
+  public static InitServer(
     host: string,
     port: number,
     username: string,
@@ -20,15 +20,16 @@ export class MysqlClient {
     this._config.password = password;
     this._config.port = port;
     this._config.username = username;
+  }
+  public static Connect() {
     MysqlClient._pool = mysql.createPool({
-      port,
-      host,
-      user: username,
-      password,
-      database
+      port: this._config.port,
+      host: this._config.host,
+      user: this._config.username,
+      password: this._config.password,
+      database: this._config.database
     });
   }
-
   public static async ResetDatabase() {
     return new Promise<void>((resolve, reject) => {
       this.Release();
@@ -38,19 +39,47 @@ export class MysqlClient {
         port: this._config.port,
         password: this._config.password
       });
-      pool.getConnection((err, con) => {
-        if (err) {
-          reject(err);
-        }
-        con.query(`drop database ${this._config.database};`, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            con.release();
-            pool.getConnection((err, conCreate) => {
-              if (err) {
-                reject(err);
-              } else {
+      pool.getConnection((err, conQuery) => {
+        conQuery.query(
+          `select * 
+        from information_schema.SCHEMATA 
+        where SCHEMA_NAME = 'noix'; `,
+          (err, res) => {
+            conQuery.release();
+            if (res && res.length) {
+              pool.getConnection((err, con) => {
+                if (err) {
+                  reject(err);
+                }
+                con.query(`drop database ${this._config.database};`, (err) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    con.release();
+                    pool.getConnection((err, conCreate) => {
+                      if (err) {
+                        reject(err);
+                      } else {
+                        conCreate.query(
+                          `create database ${this._config.database};`,
+                          (err) => {
+                            if (err) {
+                              reject(err);
+                            } else {
+                              conCreate.release();
+                              pool.end();
+                              this.Connect();
+                              resolve();
+                            }
+                          }
+                        );
+                      }
+                    });
+                  }
+                });
+              });
+            } else {
+              pool.getConnection((err, conCreate) => {
                 conCreate.query(
                   `create database ${this._config.database};`,
                   (err) => {
@@ -59,21 +88,15 @@ export class MysqlClient {
                     } else {
                       conCreate.release();
                       pool.end();
-                      this.ConnectToServer(
-                        this._config.host,
-                        this._config.port,
-                        this._config.username,
-                        this._config.password,
-                        this._config.database
-                      );
+                      this.Connect();
                       resolve();
                     }
                   }
                 );
-              }
-            });
+              });
+            }
           }
-        });
+        );
       });
     });
   }

@@ -1,7 +1,7 @@
 export class Logger {
   private static _resolver: ((
     source: string,
-    type: 'info' | 'warn' | 'error' | 'debug',
+    type: string,
     module: string
   ) => string)[] = [];
   public static Info(module: string, info: string) {
@@ -29,19 +29,19 @@ export class Logger {
     console.log(res);
   }
   public static Debug(module: string, info: string) {
-    const str = `DEBUG [${module}]: ${info}`;
+    this.Log(module, 'debug', info);
+  }
+
+  public static Log(module: string, type: string, info: string) {
+    const str = `${type.toUpperCase()} [${module}]: ${info}`;
     let res = str;
     this._resolver.forEach((resolver) => {
-      res = resolver(res, 'debug', module);
+      res = resolver(res, type, module);
     });
     console.log(res);
   }
   public static use(
-    resolver: (
-      source: string,
-      type: 'info' | 'warn' | 'error' | 'debug',
-      module: string
-    ) => string
+    resolver: (source: string, type: string, module: string) => string
   ) {
     const index = this._resolver.push(resolver);
     return {

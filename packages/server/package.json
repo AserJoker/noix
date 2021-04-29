@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "nodemon -e ts,tsx --exec ts-node ./src/ServerApplication.ts",
+    "start": "nodemon -e ts,tsx --exec ts-node ./src/ServerApplication.ts --reset",
     "clean": "rimraf  dist"
   }
 }
