@@ -7,10 +7,8 @@ import './modules';
 import { BaseModel, DataSource, GraphQL } from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
 import chalk from 'chalk';
-import { Model } from './modules';
+import { MysqlClient } from '@noix/mysql';
 
-const ds = new DataSource(Model);
-ds.CreateTable();
 @Bootstrap
 export class ServerApplication extends SystemApplication {
   private _config: Record<string, unknown> = {};
@@ -31,6 +29,8 @@ export class ServerApplication extends SystemApplication {
       if (type === 'warn') return chalk.yellow(source);
       return source;
     });
+    MysqlClient.ConnectToServer('localhost', 3306, 'admin', 'admin', 'noix');
+    await MysqlClient.ResetDatabase();
     this._serverInstance = new HttpServer(this._config.port as number);
     const systemModule = {
       module: 'system'
@@ -97,10 +97,11 @@ export class ServerApplication extends SystemApplication {
     classes.forEach((name) => {
       Logger.Info('@noix/server', 'load model ' + name);
       const DataModel = BaseModel.GetDataModel(module, name)!;
+      DataModel.InitDataSource();
       const funs = BaseModel.GetFunctions(DataModel);
       str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
       root[name.toLowerCase()] = async () => {
-        const init = await DataModel.init();
+        const init = await DataModel.Init();
         const initResponse: Record<string, Function> = {};
         if (init) {
           const resolved = await DataModel.ResolveFields(init);

@@ -1,14 +1,6 @@
 import { DataSource } from '../service';
 import { BaseModel } from './BaseModel';
 export class StoreModel extends BaseModel {
-  private static _dataSource: DataSource | null = null;
-  protected static get dataSource() {
-    if (!this._dataSource || this._dataSource.model !== this) {
-      this._dataSource = new DataSource(this);
-    }
-    return this._dataSource;
-  }
-
   @BaseModel.DataField({ type: 'string' })
   public id: string = '';
 
@@ -31,5 +23,10 @@ export class StoreModel extends BaseModel {
 
   public static async Delete<T>(record: T): Promise<T> {
     return this.dataSource.Delete(record);
+  }
+
+  public static async InitDataSource() {
+    this.dataSource = new DataSource(this);
+    DataSource.CreateTable(this);
   }
 }

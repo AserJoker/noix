@@ -64,5 +64,6 @@ export class DataSource extends EventObject {
       })
       .join(',')})`;
     Logger.Debug('@noix/engine', sql);
+    await MysqlClient.Query(sql);
   }
 }

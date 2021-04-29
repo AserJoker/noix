@@ -1,4 +1,5 @@
 import { EventObject, PromiseQueue } from '@noix/core';
+import { DataSource } from '../service';
 import {
   IDataModel,
   IDataField,
@@ -297,4 +298,8 @@ export class BaseModel extends EventObject {
       return {} as BaseModel;
     }
   }
+
+  public static async InitDataSource() {}
+
+  protected static dataSource: DataSource;
 }

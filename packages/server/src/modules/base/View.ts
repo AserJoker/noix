@@ -7,4 +7,7 @@ export class View extends StoreModel {
 
   @BaseModel.DataField({ type: 'string' })
   public name: string = '';
+
+  @BaseModel.DataField({ type: 'string' })
+  public bindingModel: string = '';
 }
