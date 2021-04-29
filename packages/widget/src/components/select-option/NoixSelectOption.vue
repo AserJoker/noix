@@ -1,12 +1,17 @@
 <template>
-  <a-select-option :value="value"><slot /></a-select-option>
+  <a-select-option :select="value" @update:select="change">
+    <slot />
+  </a-select-option>
 </template>
 <script lang="ts">
 import { Select as ASelect } from 'ant-design-vue';
-import { BaseWidget, Component, Prop } from '../../base';
-@Component({ components: { ASelect } })
+import { BaseWidget, Component, Prop, Emit } from '../../base';
+@Component({ components: { ASelectOption: ASelect.Option } })
 export default class NoixSelectOption extends BaseWidget {
   @Prop()
-  private value!: string | number;
+  private value!: boolean;
+
+  @Emit('change')
+  private change(newValue: string) {}
 }
 </script>
