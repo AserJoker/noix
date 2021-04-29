@@ -299,6 +299,10 @@ export class BaseModel extends EventObject {
     }
   }
 
+  public static async GetPamiryKey() {
+    return this.info.pamiryKey || null;
+  }
+
   public static async InitDataSource() {}
 
   protected static dataSource: DataSource;
