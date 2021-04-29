@@ -1,17 +1,19 @@
 import { BaseModel } from '../base';
 import { ITemplateType } from './ITemplateType';
 
+export type FieldType =
+  | 'int'
+  | 'string'
+  | 'boolean'
+  | 'float'
+  | 'text'
+  | 'date'
+  | 'this'
+  | ITemplateType
+  | typeof BaseModel;
 export interface IDataField {
   name: string;
-  type:
-    | 'int'
-    | 'string'
-    | 'boolean'
-    | 'float'
-    | 'text'
-    | 'this'
-    | ITemplateType
-    | typeof BaseModel;
+  type: FieldType;
   array: boolean;
   required?: boolean;
   ref?: string;

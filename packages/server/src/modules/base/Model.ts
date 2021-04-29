@@ -27,16 +27,4 @@ export class Model extends StoreModel {
     rel: 'name'
   })
   public functions: Function[] | null = null;
-
-  public static async query(record: BaseModel): Promise<BaseModel | null> {
-    const model = record as Model;
-    const res = new Model();
-    res.name = model.name;
-    res.module = model.module;
-    const dataModel = BaseModel.GetDataModel(res.module, res.name)!;
-    if (!dataModel) {
-      return null;
-    }
-    return res;
-  }
 }

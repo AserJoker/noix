@@ -68,6 +68,9 @@ export class GraphQL {
       if (type === 'this') {
         return (input ? 'Input' : '') + ClassObject.GetModelName();
       }
+      if (type === 'date') {
+        return 'String';
+      }
       return type.charAt(0).toUpperCase() + type.slice(1);
     }
     if (typeof type === 'function') {

@@ -6,7 +6,8 @@ import {
   IQueryResult,
   IQueryFunction,
   IQueryParam,
-  ITemplateType
+  ITemplateType,
+  FieldType
 } from '../types';
 
 export class BaseModel extends EventObject {
@@ -75,7 +76,7 @@ export class BaseModel extends EventObject {
     };
   }
 
-  public static QueryFunction(info: string | ITemplateType) {
+  public static QueryFunction(info: ITemplateType | typeof BaseModel | 'this') {
     return <T extends typeof BaseModel>(dataModel: T, functionName: string) => {
       const funInfo = BaseModel._functions.get(dataModel) || [];
       const index = funInfo.findIndex((info) => info.name === functionName);
@@ -162,6 +163,14 @@ export class BaseModel extends EventObject {
   }
 
   @BaseModel.QueryFunction('this')
+  public static async InsertOrUpdate<T extends BaseModel>(
+    @BaseModel.QueryParam({ name: 'record', type: 'this' })
+    record: T
+  ): Promise<BaseModel> {
+    return new BaseModel() as T;
+  }
+
+  @BaseModel.QueryFunction('this')
   public static async Update<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
   ): Promise<BaseModel> {
@@ -197,9 +206,7 @@ export class BaseModel extends EventObject {
     @BaseModel.QueryParam({ name: 'size', type: 'int' }) size: number,
     @BaseModel.QueryParam({ name: 'page', type: 'int' }) page: number,
     @BaseModel.QueryParam({ name: 'condition', type: 'string' })
-    condition: string,
-    parent: BaseModel,
-    root: BaseModel
+    condition: string
   ): Promise<IQueryResult<BaseModel>> {
     return {
       size: 0,
@@ -227,9 +234,14 @@ export class BaseModel extends EventObject {
     return result;
   }
 
-  public static async ResolveFields(data: BaseModel) {
+  public static async ResolveFields(
+    data: BaseModel,
+    templageModel?: ITemplateType
+  ) {
     const res: Record<string, Function> = {};
-    const fields = BaseModel.GetFields(this);
+    const fields =
+      (templageModel && (templageModel.types as IDataField[])) ||
+      BaseModel.GetFields(this);
     await PromiseQueue(
       fields.map(async (field) => {
         let val = Reflect.get(data, field.name);
@@ -299,8 +311,8 @@ export class BaseModel extends EventObject {
     }
   }
 
-  public static async GetPamiryKey() {
-    return this.info.pamiryKey || null;
+  public static GetPamiryKey() {
+    return this.info.pamiryKey || 'id';
   }
 
   public static async InitDataSource() {}

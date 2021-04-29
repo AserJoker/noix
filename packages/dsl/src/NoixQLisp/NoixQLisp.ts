@@ -129,6 +129,9 @@ export class NoixQLisp {
       if (qlispNode.name.startsWith('$')) {
         return qlispNode.name.substr(1);
       }
+      if (qlispNode.name.startsWith('"')) {
+        return qlispNode.name;
+      }
       return `${qlispNode.value}`;
     }
   }

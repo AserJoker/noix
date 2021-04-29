@@ -6,8 +6,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'src/index.ts'),
   output: {
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/',
-    libraryTarget: 'commonjs',
+    libraryTarget: 'umd',
     filename: `${packageName}.lib.js`
   },
   module: {

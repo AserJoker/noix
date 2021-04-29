@@ -4,10 +4,17 @@ import path from 'path';
 import fs from 'fs';
 import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
-import { BaseModel, DataSource, GraphQL } from '@noix/engine';
+import {
+  BaseModel,
+  DataSource,
+  GraphQL,
+  IDataField,
+  ITemplateType
+} from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
 import chalk from 'chalk';
 import { MysqlClient } from '@noix/mysql';
+import { Field, Function as _Function, Model } from './modules';
 
 @Bootstrap
 export class ServerApplication extends SystemApplication {
@@ -65,7 +72,7 @@ export class ServerApplication extends SystemApplication {
       }
     ];
     this._serverInstance.RegisterModule(systemModule);
-    this.LoadModules();
+    await this.LoadModules();
     this._serverInstance.Bootstrap();
   }
 
@@ -86,7 +93,7 @@ export class ServerApplication extends SystemApplication {
     }
   }
 
-  public LoadModule(module: string) {
+  public async LoadModule(module: string) {
     const baseModule = {} as IResponseModule;
     baseModule.module = module;
     baseModule.responseHandles = {};
@@ -94,44 +101,92 @@ export class ServerApplication extends SystemApplication {
     let str = '';
 
     const root: Record<string, Function> = {};
-    classes.forEach((name) => {
-      Logger.Info('@noix/server', 'load model ' + name);
-      const DataModel = BaseModel.GetDataModel(module, name)!;
-      DataModel.InitDataSource();
-      const funs = BaseModel.GetFunctions(DataModel);
-      str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
-      root[name.toLowerCase()] = async () => {
-        const init = await DataModel.Init();
-        const initResponse: Record<string, Function> = {};
-        if (init) {
-          const resolved = await DataModel.ResolveFields(init);
-          Object.keys(resolved).forEach((name) => {
-            initResponse[name] = resolved[name];
-          });
-        }
-        funs.forEach((fun) => {
-          initResponse[fun.name] = async (param: Record<string, unknown>) => {
-            const args: unknown[] = [];
-            fun.params.forEach((p) => {
-              args[p.index!] = param[p.name];
+    await Promise.all(
+      classes.map(async (name) => {
+        Logger.Info('@noix/server', 'load model ' + name);
+        const DataModel = BaseModel.GetDataModel(module, name)!;
+        await DataModel.InitDataSource();
+        const funs = BaseModel.GetFunctions(DataModel);
+        str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
+        root[name.toLowerCase()] = async () => {
+          const init = await DataModel.Init();
+          const initResponse: Record<string, Function> = {};
+          if (init) {
+            const resolved = await DataModel.ResolveFields(init);
+            Object.keys(resolved).forEach((name) => {
+              initResponse[name] = resolved[name];
             });
-            const handle = Reflect.get(DataModel, fun.name) as Function;
-            const res = await handle.apply(DataModel, args);
-            const resolved = await DataModel.ResolveFields(res);
-            return resolved;
-          };
+          }
+          funs.forEach((fun) => {
+            initResponse[fun.name] = async (param: Record<string, unknown>) => {
+              const args: unknown[] = [];
+              fun.params.forEach((p) => {
+                args[p.index!] = param[p.name];
+              });
+              const handle = Reflect.get(DataModel, fun.name) as Function;
+              const res = await handle.apply(DataModel, args);
+              let resolved;
+              if (typeof fun.returnType === 'function') {
+                resolved = await fun.returnType.ResolveFields(res);
+              } else if (fun.returnType === 'this') {
+                resolved = await DataModel.ResolveFields(res);
+              } else {
+                resolved = await DataModel.ResolveFields(
+                  res,
+                  fun.returnType as ITemplateType
+                );
+              }
+              return resolved;
+            };
+          });
+          return initResponse;
+        };
+        baseModule.responseHandles![name] = async (req, res) => {
+          const graphqlResult = await graphql(
+            this._schemes[module],
+            req.query.query as string,
+            root
+          );
+          res.body = graphqlResult;
+        };
+      })
+    );
+    await Promise.all(
+      classes.map(async (name) => {
+        const dataModel = BaseModel.GetDataModel(module, name);
+        const m = new Model();
+        m.module = module;
+        m.name = name;
+        m.fields = BaseModel.GetFields(dataModel!).map((f) => {
+          const field = new Field();
+          field.model = name;
+          field.array = f.array;
+          field.name = f.name;
+          field.ref = f.ref || '';
+          field.rel = f.ref || '';
+          if (typeof f.type === 'string') {
+            if (f.type === 'this') {
+              field.type = name;
+            } else {
+              field.type = f.type;
+            }
+          } else if (typeof f.type === 'function') {
+            field.type = f.type.GetModelName();
+          } else {
+            field.type = name + f.type.name;
+          }
+          return field;
         });
-        return initResponse;
-      };
-      baseModule.responseHandles![name] = async (req, res) => {
-        const graphqlResult = await graphql(
-          this._schemes[module],
-          req.query.query as string,
-          root
-        );
-        res.body = graphqlResult;
-      };
-    });
+        m.functions = BaseModel.GetFunctions(dataModel!).map((funmeta) => {
+          const fun = new _Function();
+          fun.model = name;
+          fun.name = funmeta.name;
+          fun.params = funmeta.params.map((param) => param.name);
+          return fun;
+        });
+        await Model.Insert(m);
+      })
+    );
     str += `type Query{
       ${classes.map((c) => `${c.toLowerCase()}:${c}`).join(' ')}
     }`;
@@ -139,7 +194,9 @@ export class ServerApplication extends SystemApplication {
     this._serverInstance.RegisterModule(baseModule);
   }
 
-  public LoadModules() {
-    BaseModel.GetAllModule().forEach((module) => this.LoadModule(module));
+  public async LoadModules() {
+    await Promise.all(
+      BaseModel.GetAllModule().map((module) => this.LoadModule(module))
+    );
   }
 }
