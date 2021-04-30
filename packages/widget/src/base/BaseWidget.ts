@@ -9,7 +9,8 @@ import {
   onMounted,
   inject,
   provide,
-  Component as VueComponent
+  Component as VueComponent,
+  VNode
 } from 'vue';
 export interface IWatcher {
   path: string;
@@ -130,6 +131,10 @@ export class BaseWidget {
       );
     });
     onMounted(() => instance.mounted());
+    if (instance.render) {
+      this.__$render = <T extends BaseWidget>(ctx: T) =>
+        instance.render && instance.render(ctx);
+    }
     return res;
   }
 
@@ -144,6 +149,8 @@ export class BaseWidget {
   private static __$injections: INameMap[] = [];
 
   private static __$providers: INameMap[] = [];
+
+  private static __$render: Function;
 
   public static Component = (
     options: {
@@ -181,7 +188,8 @@ export class BaseWidget {
         Widget.setup(props, ctx),
       components: (options.components as Record<string, DefineComponent>) || {},
       props: Widget.__$props,
-      emits: Widget.__$emits.map((e) => e.displayName)
+      emits: Widget.__$emits.map((e) => e.displayName),
+      render: (ctx: unknown) => Widget.__$render && Widget.__$render(ctx)
     };
   };
 
@@ -341,6 +349,10 @@ export class BaseWidget {
 
   protected mounted(): void | Promise<void> {
     // do nothing.
+  }
+
+  public render<T extends BaseWidget>(ctx: this): VNode | null {
+    return null;
   }
 }
 export const Component = BaseWidget.Component;

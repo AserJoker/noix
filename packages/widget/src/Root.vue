@@ -59,6 +59,7 @@
   <noix-autocomplete @change="autocompleteChange"></noix-autocomplete>
   <noix-slider @change="sliderChange" :value="sliderValue" />
   </div>
+  <common-render :view="view" />
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Attribute } from './base';
@@ -86,7 +87,10 @@ import {
 } from './components';
 import { NoixTL, NoixQLisp } from '@noix/dsl';
 import { HttpClient } from '@noix/client';
-console.log(NoixQLisp);
+import { CommonRender } from './framework';
+import { IView } from './types';
+const client = new HttpClient();
+client.SetBaseURL('http://localhost:9090');
 @Component({
   components: {
     NoixForm,
@@ -108,7 +112,8 @@ console.log(NoixQLisp);
     NoixBreadcrumbItem,
     NoixAutocomplete,
     NoixSelectOption,
-    NoixSlider
+    NoixSlider,
+    CommonRender
   }
 })
 export default class NoixRoot extends BaseWidget {
@@ -132,41 +137,7 @@ export default class NoixRoot extends BaseWidget {
   }
 
   @Attribute()
-  private async Post() {
-    const client = new HttpClient();
-    client.SetBaseURL('http://localhost:9090');
-    const res = await client.Query(
-      'base',
-      'Model',
-      'query',
-      {
-        record: {
-          module: 'base',
-          name: 'Model'
-        }
-      },
-      `{
-      fields{
-        name
-        ref
-        array
-        model
-        rel
-        type
-      }
-    }`
-    );
-    console.log(res);
-    const compiler = new NoixTL();
-    console.log(
-      compiler.Compile(`
-      $model[render="FORM",name="User"]
-        $field[render="INPUT",name="username"]#field
-        $field[render="INPUT",name="password"]#field
-      #model
-    `)
-    );
-  }
+  private async Post() {}
 
   @Attribute({ reactive: true })
   private radioValue = false;
@@ -287,6 +258,31 @@ export default class NoixRoot extends BaseWidget {
   private sliderChange(newValue: number) {
     this.sliderValue = newValue;
     console.log(newValue);
+  }
+
+  @Attribute({ reactive: true })
+  private view: IView = {} as IView;
+
+  public async mounted() {
+    const res = await client.Query<{
+      list: IView[];
+    }>(
+      'base',
+      'View',
+      'QueryList',
+      {
+        condition: ''
+      },
+      `{
+      list{
+        name
+        template
+        id
+        bindingModule
+      }
+    }`
+    );
+    this.view = (res && res.list[0]) || ({} as IView);
   }
 }
 </script>

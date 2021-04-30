@@ -6,7 +6,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'src/index.ts'),
   output: {
     path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'umd',
+    libraryTarget: 'commonjs',
     filename: `${packageName}.lib.js`,
     umdNamedDefine: true,
     globalObject: 'this'
