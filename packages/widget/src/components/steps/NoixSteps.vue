@@ -2,6 +2,7 @@
   <a-steps :current="value" @update:current="change">
     <a-step
       v-for="opt in options"
+      :key="opt.title"
       :title="opt.title"
       :description="opt.description"
     />

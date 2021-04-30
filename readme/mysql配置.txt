@@ -1,0 +1,26 @@
+#Install Mysql server 8.0 from Ubuntu 20.04 repo:
+sudo apt update && sudo apt install mysql-server -y && sudo mysql_secure_installation
+
+#Set default auth plugin to legacy:
+sudo vim /etc/mysql/my.cnf
+[mysqld]
+default-authentication-plugin=mysql_native_password
+
+#Set default password rule[Append to section[mysqld]][Dev Environment]:
+sudo vim /etc/mysql/my.cnf
+validate_password.policy = LOW
+validate_password.length = 5
+
+#Restart Mysql server:
+sudo systemctl restart mysql
+
+#Login to Mysql server:
+sudo mysql
+
+#Create user admin with all privileges granted:
+mysql> CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
+mysql> GRANT ALL PRIVILEGES ON * . * TO 'admin'@'localhost';
+mysql> exit;
+
+#Test login with user admin:
+mysql -u admin -p

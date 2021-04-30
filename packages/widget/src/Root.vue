@@ -1,4 +1,5 @@
 <template>
+<div>
   <noix-form>
     <noix-form-item label="username">
       <noix-input :value="store.username" @change="OnUsernameChange" />
@@ -56,7 +57,8 @@
     >Item</noix-breadcrumb-item
   >
   <noix-autocomplete @change="autocompleteChange"></noix-autocomplete>
-  <noix-slider @change="sliderChange" :value="sliderValue"></noix-slider>
+  <noix-slider @change="sliderChange" :value="sliderValue" />
+  </div>
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Attribute } from './base';

@@ -1,6 +1,6 @@
 <template>
   <a-breadcrumb>
-    <a-breadcrumb-item v-for="opt in options"
+    <a-breadcrumb-item v-for="opt in options" :key="opt.displayName"
       ><a :href="opt.href">{{ opt.displayName }}</a></a-breadcrumb-item
     >
   </a-breadcrumb>
