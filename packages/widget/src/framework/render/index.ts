@@ -1,1 +1,1 @@
-export * from './ViewRender';
+export * from './CommonRender';

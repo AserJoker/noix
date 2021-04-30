@@ -57,7 +57,7 @@
   >
   <noix-autocomplete @change="autocompleteChange"></noix-autocomplete>
   <noix-slider @change="sliderChange" :value="sliderValue"></noix-slider>
-  <view-render :view="view" />
+  <common-render :view="view" />
 </template>
 <script lang="ts">
 import { BaseWidget, Component, Attribute } from './base';
@@ -85,7 +85,7 @@ import {
 } from './components';
 import { NoixTL, NoixQLisp } from '@noix/dsl';
 import { HttpClient } from '@noix/client';
-import { ViewRender } from './framework';
+import { CommonRender } from './framework';
 import { IView } from './types';
 const client = new HttpClient();
 client.SetBaseURL('http://localhost:9090');
@@ -111,7 +111,7 @@ client.SetBaseURL('http://localhost:9090');
     NoixAutocomplete,
     NoixSelectOption,
     NoixSlider,
-    ViewRender
+    CommonRender
   }
 })
 export default class NoixRoot extends BaseWidget {

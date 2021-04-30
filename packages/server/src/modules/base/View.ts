@@ -15,7 +15,7 @@ export class View extends StoreModel {
     const table = new View();
     table.name = 'DEMO_TABLE';
     table.template = `
-      $Model[render="TABLE" name="Student"]
+      $Model[render="FORM" name="Student"]
         $Field[name="id"]#Field
         $Field[name="name"]#Field
         $Field[name="teachers"]#Field
