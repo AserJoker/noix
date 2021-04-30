@@ -223,7 +223,7 @@ export class DataSource extends EventObject {
     ).toLowerCase();
     const fields = BaseModel.GetFields(model);
     const pamiryKey = model.GetPamiryKey();
-    const sql = `CREATE TABLE ${tableName} (${fields
+    const sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${fields
       .filter((f) => typeof f.type === 'string' && f.type !== 'this')
       .map((f) => {
         let type = f.array

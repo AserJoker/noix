@@ -1,5 +1,6 @@
 import { StoreModel } from '@noix/engine';
 import { BaseModel } from '@noix/engine';
+import { DataSource } from '@noix/engine';
 import { Teacher } from './Teacher';
 
 @BaseModel.DataModel({ module: 'mock', name: 'Student' })
@@ -16,8 +17,7 @@ export class Student extends StoreModel {
   @BaseModel.DataField({ type: 'string' })
   public name = '';
 
-  public static async InitDataSource() {
-    await super.InitDataSource();
+  public static async InitDefaultData() {
     const mock = new Student();
     mock.name = 's1';
     mock.teachers.push(

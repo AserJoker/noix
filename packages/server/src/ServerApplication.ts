@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
-import { BaseModel, GraphQL, ITemplateType } from '@noix/engine';
+import { BaseModel, DataSource, GraphQL, ITemplateType } from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
 import chalk from 'chalk';
 import { MysqlClient } from '@noix/mysql';
@@ -138,13 +138,14 @@ export class ServerApplication extends SystemApplication {
       classes.map(async (name) => {
         Logger.Info('@noix/server', 'load model ' + name);
         const DataModel = BaseModel.GetDataModel(module, name)!;
-        if (this._config.reset) {
-          try {
-            await DataModel.InitDataSource();
-          } catch (e) {
-            Logger.Error('@noix/server', 'failed to init datasource!');
-            Logger.Error('@noix/server', e);
+        try {
+          await DataModel.InitDataSource();
+          if (this._config.reset) {
+            await DataModel.InitDefaultData();
           }
+        } catch (e) {
+          Logger.Error('@noix/server', 'failed to init datasource!');
+          Logger.Error('@noix/server', e);
         }
         const funs = BaseModel.GetFunctions(DataModel);
         str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';

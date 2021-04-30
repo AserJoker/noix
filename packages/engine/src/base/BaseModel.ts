@@ -396,4 +396,6 @@ export class BaseModel extends EventObject {
   public static async InitDataSource() {}
 
   protected static dataSource: DataSource;
+
+  public static async InitDefaultData() {}
 }
