@@ -9,5 +9,20 @@ export class View extends StoreModel {
   public name: string = '';
 
   @BaseModel.DataField({ type: 'string' })
-  public bindingModel: string = '';
+  public bindingModule: string = '';
+
+  public static async InitDefaultData() {
+    const table = new View();
+    table.name = 'DEMO_TABLE';
+    table.template = `
+      $Model[render="TABLE" name="Student"]
+        $Field[name="id"]#Field
+        $Field[name="name"]#Field
+        $Field[name="teachers"]#Field
+        $Action[render="button" fun="delete" displayName="删除"]#Action
+      #Model
+    `.replace(/\"/g, '\\"');
+    table.bindingModule = 'mock';
+    this.Insert(table);
+  }
 }
