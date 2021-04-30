@@ -354,6 +354,7 @@ export class BaseModel extends EventObject {
     value: unknown
   ): Promise<BaseModel | BaseModel[]> {
     if (field.storeRelation && typeof field.type === 'function') {
+      //查询中间表
       const relationClass = BaseModel.GetDataModel(
         '*',
         `Relation${field.model}${field.type.GetModelName()}`
@@ -369,12 +370,17 @@ export class BaseModel extends EventObject {
         field.rel
       }`;
       const refs = relations.list.map((r) => Reflect.get(r, referenceField));
+
+      //取得对方表关联信息
       const queryLisp = `(IN ${field.ref} (LIST ${refs
         .map((v) => (typeof v === 'string' ? `"${v}"` : v))
         .join(' ')}))`;
-      return (await this.dataSource.Query(queryLisp, -1, -1))
+      const res = (await this.dataSource.Query(queryLisp, -1, -1))
         .list as BaseModel[];
+      return field.array ? res : res[0];
     }
+
+    //没有中间表场景
     const qlisp = `(EQU ${field.ref} ${
       typeof value === 'string' ? `"${value}"` : value
     })`;
@@ -382,18 +388,16 @@ export class BaseModel extends EventObject {
       (this.dataSource &&
         (await this.dataSource.Query<BaseModel>(qlisp, -1, -1))) ||
       [];
-    if (field.array) {
-      return res.list as BaseModel[];
-    } else {
-      return res.list[0] as BaseModel;
-    }
+    return field.array ? res.list : res.list[0];
   }
 
   public static GetPamiryKey() {
     return this.info.pamiryKey;
   }
 
-  public static async InitDataSource() {}
+  public static async InitDataSource() {
+    this.dataSource = new DataSource(this);
+  }
 
   protected static dataSource: DataSource;
 

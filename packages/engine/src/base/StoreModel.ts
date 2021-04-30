@@ -14,7 +14,7 @@ export class StoreModel extends BaseModel {
   public createUid: string = '';
 
   public static async InitDataSource() {
-    this.dataSource = new DataSource(this);
+    await super.InitDataSource();
     if (!this.info.pamiryKey) {
       this.info.pamiryKey = 'id';
     }
