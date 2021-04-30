@@ -16,7 +16,7 @@ export class DataSource extends EventObject {
   public async Exec<T extends Record<string, unknown>>(
     sql: string
   ): Promise<T | null> {
-    return null;
+    return (await MysqlClient.Query(sql)) as T;
   }
   public async Insert<T>(record: T): Promise<T> {
     const tableName = (
@@ -44,17 +44,41 @@ export class DataSource extends EventObject {
         if (typeof type === 'function' && type.GetPamiryKey()) {
           const value = Reflect.get(record as Record<string, unknown>, f.name);
           if (value) {
-            const fieldPamiryKey = type.GetPamiryKey();
-            if (Array.isArray(value)) {
+            const fieldPamiryKey = type.GetPamiryKey()!;
+            if (f.storeRelation) {
+              const relationClass = BaseModel.GetDataModel(
+                '*',
+                `Relation${this.model.GetModelName()}${type.GetModelName()}`
+              )!;
+              const relationField = `${f.model.toLowerCase()}_${f.rel}`;
+              const referenceField = `${type.GetModelName().toLowerCase()}_${
+                f.ref
+              }`;
               await Promise.all(
-                value.map(async (v) => {
-                  const res = await type.InsertOrUpdate(v);
-                  v[fieldPamiryKey] = Reflect.get(res, fieldPamiryKey);
+                (Array.isArray(value) ? value : [value]).map(async (v) => {
+                  const ref = Reflect.get(v, f.ref!);
+                  const rel =
+                    f.rel === pamiryKey
+                      ? res.insertId
+                      : Reflect.get(kvMap, f.rel!);
+                  const r = new relationClass();
+                  Reflect.set(r, referenceField, ref);
+                  Reflect.set(r, relationField, rel);
+                  await relationClass.Insert(r);
                 })
               );
             } else {
-              const res = await type.InsertOrUpdate(value);
-              value[fieldPamiryKey] = Reflect.get(res, fieldPamiryKey);
+              if (Array.isArray(value)) {
+                await Promise.all(
+                  value.map(async (v) => {
+                    const res = await type.InsertOrUpdate(v);
+                    v[fieldPamiryKey] = Reflect.get(res, fieldPamiryKey);
+                  })
+                );
+              } else {
+                const res = await type.InsertOrUpdate(value);
+                value[fieldPamiryKey] = Reflect.get(res, fieldPamiryKey);
+              }
             }
           }
         }
@@ -117,6 +141,15 @@ export class DataSource extends EventObject {
     return record;
   }
   public async Delete<T>(record: T): Promise<T> {
+    const pamiryKey = this.model.GetPamiryKey()!;
+    const pamiryValue = Reflect.get(
+      record as Record<string, unknown>,
+      pamiryKey
+    );
+    const tableName = `${this.model.GetModuleName()}_${this.model.GetModelName()}`.toLowerCase();
+    await MysqlClient.Query(
+      `DELETE FROM ${tableName} WHERE ${pamiryKey}=${pamiryValue}`
+    );
     return record;
   }
 
@@ -133,7 +166,7 @@ export class DataSource extends EventObject {
     queryLisp: string,
     offset: number,
     limit: number
-  ): Promise<T[]> {
+  ): Promise<{ list: T[]; total: number }> {
     const tableName = (
       this.model.GetModuleName() +
       '_' +
@@ -143,7 +176,16 @@ export class DataSource extends EventObject {
       queryLisp !== ''
         ? 'WHERE ' + NoixQLisp.ToSQL(NoixQLisp.Compile(queryLisp))
         : ''
-    } `;
+    } ${limit === -1 ? '' : `LIMIT ${limit} OFFSET ${offset}`} `;
+    const totalSQL = `SELECT * from ${tableName} ${
+      queryLisp !== ''
+        ? 'WHERE ' + NoixQLisp.ToSQL(NoixQLisp.Compile(queryLisp))
+        : ''
+    }`;
+    const totalRes = (await MysqlClient.Query(totalSQL)) as Record<
+      string,
+      unknown
+    >[];
     const res = (await MysqlClient.Query(sql)) as Record<string, unknown>[];
     const arrfields = BaseModel.GetFields(this.model).filter(
       (f) => typeof f.type === 'string' && f.type !== 'this' && f.array
@@ -170,7 +212,7 @@ export class DataSource extends EventObject {
         );
       })
     );
-    return res as T[];
+    return { list: res as T[], total: totalRes.length };
   }
 
   public static async CreateTable(model: typeof BaseModel): Promise<void> {

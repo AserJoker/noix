@@ -40,6 +40,9 @@ export class MysqlClient {
         password: this._config.password
       });
       pool.getConnection((err, conQuery) => {
+        if (err) {
+          reject(err);
+        }
         conQuery.query(
           `select * 
         from information_schema.SCHEMATA 
@@ -80,6 +83,9 @@ export class MysqlClient {
               });
             } else {
               pool.getConnection((err, conCreate) => {
+                if (err) {
+                  reject(err);
+                }
                 conCreate.query(
                   `create database ${this._config.database};`,
                   (err) => {

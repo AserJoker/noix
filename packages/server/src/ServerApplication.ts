@@ -4,13 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { HttpServer, IResponseModule } from '@noix/http';
 import './modules';
-import {
-  BaseModel,
-  DataSource,
-  GraphQL,
-  IDataField,
-  ITemplateType
-} from '@noix/engine';
+import { BaseModel, GraphQL, ITemplateType } from '@noix/engine';
 import { buildSchema, graphql, GraphQLSchema } from 'graphql';
 import chalk from 'chalk';
 import { MysqlClient } from '@noix/mysql';
@@ -68,7 +62,12 @@ export class ServerApplication extends SystemApplication {
     );
     MysqlClient.InitServer('localhost', 3306, 'admin', 'admin', 'noix');
     if (this._config.reset) {
-      await MysqlClient.ResetDatabase();
+      try {
+        await MysqlClient.ResetDatabase();
+      } catch (e) {
+        Logger.Error('@noix/server', 'failed to reset database!');
+        Logger.Error('@noix/server', e);
+      }
     }
     MysqlClient.Connect();
     this._serverInstance = new HttpServer(this._config.port as number);
@@ -140,7 +139,12 @@ export class ServerApplication extends SystemApplication {
         Logger.Info('@noix/server', 'load model ' + name);
         const DataModel = BaseModel.GetDataModel(module, name)!;
         if (this._config.reset) {
-          await DataModel.InitDataSource();
+          try {
+            await DataModel.InitDataSource();
+          } catch (e) {
+            Logger.Error('@noix/server', 'failed to init datasource!');
+            Logger.Error('@noix/server', e);
+          }
         }
         const funs = BaseModel.GetFunctions(DataModel);
         str += GraphQL.BuildGraphQLScheme(DataModel) + ' ';
@@ -161,6 +165,9 @@ export class ServerApplication extends SystemApplication {
               });
               const handle = Reflect.get(DataModel, fun.name) as Function;
               const res = await handle.apply(DataModel, args);
+              if (!res) {
+                return null;
+              }
               let resolved;
               if (typeof fun.returnType === 'function') {
                 resolved = await fun.returnType.ResolveFields(res);

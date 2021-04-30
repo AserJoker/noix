@@ -19,4 +19,5 @@ export interface IDataField {
   ref?: string;
   rel?: string;
   model: string;
+  storeRelation?: boolean;
 }

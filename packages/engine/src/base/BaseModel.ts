@@ -6,12 +6,11 @@ import {
   IQueryResult,
   IQueryFunction,
   IQueryParam,
-  ITemplateType,
-  FieldType
+  ITemplateType
 } from '../types';
 
 export class BaseModel extends EventObject {
-  private static info: IDataModel = { name: '', module: '' };
+  protected static info: IDataModel = { name: '', module: '' };
   private static _classes: Map<
     string,
     Record<string, typeof BaseModel>
@@ -61,6 +60,37 @@ export class BaseModel extends EventObject {
       BaseModel._fields.set(dataModel, resFields);
       BaseModel._classes.set(info.module, classes);
       dataModel.info = info;
+      resFields.forEach((f) => {
+        if (typeof f.type === 'function' && f.storeRelation) {
+          const relationClass = class extends BaseModel {};
+          const className = `Relation${info.name}${f.type.GetModelName()}`;
+          relationClass.info = {
+            module: info.module,
+            name: className
+          };
+          const refFields = BaseModel.GetFields(f.type).find(
+            (rf) => rf.name === f.ref
+          )!;
+          const relFields = resFields.find((rf) => rf.name === f.rel)!;
+          BaseModel._fields.set(relationClass, [
+            {
+              ...refFields,
+              model: className,
+              name: f.type.GetModelName().toLowerCase() + '_' + refFields.name
+            },
+            {
+              ...relFields,
+              model: className,
+              name: info.name.toLowerCase() + '_' + refFields.name
+            }
+          ]);
+          classes[className] = relationClass;
+          relationClass.InitDataSource = async () => {
+            relationClass.dataSource = new DataSource(relationClass);
+            DataSource.CreateTable(relationClass);
+          };
+        }
+      });
     };
   }
 
@@ -159,7 +189,7 @@ export class BaseModel extends EventObject {
     @BaseModel.QueryParam({ name: 'record', type: 'this' })
     record: T
   ): Promise<BaseModel> {
-    return new BaseModel() as T;
+    return this.dataSource && this.dataSource.Insert(record);
   }
 
   @BaseModel.QueryFunction('this')
@@ -167,30 +197,38 @@ export class BaseModel extends EventObject {
     @BaseModel.QueryParam({ name: 'record', type: 'this' })
     record: T
   ): Promise<BaseModel> {
-    return new BaseModel() as T;
+    return this.dataSource && this.dataSource.InsertOrUpdate(record);
   }
 
   @BaseModel.QueryFunction('this')
   public static async Update<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
   ): Promise<BaseModel> {
-    return new BaseModel() as T;
+    return this.dataSource && this.dataSource.Update(record);
   }
 
   @BaseModel.QueryFunction('this')
   public static async Delete<T extends BaseModel>(
     @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
   ): Promise<BaseModel> {
-    return new BaseModel() as T;
+    return this.dataSource && this.dataSource.Delete(record);
   }
 
   @BaseModel.QueryFunction('this')
   public static async Query<T extends BaseModel>(
-    @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T,
-    parent: BaseModel,
-    root: BaseModel
+    @BaseModel.QueryParam({ name: 'record', type: 'this' }) record: T
   ): Promise<BaseModel | null> {
-    return null;
+    const pamiryKey = this.GetPamiryKey()!;
+    const pamirtyValue = Reflect.get(record, pamiryKey);
+    return (
+      await this.QueryList(
+        1,
+        1,
+        `(EQU ${pamiryKey} ${
+          typeof pamirtyValue === 'string' ? `"${pamirtyValue}"` : pamirtyValue
+        })`
+      )
+    ).list[0];
   }
 
   @BaseModel.QueryFunction({
@@ -208,11 +246,22 @@ export class BaseModel extends EventObject {
     @BaseModel.QueryParam({ name: 'condition', type: 'string' })
     condition: string
   ): Promise<IQueryResult<BaseModel>> {
+    if (!size) size = -1;
+    if (!page) page = -1;
+    if (!condition) condition = '';
+    const res =
+      (this.dataSource &&
+        (await this.dataSource.Query<BaseModel>(
+          condition,
+          size * (page - 1),
+          size
+        ))) ||
+      [];
     return {
-      size: 0,
-      page: 1,
-      total: 0,
-      list: []
+      size: size,
+      page: page,
+      total: res.total,
+      list: res.list
     };
   }
 
@@ -304,15 +353,44 @@ export class BaseModel extends EventObject {
     field: IDataField,
     value: unknown
   ): Promise<BaseModel | BaseModel[]> {
+    if (field.storeRelation && typeof field.type === 'function') {
+      const relationClass = BaseModel.GetDataModel(
+        '*',
+        `Relation${field.model}${field.type.GetModelName()}`
+      )!;
+      const relations = await relationClass.QueryList(
+        -1,
+        -1,
+        `(EQU ${field.model.toLowerCase()}_${field.ref} ${
+          typeof value === 'string' ? `"${value}"` : value
+        })`
+      );
+      const referenceField = `${field.type.GetModelName().toLowerCase()}_${
+        field.rel
+      }`;
+      const refs = relations.list.map((r) => Reflect.get(r, referenceField));
+      const queryLisp = `(IN ${field.ref} (LIST ${refs
+        .map((v) => (typeof v === 'string' ? `"${v}"` : v))
+        .join(' ')}))`;
+      return (await this.dataSource.Query(queryLisp, -1, -1))
+        .list as BaseModel[];
+    }
+    const qlisp = `(EQU ${field.ref} ${
+      typeof value === 'string' ? `"${value}"` : value
+    })`;
+    const res =
+      (this.dataSource &&
+        (await this.dataSource.Query<BaseModel>(qlisp, -1, -1))) ||
+      [];
     if (field.array) {
-      return [] as BaseModel[];
+      return res.list as BaseModel[];
     } else {
-      return {} as BaseModel;
+      return res.list[0] as BaseModel;
     }
   }
 
   public static GetPamiryKey() {
-    return this.info.pamiryKey || 'id';
+    return this.info.pamiryKey;
   }
 
   public static async InitDataSource() {}
