@@ -6,22 +6,28 @@ interface IPatten {
 }
 
 export class NoixTL {
-  private IsStringPatten(template: string) {
+  private static IsStringPatten(template: string) {
     return template.startsWith('"');
   }
-  private IsSymbolPatten(template: string) {
+  private static IsSymbolPatten(template: string) {
     return ['$', '#', '[', ']', '=', ','].includes(template.charAt(0));
   }
-  private IsTokenPatten(template: string) {
+  private static IsTokenPatten(template: string) {
     const c = template.charAt(0);
     return /[a-z]|[A-Z]|_/.test(c);
   }
-  private ResolveSymbolPatten(template: string, partten: IPatten): string {
+  private static ResolveSymbolPatten(
+    template: string,
+    partten: IPatten
+  ): string {
     partten.type = 'symbol';
     partten.name = template.charAt(0);
     return template.substr(partten.name.length);
   }
-  private ResolveStringPatten(template: string, partten: IPatten): string {
+  private static ResolveStringPatten(
+    template: string,
+    partten: IPatten
+  ): string {
     partten.type = 'string';
     partten.name = '"';
     for (let index = 1; index < template.length; index++) {
@@ -32,7 +38,10 @@ export class NoixTL {
     }
     return template.substr(partten.name.length);
   }
-  private ResolveTokenPatten(template: string, partten: IPatten): string {
+  private static ResolveTokenPatten(
+    template: string,
+    partten: IPatten
+  ): string {
     partten.type = 'token';
     partten.name = '';
     for (let index = 0; index < template.length; index++) {
@@ -43,7 +52,7 @@ export class NoixTL {
     }
     return template.substr(partten.name.length);
   }
-  private ResolvePattens(template: string): IPatten[] {
+  private static ResolvePattens(template: string): IPatten[] {
     const res: IPatten[] = [];
     while (template.length) {
       const pat = {} as IPatten;
@@ -60,7 +69,7 @@ export class NoixTL {
     return res;
   }
 
-  public GetTagNode(pattens: IPatten[]): IPatten[] {
+  public static GetTagNode(pattens: IPatten[]): IPatten[] {
     const res: IPatten[] = [];
     let level = 0;
     for (let index = 0; index < pattens.length; index++) {
@@ -78,7 +87,7 @@ export class NoixTL {
     }
     return res;
   }
-  public GetAttrsNode(pattens: IPatten[]): IPatten[] {
+  public static GetAttrsNode(pattens: IPatten[]): IPatten[] {
     const res: IPatten[] = [];
     for (let index = 0; index < pattens.length; index++) {
       res.push(pattens[index]);
@@ -86,7 +95,7 @@ export class NoixTL {
     }
     return res;
   }
-  public CompileAttr(pattens: IPatten[]): Record<string, string> {
+  public static CompileAttr(pattens: IPatten[]): Record<string, string> {
     const res: Record<string, string> = {};
     for (let index = 0; index < pattens.length; index++) {
       if (pattens[index].name !== ',') {
@@ -101,7 +110,7 @@ export class NoixTL {
     }
     return res;
   }
-  public CompileNode(pattens: IPatten[]): NoixTLNode {
+  public static CompileNode(pattens: IPatten[]): NoixTLNode {
     const res = new NoixTLNode();
     res.name = pattens[1].name;
     res.attributes = {};
@@ -116,7 +125,7 @@ export class NoixTL {
     res.children = this.CompilePattens(pattens);
     return res;
   }
-  public CompilePattens(pattens: IPatten[]): NoixTLNode[] {
+  public static CompilePattens(pattens: IPatten[]): NoixTLNode[] {
     const res: NoixTLNode[] = [];
     while (pattens.length) {
       const nodepats = this.GetTagNode(pattens);
@@ -125,7 +134,7 @@ export class NoixTL {
     }
     return res;
   }
-  public Compile(template: string): NoixTLNode {
+  public static Compile(template: string): NoixTLNode {
     const pats = this.ResolvePattens(template).filter((p) => p.name);
     return this.CompilePattens(pats)[0];
   }
