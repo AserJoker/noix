@@ -13,7 +13,7 @@ export class StoreModel extends BaseModel {
   }
   @Field({ type: FIELD_TYPE.INTEGER })
   private id = 0;
-  public queryOne(record: Record<string, unknown>) {
+  public async queryOne(record: Record<string, unknown>) {
     return record;
   }
   public constructor(service: NoixService) {

@@ -1,9 +1,9 @@
 import { Field, FIELD_TYPE, Model } from "../base";
-import { BaseModel } from "../base/base.model";
+import { StoreModel } from "../base/store.model";
 import { Demo2 } from "./demo2.model";
 
 @Model()
-export class Demo extends BaseModel {
+export class Demo extends StoreModel {
   @Field({ type: FIELD_TYPE.STRING })
   protected name = "";
 
@@ -14,8 +14,4 @@ export class Demo extends BaseModel {
     refModel: "base.demo2",
   })
   protected demo2: Demo2[] = [];
-
-  public async queryOne(record: Record<string, unknown>) {
-    return new Demo(this.$service).fill(record);
-  }
 }
