@@ -7,7 +7,13 @@ import fs from "fs";
 import path from "path";
 import { Home } from "./controller/home.controller";
 import { Base } from "./module/base.module";
-import { FIELD_TYPE, IEnumField, ISimpleField, NoixService } from "./base";
+import {
+  FIELD_TYPE,
+  IEnumField,
+  IMixedModel,
+  ISimpleField,
+  NoixService,
+} from "./base";
 @Boot({ controllers: [Home, Base], factory: NoixFactory.theFactory })
 @RequestBody
 @ResponseBody
@@ -27,7 +33,41 @@ export class Application implements IApplication {
   public getConfig(name: string) {
     return this._config[name] || {};
   }
-  @Hook(async function (this: Application, args, next) {
+  private resolveColumnType(fieldType: FIELD_TYPE) {
+    let type: string = "NULL";
+    switch (fieldType) {
+      case FIELD_TYPE.BOOLEAN:
+        type = "TINYINT";
+        break;
+      case FIELD_TYPE.ENUM:
+      case FIELD_TYPE.STRING:
+        type = "VARCHAR(1024)";
+        break;
+      case FIELD_TYPE.INTEGER:
+        type = "INTEGER";
+        break;
+      case FIELD_TYPE.FLOAT:
+        type = "FLOAT";
+        break;
+      case FIELD_TYPE.TEXT:
+        type = "LONGTEXT";
+        break;
+    }
+    return type;
+  }
+  private resolveColumn(field: ISimpleField | IEnumField, model: IMixedModel) {
+    const { type: fieldType } = field;
+    return {
+      name: field.name,
+      unique:
+        field.name === "id" ||
+        field.name === "code" ||
+        field.name === model.key,
+      auto_increase: field.name === "id",
+      type: this.resolveColumnType(fieldType),
+    };
+  }
+  private async initDatasource() {
     await this.datasource.boot(this.getConfig("data"));
     await Promise.all(
       NoixService.getMetadata()
@@ -46,39 +86,14 @@ export class Application implements IApplication {
               )
               .map((field) => {
                 const simpleField = field as ISimpleField | IEnumField;
-                const { type: fieldType } = simpleField;
-                let type: string = "NULL";
-                switch (fieldType) {
-                  case FIELD_TYPE.BOOLEAN:
-                    type = "TINYINT";
-                    break;
-                  case FIELD_TYPE.ENUM:
-                  case FIELD_TYPE.STRING:
-                    type = "VARCHAR(1024)";
-                    break;
-                  case FIELD_TYPE.INTEGER:
-                    type = "INTEGER";
-                    break;
-                  case FIELD_TYPE.FLOAT:
-                    type = "FLOAT";
-                    break;
-                  case FIELD_TYPE.TEXT:
-                    type = "LONGTEXT";
-                    break;
-                }
-                return {
-                  name: field.name,
-                  unique:
-                    field.name === "id" ||
-                    field.name === "code" ||
-                    field.name === model.key,
-                  auto_increase: field.name === "id",
-                  type,
-                };
+                return this.resolveColumn(simpleField, model);
               }),
           });
         })
     );
+  }
+  @Hook(async function (this: Application, args, next) {
+    await this.initDatasource();
     return next();
   })
   public async boot(server: http.Server) {
@@ -93,9 +108,4 @@ export class Application implements IApplication {
     }
     console.log(`noix server is running @ http://${_address}`);
   }
-
-  public async emit(event: "init", name: string): Promise<void>;
-  public async emit(event: "postinit"): Promise<void>;
-  @Emit
-  public async emit(event: string, ...args: unknown[]) {}
 }
