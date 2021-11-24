@@ -1,0 +1,20 @@
+{
+  "name": "noix",
+  "version": "0.1.0",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean -y&&lerna run clean",
+    "lerna:build": "lerna exec npm run build --scope",
+    "lerna:test": "lerna exec npm run test --scope",
+    "lerna:start": "lerna exec npm run start --scope",
+    "boot": "npm run lerna:start @noix/boot"
+  },
+  "devDependencies": {
+    "lerna": "^4.0.0",
+    "typescript": "^4.4.4",
+    "ts-node": "^10.4.0",
+    "jest": "^27.3.1",
+    "ts-jest": "^27.0.7",
+    "@types/jest": "^27.0.3"
+  }
+}

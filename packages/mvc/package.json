@@ -1,0 +1,19 @@
+{
+  "name": "@noix/mvc",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "typings": "dist/typings/index.d.ts",
+  "devDependencies": {
+    "@types/koa": "^2.13.4",
+    "@types/ejs": "^3.1.0"
+  },
+  "dependencies": {
+    "@noix/core": "0.1.0",
+    "ejs": "^3.1.6"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "clean": "rimraf -f ./dist"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@noix/core",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "typings": "dist/typings/index.d.ts",
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "clean": "rimraf -f ./dist",
+    "test": "jest"
+  }
+}

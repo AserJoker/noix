@@ -1,0 +1,11 @@
+{
+  "name": "@noix/lisp",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "typings": "dist/typings/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf -f ./dist",
+    "test": "jest"
+  }
+}

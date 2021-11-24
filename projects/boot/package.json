@@ -1,0 +1,20 @@
+{
+  "name": "@noix/boot",
+  "version": "0.1.0",
+  "main": "dist/Application.js",
+  "dependencies": {
+    "@noix/mvc": "0.1.0",
+    "@noix/core": "0.1.0",
+    "@noix/resolve": "0.1.0",
+    "@noix/data": "0.1.0",
+    "koa": "^2.13.4"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.13.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node ./src/Application.ts",
+    "clean": "rimraf -f ./dist"
+  }
+}
