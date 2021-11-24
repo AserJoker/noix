@@ -33,8 +33,9 @@ export class Application implements IApplication {
   public getConfig(name: string) {
     return this._config[name] || {};
   }
-  private resolveColumnType(fieldType: FIELD_TYPE) {
+  private resolveColumnType(field: ISimpleField | IEnumField) {
     let type: string = "NULL";
+    const { type: fieldType, array } = field;
     switch (fieldType) {
       case FIELD_TYPE.BOOLEAN:
         type = "TINYINT";
@@ -53,10 +54,12 @@ export class Application implements IApplication {
         type = "LONGTEXT";
         break;
     }
+    if (array) {
+      return "VARCHAR(1024)";
+    }
     return type;
   }
   private resolveColumn(field: ISimpleField | IEnumField, model: IMixedModel) {
-    const { type: fieldType } = field;
     return {
       name: field.name,
       unique:
@@ -64,7 +67,7 @@ export class Application implements IApplication {
         field.name === "code" ||
         field.name === model.key,
       auto_increase: field.name === "id",
-      type: this.resolveColumnType(fieldType),
+      type: this.resolveColumnType(field),
     };
   }
   private async initDatasource() {
