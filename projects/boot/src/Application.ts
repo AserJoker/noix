@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import { Home } from "./controller/home.controller";
 import { Base } from "./module/base.module";
+import { FIELD_TYPE, IEnumField, ISimpleField, NoixService } from "./base";
 @Boot({ controllers: [Home, Base], factory: NoixFactory.theFactory })
 @RequestBody
 @ResponseBody
@@ -28,6 +29,56 @@ export class Application implements IApplication {
   }
   @Hook(async function (this: Application, args, next) {
     await this.datasource.boot(this.getConfig("data"));
+    await Promise.all(
+      NoixService.getMetadata()
+        .filter((model) => model.store !== false)
+        .map(async (model) => {
+          await this.datasource.getTable({
+            name: `${model.namespace}_${model.name}`,
+            key: model.key || "code",
+            columns: model.fields
+              .filter(
+                (f) =>
+                  f.type !== FIELD_TYPE.MANY2MANY &&
+                  f.type !== FIELD_TYPE.MANY2ONE &&
+                  f.type !== FIELD_TYPE.ONE2MANY &&
+                  f.type !== FIELD_TYPE.ONE2ONE
+              )
+              .map((field) => {
+                const simpleField = field as ISimpleField | IEnumField;
+                const { type: fieldType } = simpleField;
+                let type: string = "NULL";
+                switch (fieldType) {
+                  case FIELD_TYPE.BOOLEAN:
+                    type = "TINYINT";
+                    break;
+                  case FIELD_TYPE.ENUM:
+                  case FIELD_TYPE.STRING:
+                    type = "VARCHAR(1024)";
+                    break;
+                  case FIELD_TYPE.INTEGER:
+                    type = "INTEGER";
+                    break;
+                  case FIELD_TYPE.FLOAT:
+                    type = "FLOAT";
+                    break;
+                  case FIELD_TYPE.TEXT:
+                    type = "LONGTEXT";
+                    break;
+                }
+                return {
+                  name: field.name,
+                  unique:
+                    field.name === "id" ||
+                    field.name === "code" ||
+                    field.name === model.key,
+                  auto_increase: field.name === "id",
+                  type,
+                };
+              }),
+          });
+        })
+    );
     return next();
   })
   public async boot(server: http.Server) {

@@ -1,3 +1,4 @@
+import { IField, IFunction } from ".";
 import { IMetadata } from "./IMetadata";
 
 export interface IModel extends IMetadata {
@@ -5,4 +6,9 @@ export interface IModel extends IMetadata {
   displayName?: string;
   store?: boolean;
   virtual?: boolean;
+  key?: string;
+}
+export interface IMixedModel extends IModel {
+  fields: IField[];
+  functions: IFunction[];
 }

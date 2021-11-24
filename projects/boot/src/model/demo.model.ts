@@ -16,6 +16,6 @@ export class Demo extends BaseModel {
   protected demo2: Demo2[] = [];
 
   public async queryOne(record: Record<string, unknown>) {
-    return new Demo(this.service).fill(record);
+    return new Demo(this.$service).fill(record);
   }
 }

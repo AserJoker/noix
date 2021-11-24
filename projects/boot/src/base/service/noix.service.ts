@@ -1,7 +1,13 @@
 import { getMetadata, IFactory } from "@noix/core";
 import { IResolver, ISchema, ResolveHandle, useResolver } from "@noix/resolve";
-import { FIELD_TYPE, IComplexField, IField, IFunction } from "..";
-import { IModel } from "../types/IModel";
+import {
+  FIELD_TYPE,
+  IComplexField,
+  IField,
+  IFunction,
+  IMixedModel,
+  IModel,
+} from "../types";
 
 export class NoixService {
   private static _services = new Map<string, NoixService>();
@@ -318,32 +324,26 @@ export class NoixService {
   }
 
   public getMetadata() {
-    const fields: IField[] = [];
-    const functions: IFunction[] = [];
     const models = this._models
       .map((classObject) => {
-        fields.push(
-          ...((getMetadata(classObject, "base:fields") as IField[]) || [])
-        );
-        functions.push(
-          ...((getMetadata(classObject, "base:functions") as IFunction[]) || [])
-        );
-        return getMetadata(classObject, "base:model");
+        const fields: IField[] = getMetadata(classObject, "base:fields") || [];
+        const functions: IFunction[] =
+          getMetadata(classObject, "base:functions") || [];
+        const meta: IModel | undefined = getMetadata(classObject, "base:model");
+        if (meta) {
+          return { ...meta, fields, functions };
+        }
       })
-      .filter((m) => !!m) as IModel[];
-    return { fields, functions, models };
+      .filter((m) => !!m) as IMixedModel[];
+    return models;
   }
   public static getMetadata() {
-    const _models: IModel[] = [];
-    const _fields: IField[] = [];
-    const _functions: IFunction[] = [];
+    const _models: IMixedModel[] = [];
     NoixService._services.forEach((service) => {
-      const { models, fields, functions } = service.getMetadata();
+      const models = service.getMetadata();
       _models.push(...models);
-      _fields.push(...fields);
-      _functions.push(...functions);
     });
-    return { models: _models, fields: _fields, functions: _functions };
+    return _models;
   }
   public static select(module: string) {
     return NoixService._services.get(module);
