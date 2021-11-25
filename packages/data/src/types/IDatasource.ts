@@ -15,6 +15,8 @@ export interface IDatasource {
     columns?: IColumn[];
   }): ITable | undefined;
   create(name: string, key: string, columns: IColumn[]): Promise<void>;
+  lock(): Promise<void>;
+  unlock(): Promise<void>;
 }
 export type DatasourceClass = {
   new (...args: unknown[]): IDatasource;

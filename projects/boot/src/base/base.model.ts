@@ -10,12 +10,10 @@ import {
   Model,
   NoixService,
 } from ".";
-
+import { NoixFactory } from "../NoixFactory";
+import { PAGE_WRAPPER } from "./wrapper";
 @Model({ store: false, virtual: true })
 export class BaseModel {
-  @Inject(CURRENT_FACTORY)
-  protected $factory!: IFactory;
-
   @Field({ type: FIELD_TYPE.STRING })
   protected code = "";
 
@@ -49,6 +47,24 @@ export class BaseModel {
     return [];
   }
 
+  @Func({
+    params: ["record", "current", "pageSize"],
+    returnType: "$this",
+    array: true,
+    wrapper: PAGE_WRAPPER,
+  })
+  public queryPage(
+    record: Record<string, unknown>,
+    current: number,
+    pageSize: number
+  ): unknown {
+    return {
+      current,
+      total: 0,
+      list: [],
+    };
+  }
+
   public fill(record: Record<string, unknown>) {
     Object.assign(this, record);
     return this;
@@ -63,5 +79,17 @@ export class BaseModel {
     return { ...model, functions, fields };
   }
 
-  public constructor(protected $service: NoixService, ...args: unknown[]) {}
+  protected get $metadata() {
+    const meta = this.getMetadata();
+    if (!meta) {
+      throw new Error("metadata lost");
+    }
+    return meta;
+  }
+
+  public constructor(
+    protected $service: NoixService,
+    protected $factory: NoixFactory,
+    ...args: unknown[]
+  ) {}
 }

@@ -11,4 +11,7 @@ export class Function extends Metadata {
 
   @Field({ type: FIELD_TYPE.BOOLEAN })
   private array = false;
+
+  @Field({ type: FIELD_TYPE.STRING })
+  private wrapper = "";
 }

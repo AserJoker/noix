@@ -9,6 +9,9 @@ export const DATASOURCE_FILE = Symbol("datasource.file");
 export class FileDatasource implements IDatasource {
   private _rootPath: string = process.cwd();
   private _tables = new Map<string, ITable>();
+  private _tasks: { resolve: () => void; reject: (error: Error) => void }[] =
+    [];
+  private _busy: boolean = false;
   public constructor(@Inject(CURRENT_FACTORY) private factory: IFactory) {}
   public dispose() {
     console.log("file dispose");
@@ -43,6 +46,7 @@ export class FileDatasource implements IDatasource {
         param.name,
         param.key as string,
         param.columns as IColumn[],
+        path.resolve(this._rootPath, param.name + ".json"),
         this
       );
       this._tables.set(param.name, table);
@@ -59,5 +63,25 @@ export class FileDatasource implements IDatasource {
       path.resolve(this._rootPath, name + ".json"),
       JSON.stringify(table)
     );
+  }
+  public async lock() {
+    if (this._busy) {
+      return new Promise<void>((resolve, reject) =>
+        this._tasks.push({ resolve, reject })
+      );
+    } else {
+      this._busy = true;
+    }
+  }
+  public async unlock() {
+    if (this._tasks.length) {
+      const last = this._tasks.shift();
+      if (last) {
+        last.resolve();
+      }
+    }
+    if (!this._tasks.length) {
+      this._busy = false;
+    }
   }
 }

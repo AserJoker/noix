@@ -3,4 +3,5 @@ export interface IColumn {
   unique?: boolean;
   type: string;
   auto_increase?: boolean;
+  _increase_counter?: number;
 }

@@ -6,4 +6,5 @@ export interface IFunction extends IMetadata {
   params: string[];
   returnType?: string;
   array?: boolean;
+  wrapper?: string;
 }

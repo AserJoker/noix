@@ -14,6 +14,9 @@ export const getInstance = <T = unknown>(
     path: (string | symbol)[],
     params: unknown[]
   ): T | undefined => {
+    if (token === CURRENT_FACTORY) {
+      return factory as T;
+    }
     const index = path.findIndex((p) => p === token);
     if (index !== -1) {
       const _path: (string | symbol)[] = [];
@@ -39,9 +42,6 @@ export const getInstance = <T = unknown>(
         ) as (string | symbol)[]) || [];
       const deps = inject_constructor.map((_token: string | symbol) => {
         if (_token) {
-          if (_token === CURRENT_FACTORY) {
-            return factory;
-          }
           return _getInstance(_token, providers, [...path, token], []);
         }
         return null;

@@ -42,7 +42,7 @@ export class Application implements IApplication {
         break;
       case FIELD_TYPE.ENUM:
       case FIELD_TYPE.STRING:
-        type = "VARCHAR(1024)";
+        type = "VARCHAR(255)";
         break;
       case FIELD_TYPE.INTEGER:
         type = "INTEGER";
@@ -78,7 +78,7 @@ export class Application implements IApplication {
         .map(async (model) => {
           await this.datasource.getTable({
             name: `${model.namespace}_${model.name}`,
-            key: model.key || "code",
+            key: "id",
             columns: model.fields
               .filter(
                 (f) =>
@@ -95,8 +95,17 @@ export class Application implements IApplication {
         })
     );
   }
+  public async initMetadata() {
+    const allModels = NoixService.getMetadata();
+    await allModels.reduce(async (last, model) => {
+      await last;
+      const baseService = NoixService.select("base") as NoixService;
+      return baseService.call("model", "insertOne", [model]);
+    }, new Promise<void>((resolve) => resolve()));
+  }
   @Hook(async function (this: Application, args, next) {
     await this.initDatasource();
+    await this.initMetadata();
     return next();
   })
   public async boot(server: http.Server) {

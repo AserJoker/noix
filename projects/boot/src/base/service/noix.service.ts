@@ -12,6 +12,8 @@ import {
 export class NoixService {
   private static _services = new Map<string, NoixService>();
 
+  public static functionWrappers = new Map<string, Function>();
+
   private _resolver: ResolveHandle;
 
   private _models: Function[];
@@ -41,7 +43,7 @@ export class NoixService {
     NoixService._services.set(module, this);
   }
 
-  protected resolveModel(meta: IModel, classObject: Function) {
+  public resolveModel(meta: IModel, classObject: Function) {
     const model_handles: Record<string, Function> = {};
     const functions: IFunction[] =
       getMetadata(classObject, "base:functions") || [];
@@ -51,7 +53,7 @@ export class NoixService {
     return () => model_handles;
   }
 
-  protected resolveFunction(meta: IFunction, classObject: Function) {
+  public resolveFunction(meta: IFunction, classObject: Function) {
     return async (...args: unknown[]) => {
       const [ctx, param] = args as [
         Record<string, unknown>,
@@ -63,7 +65,7 @@ export class NoixService {
     };
   }
 
-  protected async resolveFunctionCall(
+  public async resolveFunctionCall(
     name: string | Function,
     funName: string | IFunction,
     params: unknown[]
@@ -89,6 +91,12 @@ export class NoixService {
         } else {
           const refModel =
             fun.returnType === "$this" ? fun.namespace : fun.returnType;
+          if (fun.wrapper) {
+            const wrapper = NoixService.functionWrappers.get(fun.wrapper);
+            if (wrapper) {
+              return wrapper(this, result, fun);
+            }
+          }
           if (fun.array) {
             return this.resolveArray(
               result as Record<string, unknown>[],
@@ -105,14 +113,11 @@ export class NoixService {
     }
   }
 
-  protected resolveArray(
-    records: Record<string, unknown>[],
-    modelName: string
-  ) {
+  public resolveArray(records: Record<string, unknown>[], modelName: string) {
     return records.map((record) => this.resolveRecord(record, modelName));
   }
 
-  protected resolveRecord(record: Record<string, unknown>, modelName: string) {
+  public resolveRecord(record: Record<string, unknown>, modelName: string) {
     const [module, name] = modelName.split(".");
     const service = NoixService._services.get(module);
     if (service) {
@@ -121,7 +126,7 @@ export class NoixService {
     }
   }
 
-  protected resolveMetadata(module: string) {
+  private resolveMetadata(module: string) {
     this._models.forEach((model) => {
       const model_meta: IModel = getMetadata(model, "base:model");
       model_meta.namespace = module;
@@ -143,11 +148,11 @@ export class NoixService {
     });
   }
 
-  protected getModelResolver(name: string) {
+  public getModelResolver(name: string) {
     return this._model_resolvers[name];
   }
 
-  protected createRecordResolver(meta: IModel, classObject: Function) {
+  private createRecordResolver(meta: IModel, classObject: Function) {
     const fields: IField[] = getMetadata(classObject, "base:fields");
     this._model_resolvers[meta.name] = (record: Record<string, unknown>) => {
       return new Proxy(
@@ -184,7 +189,7 @@ export class NoixService {
     };
   }
 
-  protected resolveRelation(
+  private resolveRelation(
     record: Record<string, unknown>,
     field: IComplexField
   ) {
@@ -196,7 +201,7 @@ export class NoixService {
     return result;
   }
 
-  protected resolveMany2One(
+  public resolveMany2One(
     record: Record<string, unknown>,
     field: IComplexField,
     context: unknown
@@ -210,7 +215,7 @@ export class NoixService {
     }
   }
 
-  protected resolveOne2Many(
+  public resolveOne2Many(
     record: Record<string, unknown>,
     field: IComplexField,
     context: unknown
@@ -227,7 +232,7 @@ export class NoixService {
     }
   }
 
-  protected async resolveOne2One(
+  public async resolveOne2One(
     record: Record<string, unknown>,
     field: IComplexField,
     context: unknown
@@ -262,7 +267,7 @@ export class NoixService {
     return null;
   }
 
-  protected async resolveMany2Many(
+  public async resolveMany2Many(
     record: Record<string, unknown>,
     field: IComplexField,
     context: unknown
@@ -314,7 +319,10 @@ export class NoixService {
             }
           });
     if (classObject) {
-      const ins = this.factory.createInstance(classObject, [this]) as Object;
+      const ins = this.factory.createInstance(classObject, [
+        this,
+        this.factory,
+      ]) as Object;
       const handle: Function = Reflect.get(
         ins,
         typeof funName === "object" ? funName.name : funName

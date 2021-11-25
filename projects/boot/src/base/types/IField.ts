@@ -26,7 +26,7 @@ export interface ISimpleField extends IBaseField {
 }
 export interface IEnumField extends IBaseField {
   type: FIELD_TYPE.ENUM;
-  options: string[] | { name: string; value: string }[];
+  options: string[] | { displayName: string; name: string }[];
 }
 export interface IComplexField extends IBaseField {
   type:

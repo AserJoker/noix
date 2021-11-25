@@ -6,6 +6,7 @@ export const Func = (meta?: {
   returnType?: string;
   displayName?: string;
   array?: boolean;
+  wrapper?: string;
 }) => {
   return <T extends Object, K extends Function>(
     proto: T,

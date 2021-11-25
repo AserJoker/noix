@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "mysql2": "^2.3.3",
-    "@noix/core": "0.1.0"
+    "@noix/core": "0.1.0",
+    "@noix/lisp": "0.1.0"
   }
 }

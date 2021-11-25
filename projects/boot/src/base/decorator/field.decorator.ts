@@ -1,5 +1,11 @@
 import { getMetadata, defineMetadata } from "@noix/core";
-import { IComplexField, IEnumField, IField, ISimpleField } from "../types";
+import {
+  FIELD_TYPE,
+  IComplexField,
+  IEnumField,
+  IField,
+  ISimpleField,
+} from "../types";
 import { IMetadata } from "../types/IMetadata";
 
 export const Field = (
@@ -12,6 +18,17 @@ export const Field = (
     const classObject = proto.constructor;
     const _meta: IField = { ...meta } as IField;
     _meta.name = name;
+    if (_meta.type === FIELD_TYPE.ENUM) {
+      const options = _meta.options;
+      if (typeof options[0] === "string") {
+        _meta.options = options.map((o) => {
+          return {
+            displayName: o as string,
+            name: o as string,
+          };
+        });
+      }
+    }
     const fields: IField[] = getMetadata(classObject, "base:fields") || [];
     fields.push(_meta);
     defineMetadata(classObject, { "base:fields": fields });

@@ -8,5 +8,10 @@ export class Metadata extends StoreModel {
   @Field({ type: FIELD_TYPE.STRING })
   private name = "";
   @Field({ type: FIELD_TYPE.STRING })
-  private displayname = "";
+  private displayName = "";
+
+  public async insertOne(record: Record<string, unknown>) {
+    const code = `${record.namespace}.${record.name}`;
+    return super.insertOne({ ...record, code });
+  }
 }
