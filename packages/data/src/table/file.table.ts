@@ -57,9 +57,26 @@ export class FileTable implements ITable {
 
   public async select<T>(record: Record<string, unknown>) {
     const list = await this.read();
-    const result = list.filter((item) => {
-      return Lisp.eval(this.resolveRecordToLisp(record), item);
-    }) as T[];
+    const result = list
+      .filter((item) => {
+        return Lisp.eval(this.resolveRecordToLisp(record), item);
+      })
+      .map((item) => {
+        const _record: Record<string, unknown> = {};
+        this._columns
+          .filter((col) => item[col.name] !== undefined)
+          .forEach((col) => {
+            if (
+              col.type === "VARCHAR(255)" &&
+              typeof item[col.name] !== "string"
+            ) {
+              _record[col.name] = JSON.stringify(item[col.name]);
+            } else {
+              _record[col.name] = item[col.name];
+            }
+          });
+        return _record;
+      }) as T[];
     return result;
   }
 
@@ -68,7 +85,14 @@ export class FileTable implements ITable {
     this._columns
       .filter((col) => record[col.name] !== undefined)
       .forEach((col) => {
-        _record[col.name] = record[col.name];
+        if (
+          col.type === "VARCHAR(255)" &&
+          typeof record[col.name] !== "string"
+        ) {
+          _record[col.name] = JSON.stringify(record[col.name]);
+        } else {
+          _record[col.name] = record[col.name];
+        }
       });
     const key = this._columns.find((col) => col.name == this._key) as IColumn;
     if (!key._increase_counter) {
@@ -86,7 +110,14 @@ export class FileTable implements ITable {
     this._columns
       .filter((col) => record[col.name] !== undefined)
       .forEach((col) => {
-        _record[col.name] = record[col.name];
+        if (
+          col.type === "VARCHAR(255)" &&
+          typeof record[col.name] !== "string"
+        ) {
+          _record[col.name] = JSON.stringify(record[col.name]);
+        } else {
+          _record[col.name] = record[col.name];
+        }
       });
     const key = this._columns.find((col) => col.name == this._key) as IColumn;
     if (!_record[key.name]) {
@@ -107,7 +138,14 @@ export class FileTable implements ITable {
     this._columns
       .filter((col) => record[col.name] !== undefined)
       .forEach((col) => {
-        _record[col.name] = record[col.name];
+        if (
+          col.type === "VARCHAR(255)" &&
+          typeof record[col.name] !== "string"
+        ) {
+          _record[col.name] = JSON.stringify(record[col.name]);
+        } else {
+          _record[col.name] = record[col.name];
+        }
       });
     const key = this._columns.find((col) => col.name == this._key) as IColumn;
     if (!_record[key.name]) {
