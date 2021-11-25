@@ -1,6 +1,6 @@
 import { Factory, IFactory } from "@noix/core";
 import { datasource_providers } from "@noix/data";
-import { NoixService } from "./base";
+import { NoixService } from "@noix/base";
 @Factory(Symbol(), [NoixService, ...datasource_providers])
 export class NoixFactory implements IFactory {
   public static theFactory: NoixFactory;

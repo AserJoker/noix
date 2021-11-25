@@ -10,3 +10,4 @@ export { Model as ModelModel } from "./model/model.model";
 export { Function as FunctionModel } from "./model/function.model";
 export { Metadata as MetadataModel } from "./model/metadata.model";
 export { Option as OptionModel } from "./model/option.model";
+export { Base } from "./module/base.module";

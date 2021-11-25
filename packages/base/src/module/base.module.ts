@@ -2,15 +2,14 @@ import { Body, Post } from "@noix/mvc";
 import { ISchema } from "@noix/resolve";
 import {
   Module,
-  Service,
-  NoixService,
   ModelModel,
   FieldModel,
   FunctionModel,
   OptionModel,
   MetadataModel,
-} from "../base";
-
+  Service,
+  NoixService,
+} from "..";
 @Module({ name: "base", displayName: "基本模块" }, [
   ModelModel,
   FieldModel,

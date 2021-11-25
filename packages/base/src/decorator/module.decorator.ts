@@ -1,4 +1,4 @@
-import { Controller, IMiddleware, Middleware, Param, Post } from "@noix/mvc";
+import { Controller, IMiddleware, Middleware, Param } from "@noix/mvc";
 import { NoixService } from "../service/noix.service";
 import { IModule } from "../types";
 import { Context, Next } from "koa";

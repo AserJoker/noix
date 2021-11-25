@@ -10,7 +10,6 @@ import {
   Model,
   NoixService,
 } from ".";
-import { NoixFactory } from "../NoixFactory";
 import { PAGE_WRAPPER } from "./wrapper";
 @Model({ store: false, virtual: true })
 export class BaseModel {
@@ -89,7 +88,7 @@ export class BaseModel {
 
   public constructor(
     protected $service: NoixService,
-    protected $factory: NoixFactory,
+    protected $factory: IFactory,
     ...args: unknown[]
   ) {}
 }

@@ -1,6 +1,6 @@
 import { DATASOURCE_FILE, IDatasource, ITable } from "@noix/data";
+import { IFactory } from "@noix/core";
 import { Field, FIELD_TYPE, IComplexField, Model, NoixService } from ".";
-import { NoixFactory } from "../NoixFactory";
 import { BaseModel } from "./base.model";
 
 @Model({ store: false, virtual: true })
@@ -242,7 +242,7 @@ export class StoreModel extends BaseModel {
     };
   }
 
-  public constructor(service: NoixService, factory: NoixFactory) {
+  public constructor(service: NoixService, factory: IFactory) {
     super(service, factory);
     const meta = this.getMetadata();
     if (meta) {
