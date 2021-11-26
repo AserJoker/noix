@@ -102,9 +102,14 @@ export class Application implements IApplication {
       return baseService.call("model", "insertOne", [model]);
     }, new Promise<void>((resolve) => resolve()));
   }
+  public async initDefaultValue() {
+    const systemService = NoixService.select("system") as NoixService;
+    //await systemService.call("view", "insertOne", [{}]);
+  }
   @Hook(async function (this: Application, args, next) {
     await this.initDatasource();
     await this.initMetadata();
+    await this.initDefaultValue();
     return next();
   })
   public async boot(server: http.Server) {
