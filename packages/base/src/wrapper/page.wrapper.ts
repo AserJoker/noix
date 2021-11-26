@@ -13,7 +13,7 @@ const PageWrapper = (
   return {
     current: () => result.current,
     total: () => result.total,
-    list: service.resolveArray(result.list, fun.returnType as string),
+    list: () => service.resolveArray(result.list, fun.returnType as string),
   };
 };
 NoixService.functionWrappers.set(PAGE_WRAPPER, PageWrapper);

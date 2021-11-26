@@ -54,9 +54,6 @@ export class Application implements IApplication {
         type = "LONGTEXT";
         break;
     }
-    if (array) {
-      return "VARCHAR(1024)";
-    }
     return type;
   }
   private resolveColumn(field: ISimpleField | IEnumField, model: IMixedModel) {
@@ -68,6 +65,7 @@ export class Application implements IApplication {
         field.name === model.key,
       auto_increase: field.name === "id",
       type: this.resolveColumnType(field),
+      serialize: (field.array && "json") || undefined,
     };
   }
   private async initDatasource() {

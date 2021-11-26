@@ -27,10 +27,14 @@ export class FileTable implements ITable {
     this._columns
       .filter((col) => record[col.name] !== undefined)
       .forEach((col) => {
-        conditions.push(`(EQU ${col.name} ${record[col.name]})`);
+        let value = record[col.name];
+        if (typeof value === "string") {
+          value = `"${value}"`;
+        }
+        conditions.push(`(eq ${col.name} ${value})`);
       });
     return conditions.reduce((last, now) => {
-      return `(AND ${last} ${now})`;
+      return `(and ${last} ${now})`;
     });
   }
 
@@ -59,18 +63,16 @@ export class FileTable implements ITable {
     const list = await this.read();
     const result = list
       .filter((item) => {
-        return Lisp.eval(this.resolveRecordToLisp(record), item);
+        const lisp = this.resolveRecordToLisp(record);
+        return Lisp.eval(lisp, item);
       })
       .map((item) => {
         const _record: Record<string, unknown> = {};
         this._columns
           .filter((col) => item[col.name] !== undefined)
           .forEach((col) => {
-            if (
-              col.type === "VARCHAR(255)" &&
-              typeof item[col.name] !== "string"
-            ) {
-              _record[col.name] = JSON.stringify(item[col.name]);
+            if (col.serialize === "json") {
+              _record[col.name] = JSON.parse(item[col.name] as string);
             } else {
               _record[col.name] = item[col.name];
             }
@@ -85,10 +87,7 @@ export class FileTable implements ITable {
     this._columns
       .filter((col) => record[col.name] !== undefined)
       .forEach((col) => {
-        if (
-          col.type === "VARCHAR(255)" &&
-          typeof record[col.name] !== "string"
-        ) {
+        if (col.serialize === "json") {
           _record[col.name] = JSON.stringify(record[col.name]);
         } else {
           _record[col.name] = record[col.name];
@@ -110,10 +109,7 @@ export class FileTable implements ITable {
     this._columns
       .filter((col) => record[col.name] !== undefined)
       .forEach((col) => {
-        if (
-          col.type === "VARCHAR(255)" &&
-          typeof record[col.name] !== "string"
-        ) {
+        if (col.serialize === "json") {
           _record[col.name] = JSON.stringify(record[col.name]);
         } else {
           _record[col.name] = record[col.name];
@@ -138,10 +134,7 @@ export class FileTable implements ITable {
     this._columns
       .filter((col) => record[col.name] !== undefined)
       .forEach((col) => {
-        if (
-          col.type === "VARCHAR(255)" &&
-          typeof record[col.name] !== "string"
-        ) {
+        if (col.serialize === "json") {
           _record[col.name] = JSON.stringify(record[col.name]);
         } else {
           _record[col.name] = record[col.name];

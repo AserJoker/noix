@@ -4,4 +4,5 @@ export interface IColumn {
   type: string;
   auto_increase?: boolean;
   _increase_counter?: number;
+  serialize?: string;
 }

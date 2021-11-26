@@ -94,7 +94,11 @@ export class NoixService {
           if (fun.wrapper) {
             const wrapper = NoixService.functionWrappers.get(fun.wrapper);
             if (wrapper) {
-              return wrapper(this, result, fun);
+              return wrapper(this, result, {
+                ...fun,
+                returnType:
+                  fun.returnType === "$this" ? fun.namespace : fun.returnType,
+              });
             }
           }
           if (fun.array) {
