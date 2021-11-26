@@ -1,11 +1,5 @@
-import { Controller, Get, View, Guard } from "@noix/mvc";
+import { Controller, Get, View } from "@noix/mvc";
 
-@Guard({
-  active: () => {
-    return false;
-  },
-  reject: () => "demo reject",
-})
 @Controller("/")
 export class Home {
   @View("./view/index.ejs")

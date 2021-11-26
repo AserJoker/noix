@@ -11,3 +11,6 @@ export { Function as FunctionModel } from "./model/function.model";
 export { Metadata as MetadataModel } from "./model/metadata.model";
 export { Option as OptionModel } from "./model/option.model";
 export { Base } from "./module/base.module";
+
+export * from "./base.model";
+export * from "./store.model";

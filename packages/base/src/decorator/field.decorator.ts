@@ -10,9 +10,9 @@ import { IMetadata } from "../types/IMetadata";
 
 export const Field = (
   meta:
-    | Omit<ISimpleField, keyof IMetadata>
-    | Omit<IEnumField, keyof IMetadata>
-    | Omit<IComplexField, keyof IMetadata>
+    | Omit<ISimpleField, Exclude<keyof IMetadata, "displayName">>
+    | Omit<IEnumField, Exclude<keyof IMetadata, "displayName">>
+    | Omit<IComplexField, Exclude<keyof IMetadata, "displayName">>
 ) => {
   return <T extends Object>(proto: T, name: string) => {
     const classObject = proto.constructor;

@@ -4,7 +4,9 @@ import { BaseModel } from "../base.model";
 import { IMetadata } from "../types/IMetadata";
 import { IModel } from "../types/IModel";
 
-export const Model = (model?: Omit<IModel, keyof IMetadata>) => {
+export const Model = (
+  model?: Omit<IModel, Exclude<keyof IMetadata, "displayName">>
+) => {
   return <T extends typeof BaseModel>(classObject: T) => {
     defineMetadata(classObject, { "base:model": model || {} });
     const fields: IField[] = getMetadata(classObject, "base:fields") || [];

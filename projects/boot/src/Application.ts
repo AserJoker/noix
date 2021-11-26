@@ -14,7 +14,8 @@ import {
   NoixService,
   Base,
 } from "@noix/base";
-@Boot({ controllers: [Home, Base], factory: NoixFactory.theFactory })
+import { System } from "@noix/system";
+@Boot({ controllers: [Home, Base, System], factory: NoixFactory.theFactory })
 @RequestBody
 @ResponseBody
 export class Application implements IApplication {

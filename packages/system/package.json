@@ -1,0 +1,21 @@
+{
+  "name": "@noix/system",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "typings": "dist/typings/index.d.ts",
+  "devDependencies": {
+    "@types/koa": "^2.13.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "clean": "rimraf -f ./dist",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@noix/core": "0.1.0",
+    "@noix/resolve": "0.1.0",
+    "@noix/base": "0.1.0",
+    "@noix/mvc": "0.1.0"
+  }
+}
