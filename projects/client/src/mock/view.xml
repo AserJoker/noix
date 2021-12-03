@@ -1,0 +1,27 @@
+<form model="base.model">
+    <col-container>
+        <action-bar>
+            <action name="back"/>
+        </action-bar>
+        <row-container cols="12">
+            <row-item span="3">
+                <form-item name="code" component="input"/>
+            </row-item>
+            <row-item span="3">
+                <form-item name="name" component="input"/>
+            </row-item>
+            <row-item span="3">
+                <form-item name="namespace" component="input"/>
+            </row-item>
+            <row-item span="3">
+                <form-item name="key" component="input"/>
+            </row-item>
+            <row-item span="3">
+                <form-item name="store" component="input"/>
+            </row-item>
+            <row-item span="3">
+                <form-item name="virtual" component="input"/>
+            </row-item>
+        </row-container>
+    </col-container>
+</form>
