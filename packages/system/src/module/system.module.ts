@@ -8,11 +8,12 @@ import { View } from "../model/view.model";
 @Module({ name: "system", displayName: "系统模块" }, [Name, View, Menu])
 export class System {
   @Post
-  public onPost(
+  public async onPost(
     @Service service: NoixService,
     @Body("schema") schema: ISchema,
     @Body("context") context: Record<string, unknown> | undefined
   ) {
-    return service.run(schema, context);
+    const result = await service.run(schema, context);
+    return result;
   }
 }

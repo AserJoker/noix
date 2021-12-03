@@ -13,11 +13,7 @@ export const Module = (info: IModule, models: Function[]) => {
       return next();
     };
     public constructor(@Inject(CURRENT_FACTORY) factory: IFactory) {
-      this._service = factory.createInstance<NoixService>(NoixService, [
-        info.name,
-        models,
-        factory,
-      ]) as NoixService;
+      this._service = new NoixService(info.name, models, factory);
     }
   }
   return <T extends Function>(classObject: T) => {

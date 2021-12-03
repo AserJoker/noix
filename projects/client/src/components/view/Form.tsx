@@ -3,12 +3,13 @@ import {
   defineComponent,
   h,
   inject,
+  onMounted,
   PropType,
   provide,
   watch,
 } from "@vue/runtime-core";
-import { NFormItem, NInput } from "naive-ui";
-import { useComponent, useField } from "../../hooks";
+import { NFormItem, NSpin } from "naive-ui";
+import { useComponent, useField, useRef, useRouter } from "../../hooks";
 import { IReactiveState, ObjectService } from "../../service";
 import { IViewNode } from "../../types";
 import style from "./index.module.scss";
@@ -21,7 +22,9 @@ export const Form = defineComponent({
     },
   },
   setup(props, ctx) {
-    const service = new ObjectService({}, props.node);
+    const service = new ObjectService<Record<string, unknown>>({}, props.node);
+    const loading = useRef(service.loading);
+    const router = useRouter();
     watch(
       () => props.node,
       (node) => {
@@ -29,8 +32,18 @@ export const Form = defineComponent({
       }
     );
     provide("service", service);
+    onMounted(() => {
+      if (router.raw.param.code) {
+        service.state.value.code = router.raw.param.code;
+        service.queryOne();
+      }
+    });
     return () => {
-      return <div>{ctx.slots.default && ctx.slots.default()}</div>;
+      return (
+        <NSpin show={loading.value}>
+          {ctx.slots.default && ctx.slots.default()}
+        </NSpin>
+      );
     };
   },
 });
@@ -48,19 +61,20 @@ export const FormItem = defineComponent({
     }
     const { value, onChange } = useField(
       service.state as IReactiveState<Record<string, unknown>>,
-      (record) => record[props.node.attrs.name as string],
-      (record, value) => (record[props.node.attrs.name as string] = value)
+      (record) => record[props.node.attrs.field as string],
+      (record, value) => (record[props.node.attrs.field as string] = value)
     );
     return () => {
       const { node } = props;
-      const { name, component } = node.attrs as {
+      const { component, displayName } = node.attrs as {
         name: string;
         component: string;
+        displayName: string;
       };
       const Component = useComponent<DefineComponent>(component);
       return (
         <div class={style["form-item"]}>
-          <NFormItem label={name} labelWidth={120} labelPlacement="left">
+          <NFormItem label={displayName} labelWidth={120} labelPlacement="left">
             {Component && h(Component, { value: value.value, onChange, node })}
           </NFormItem>
         </div>

@@ -1,5 +1,6 @@
 import { getMetadata, IFactory, Provide } from "@noix/core";
 import Koa, { Context, Next } from "koa";
+import cors from "koa2-cors";
 import { IApplication, IMiddleware, IRuntime } from "../types";
 import http from "http";
 const execMiddlewares = (
@@ -105,6 +106,7 @@ export const Boot = (config: {
     };
     const boot = () => {
       const koa = new Koa();
+      koa.use(cors());
       koa.use(service);
       return koa.callback();
     };

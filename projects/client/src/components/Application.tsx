@@ -1,41 +1,10 @@
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { NConfigProvider, NSpin } from "naive-ui";
 import { Header } from "./block/Header";
 import { Menu } from "./block/Menu";
-import { useRef, useRender, useRouter } from "../hooks";
+import { useHistory, useRender, useRouter, useView } from "../hooks";
 import { resolveView } from "../helper/view";
 import { IViewNode } from "../types";
-const viewXML = `
-<form model="base.model">
-    <col-container>
-        <action-bar>
-            <action name="back" displayName="返回"/>
-            <action name="router" displayName="前往">
-              <param value="\${current.code}"/>
-            </action>
-        </action-bar>
-        <row-container cols="12">
-            <row-item span="3">
-                <form-item name="code" component="string-input"/>
-            </row-item>
-            <row-item span="3">
-                <form-item name="name" component="string-input"/>
-            </row-item>
-            <row-item span="3">
-                <form-item name="namespace" component="string-input"/>
-            </row-item>
-            <row-item span="3">
-                <form-item name="key" component="string-input"/>
-            </row-item>
-            <row-item span="3">
-                <form-item name="store" component="boolean-radio"/>
-            </row-item>
-            <row-item span="3">
-                <form-item name="virtual" component="boolean-radio"/>
-            </row-item>
-        </row-container>
-    </col-container>
-</form>`;
 export const Application = defineComponent({
   props: {
     loading: {
@@ -44,11 +13,28 @@ export const Application = defineComponent({
   },
   setup(props, ctx) {
     const router = useRouter();
-    const routerRef = useRef(router);
     const view = ref<IViewNode | null>(null);
-    onMounted(() => {
-      view.value = resolveView(viewXML);
-    });
+    router.watch(
+      () => {
+        const _view = router.raw.param.view;
+        if (!_view) {
+          useHistory().push({
+            param: { ...router.raw.param, view: "model.form" },
+          });
+        } else {
+          useView(_view)
+            .then((data) => {
+              if (data) {
+                view.value = resolveView(data.xml);
+              }
+            })
+            .catch((e) => {
+              alert(e.message);
+            });
+        }
+      },
+      { immediate: true }
+    );
     return () => {
       const { loading } = props;
       return (
@@ -61,7 +47,7 @@ export const Application = defineComponent({
                 </div>
                 <div class="layout-item layout-item-fill layout-container layout-container-row">
                   <Menu />
-                  <div class="layout-item layout-item-fill">
+                  <div class="layout-item layout-item-fill layout-item-fixed">
                     {view.value && useRender(view.value)}
                   </div>
                 </div>

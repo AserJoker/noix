@@ -229,8 +229,10 @@ export class NoixService {
     const [module, name] = refModel.split(".");
     const service = NoixService._services.get(module);
     if (service) {
-      return service.resolveFunctionCall(name, "queryList", [
+      return service.resolveFunctionCall(name, "queryPage", [
         relation,
+        1,
+        10,
         context,
       ]);
     }
@@ -286,7 +288,7 @@ export class NoixService {
     const relationModel = `${relModule}.${relName}_${refName}`;
     const relations = await this.call<Record<string, unknown>[]>(
       relationModel,
-      "queryOne",
+      "queryList",
       [relRelation, context]
     );
     if (!relations) {

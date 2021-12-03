@@ -1,10 +1,14 @@
 import { useHistory } from "../../hooks";
 
-export const router = (
-  path: string,
-  param?: Record<string, unknown>,
-  hash?: string
-) => {
+export const router = ({
+  path,
+  param,
+  hash,
+}: {
+  path: string;
+  param?: Record<string, unknown>;
+  hash?: string;
+}) => {
   const _router = useHistory();
   const _param: Record<string, string> = {};
   if (param) {

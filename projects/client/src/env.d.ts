@@ -6,3 +6,8 @@ declare module "*.vue" {
   const component: DefineComponent<{}, {}, any>;
   export default component;
 }
+declare function setTimeout(
+  handler: TimerHandler,
+  timeout?: number,
+  ...arguments: any[]
+): number;

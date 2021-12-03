@@ -9,6 +9,7 @@
     "@noix/data": "0.1.0",
     "@noix/base": "0.1.0",
     "@noix/system": "0.1.0",
+    "@noix/log":"0.1.0",
     "koa": "^2.13.4"
   },
   "devDependencies": {

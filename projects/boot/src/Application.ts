@@ -15,6 +15,7 @@ import {
   Base,
 } from "@noix/base";
 import { System } from "@noix/system";
+import { Log } from "@noix/log";
 @Boot({ controllers: [Home, Base, System], factory: NoixFactory.theFactory })
 @RequestBody
 @ResponseBody
@@ -57,6 +58,7 @@ export class Application implements IApplication {
     }
     return type;
   }
+
   private resolveColumn(field: ISimpleField | IEnumField, model: IMixedModel) {
     return {
       name: field.name,
@@ -102,10 +104,27 @@ export class Application implements IApplication {
       return baseService.call("model", "insertOne", [model]);
     }, new Promise<void>((resolve) => resolve()));
   }
+  public async initView(service: NoixService) {
+    const rootPath = path.resolve(__dirname, "./view");
+    const files = fs.readdirSync(rootPath);
+    await Promise.all(
+      files.map(async (name) => {
+        const filepath = path.resolve(rootPath, name);
+        await service.call("view", "insertOne", [
+          {
+            xml: fs.readFileSync(path.resolve(filepath)).toString(),
+            name: path.basename(filepath, path.extname(filepath)),
+          },
+        ]);
+      })
+    );
+  }
   public async initDefaultValue() {
     const systemService = NoixService.select("system") as NoixService;
-    //await systemService.call("view", "insertOne", [{}]);
+    await this.initView(systemService);
   }
+
+  @Log("boot...", "before")
   @Hook(async function (this: Application, args, next) {
     await this.initDatasource();
     await this.initMetadata();

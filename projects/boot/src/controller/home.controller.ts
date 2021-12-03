@@ -1,4 +1,4 @@
-import { Controller, Get, View } from "@noix/mvc";
+import { Controller, Get, Post, View } from "@noix/mvc";
 
 @Controller("/")
 export class Home {

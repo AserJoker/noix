@@ -1,0 +1,30 @@
+<form model="base.model">
+    <col-container>
+        <action-bar>
+            <action name="back" displayName="返回"/>
+            <action name="router" displayName="前往">
+                <param value="\${current.code}"/>
+            </action>
+        </action-bar>
+        <row-container cols="12">
+            <row-item span="3">
+                <form-item field="code" component="string-input" displayName="模型编码" type="STRING"/>
+            </row-item>
+            <row-item span="3">
+                <form-item field="name" component="string-input" displayName="模型名称" type="STRING"/>
+            </row-item>
+            <row-item span="3">
+                <form-item field="namespace" component="string-input" displayName="模块" type="STRING"/>
+            </row-item>
+            <row-item span="3">
+                <form-item field="key" component="string-input" displayName="模型唯一键" type="STRING"/>
+            </row-item>
+            <row-item span="3">
+                <form-item field="store" component="boolean-radio" displayName="是否存储" type="BOOLEAN"/>
+            </row-item>
+            <row-item span="3">
+                <form-item field="virtual" component="boolean-radio" displayName="是否虚拟" type="BOOLEAN"/>
+            </row-item>
+        </row-container>
+    </col-container>
+</form>

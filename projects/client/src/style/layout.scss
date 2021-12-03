@@ -14,6 +14,9 @@
     &-fill {
       flex-grow: 1;
     }
+    &-fixed {
+      overflow: auto;
+    }
     &-end {
       justify-self: flex-end;
     }

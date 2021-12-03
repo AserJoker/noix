@@ -19,11 +19,11 @@ import {
 ])
 export class Base {
   @Post
-  public onPost(
+  public async onPost(
     @Service service: NoixService,
     @Body("schema") schema: ISchema,
     @Body("context") context: Record<string, unknown> | undefined
   ) {
-    return service.run(schema, context);
+    return await service.run(schema, context);
   }
 }

@@ -18,8 +18,5 @@ export class Watcher<T> {
     this._getter = getter;
     this._old = clone(getter());
     this._handle = handle;
-    if (options?.immediate) {
-      this.notify();
-    }
   }
 }

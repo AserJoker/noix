@@ -63,6 +63,9 @@ export class State<T> implements IReactiveState<T> {
     const handle = args[0] as Function;
     const watcher = new Watcher(handle, getter, options);
     this._watchers.push(watcher);
+    if (options?.immediate) {
+      watcher.notify();
+    }
     return () => {
       const index = this._watchers.findIndex((w) => w === watcher);
       if (index !== -1) {
