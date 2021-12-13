@@ -1,8 +1,13 @@
 import { DATASOURCE_FILE, IDatasource, ITable } from "@noix/data";
-import { IFactory } from "@noix/core";
+import {
+  NoEmptyObject,
+  IFactory,
+  TypeCheck,
+  Validate,
+  Required,
+} from "@noix/core";
 import { Field, FIELD_TYPE, IComplexField, Model, NoixService } from ".";
 import { BaseModel } from "./base.model";
-
 @Model({ store: false, virtual: true })
 export class StoreModel extends BaseModel {
   private _$data?: ITable;
@@ -133,14 +138,26 @@ export class StoreModel extends BaseModel {
     }
   }
 
-  public async queryOne(record: Record<string, unknown>) {
+  @Validate
+  public async queryOne(
+    @Required
+    @TypeCheck("object")
+    @NoEmptyObject("record")
+    record: Record<string, unknown>
+  ) {
     await this.$data.lock();
     const list = await this.$data.select(record);
     await this.$data.unlock();
     return list[0];
   }
 
-  public async insertOne(record: Record<string, unknown>) {
+  @Validate
+  public async insertOne(
+    @Required
+    @TypeCheck("object")
+    @NoEmptyObject("record")
+    record: Record<string, unknown>
+  ) {
     const [m2m, m2o, o2m, o2o] = this.getRelationFields();
     await this.$data.lock();
     await m2o
@@ -172,7 +189,13 @@ export class StoreModel extends BaseModel {
     return result;
   }
 
-  public async updateOne(record: Record<string, unknown>) {
+  @Validate
+  public async updateOne(
+    @Required
+    @TypeCheck("object")
+    @NoEmptyObject("record")
+    record: Record<string, unknown>
+  ) {
     const [m2m, m2o, o2m, o2o] = this.getRelationFields();
     await this.$data.lock();
     await m2o
@@ -204,14 +227,26 @@ export class StoreModel extends BaseModel {
     return result;
   }
 
-  public async deleteOne(record: Record<string, unknown>) {
+  @Validate
+  public async deleteOne(
+    @Required
+    @TypeCheck("object")
+    @NoEmptyObject("record")
+    record: Record<string, unknown>
+  ) {
     await this.$data.lock();
     const result = await this.$data.delete(record);
     await this.$data.unlock();
     return result;
   }
 
-  public async insertOrUpdateOne(record: Record<string, unknown>) {
+  @Validate
+  public async insertOrUpdateOne(
+    @Required
+    @TypeCheck("object")
+    @NoEmptyObject("record")
+    record: Record<string, unknown>
+  ) {
     if (record[this.$data.getKey()] === undefined) {
       return this.insertOne(record);
     } else {
@@ -219,21 +254,29 @@ export class StoreModel extends BaseModel {
     }
   }
 
-  public async queryList(record: Record<string, unknown>) {
+  @Validate
+  public async queryList(
+    @Required
+    @TypeCheck("object")
+    record: Record<string, unknown>
+  ) {
     await this.$data.lock();
     const result = await this.$data.select(record);
     await this.$data.unlock();
     return result;
   }
 
+  @Validate
   public async queryPage(
+    @Required
+    @TypeCheck("object")
     record: Record<string, unknown>,
     current: number,
     pageSize: number
   ) {
     await this.$data.lock();
     const list = await this.$data.select(record);
-    const total = await this.$data.count();
+    const total = await this.$data.count(record);
     await this.$data.unlock();
     return {
       current,

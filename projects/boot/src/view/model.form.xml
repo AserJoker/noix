@@ -2,13 +2,15 @@
     <col-container>
         <action-bar>
             <action name="back" displayName="返回"/>
-            <action name="router" displayName="前往">
-                <param value="\${current.code}"/>
+            <action name="complex" displayName="确认" type="primary">
+                <action name="validate" />
+                <action name="insertOrUpdateOne" />
+                <action name="back" />
             </action>
         </action-bar>
         <row-container cols="12">
             <row-item span="3">
-                <form-item field="code" component="string-input" displayName="模型编码" type="STRING"/>
+                <form-item field="code" component="string-input" displayName="模型编码" type="STRING" required="true" requiredMessage="模型编码必填"/>
             </row-item>
             <row-item span="3">
                 <form-item field="name" component="string-input" displayName="模型名称" type="STRING"/>

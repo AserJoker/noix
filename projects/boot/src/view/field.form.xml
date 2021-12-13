@@ -1,0 +1,68 @@
+<form model="base.field">
+    <col-container>
+        <action-bar>
+            <action name="back" displayName="返回"/>
+            <action name="complex" displayName="确认" type="primary">
+                <action name="validate" />
+                <action name="insertOrUpdateOne" />
+                <action name="back" />
+            </action>
+        </action-bar>
+        <row-container cols="12">
+            <row-item span="4">
+                <form-item component="string-input" field="id" displayName="ID" type="INTEGER" invisible="true"/>
+            </row-item>
+            <row-item span="4">
+                <form-item component="string-input" field="namespace" displayName="模型" type="STRING" disabled="true"/>
+            </row-item>
+            <row-item span="4">
+                <form-item component="string-input" field="code" displayName="编码" type="STRING" invisible="${!current.code}" disabled="${current.code}"/>
+            </row-item>
+            <row-item span="4">
+                <form-item component="string-input" field="name" displayName="名称" type="STRING" required="true"/>
+            </row-item>
+            <row-item span="4">
+                <form-item component="string-input" field="displayName" displayName="展示名称" type="STRING"/>
+            </row-item>
+            <row-item span="4">
+                <form-item component="enum-select" field="type" displayName="类型" type="ENUM" required="true">
+                    <option label="文本" value="STRING"/>
+                    <option label="长文本" value="TEXT"/>
+                    <option label="整数" value="INTEGER" />
+                    <option label="浮点数" value="FLOAT" />
+                    <option label="布尔" value="BOOLEAN" />
+                    <option label="枚举" value="ENUM" />
+                    <option label="一对多" value="ONE2MANY" />
+                    <option label="多对一" value="MANY2ONE" />
+                    <option label="一对一" value="ONE2ONE" />
+                    <option label="多对多" value="MANY2MANY" />
+                </form-item>
+            </row-item>
+            <row-item span="4">
+                <form-item component="string-multi-input" field="refs" displayName="关系字段" type="STRING" array="true" invisible="${current.type!=='ONE2MANY'&amp;&amp;current.type!=='MANY2ONE'&amp;&amp;current.type!=='ONE2ONE'&amp;&amp;current.type!=='MANY2MANY'}"/>
+            </row-item>
+            <row-item span="4">
+                <form-item component="string-multi-input" field="rels" displayName="关联字段" type="STRING" array="true" invisible="${current.type!=='ONE2MANY'&amp;&amp;current.type!=='MANY2ONE'&amp;&amp;current.type!=='ONE2ONE'&amp;&amp;current.type!=='MANY2MANY'}"/>
+            </row-item>
+            <row-item span="4">
+                <form-item component="string-input" field="refModel" displayName="关系模型" type="STRING" invisible="${current.type!=='ONE2MANY'&amp;&amp;current.type!=='MANY2ONE'&amp;&amp;current.type!=='ONE2ONE'&amp;&amp;current.type!=='MANY2MANY'}"/>
+            </row-item>
+            <row-item span="12">
+                <form-item component="o2m-table" field="options" refs="code" rels="namespace" type="ONE2MANY" invisible="${current.type!=='ENUM'}" displayName="枚举值">
+                    <table model="base.option" key="code">
+                        <column field="id" displayName="ID" type="INTEGER" width="80"/>
+                        <column field="code" displayName="编码" type="STRING" />
+                        <column field="name" displayName="名称" type="STRING" />
+                        <column field="displayName" displayName="展示名称" type="STRING" />
+                        <inline-action>
+                            <action name="dialog" displayName="编辑" inline="true" type="primary">
+                                <param name="view" value="option.form" />
+                                <param name="code" value="${current[0].code}"/>
+                            </action>
+                        </inline-action>
+                    </table>
+                </form-item>
+            </row-item>
+        </row-container>
+    </col-container>
+</form>

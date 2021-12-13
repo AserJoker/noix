@@ -54,8 +54,8 @@ export class FileTable implements ITable {
     return null;
   }
 
-  public async count() {
-    const list = await this.read();
+  public async count(record?: Record<string, unknown>) {
+    const list = await this.select(record || {});
     return list.length;
   }
 
@@ -63,6 +63,9 @@ export class FileTable implements ITable {
     const list = await this.read();
     const result = list
       .filter((item) => {
+        if (Object.keys(record).length === 0) {
+          return true;
+        }
         const lisp = this.resolveRecordToLisp(record);
         return Lisp.eval(lisp, item);
       })
@@ -101,7 +104,8 @@ export class FileTable implements ITable {
     const list = await this.read();
     list.push(_record);
     await this.write(list);
-    return _record as T;
+    record[key.name] = _record[key.name];
+    return record as T;
   }
 
   public async update<T>(record: Record<string, unknown>) {
@@ -124,7 +128,7 @@ export class FileTable implements ITable {
     if (index !== -1) {
       list[index] = _record;
       await this.write(list);
-      return _record as T;
+      return record as T;
     }
     return null;
   }

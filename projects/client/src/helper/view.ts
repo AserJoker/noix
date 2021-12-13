@@ -38,13 +38,29 @@ const resolveField = (node: IViewNode, schema: ISchema) => {
     schema[node.attrs.field as string] = "number";
   } else if (node.attrs.type === "BOOLEAN") {
     schema[node.attrs.field as string] = "boolean";
-  } else {
+  } else if (node.attrs.type === "MANY2ONE" || node.attrs.type === "ONE2ONE") {
     const modelSchema: ISchema = {};
     resolveModel(
       node.children.find((c) => c.attrs.model) as IViewNode,
       modelSchema
     );
     schema[node.attrs.field as string] = modelSchema;
+  } else if (
+    node.attrs.type === "MANY2MANY" ||
+    node.attrs.type === "ONE2MANY"
+  ) {
+    const modelSchema: ISchema = {};
+    resolveModel(
+      node.children.find((c) => c.attrs.model) as IViewNode,
+      modelSchema
+    );
+    schema[node.attrs.field as string] = {
+      current: "number",
+      total: "number",
+      list: modelSchema,
+    };
+  } else {
+    throw new Error(`field ${node.attrs.field}.type is lost`);
   }
 };
 

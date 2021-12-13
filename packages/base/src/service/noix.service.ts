@@ -50,7 +50,15 @@ export class NoixService {
     functions.forEach((fun) => {
       model_handles[fun.name] = this.resolveFunction(fun, classObject);
     });
-    return () => model_handles;
+    return () =>
+      new Proxy(model_handles, {
+        get: (target, name: string) => {
+          if (!target[name] && !Reflect.get(Promise.resolve(target), name)) {
+            throw new Error(`${meta.code}.${name} is not defined`);
+          }
+          return target[name];
+        },
+      });
   }
 
   public resolveFunction(meta: IFunction, classObject: Function) {

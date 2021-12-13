@@ -31,6 +31,7 @@ export interface INoixResponse<T> {
 class HttpClient {
   private static _cache: Map<string, HttpClient> = new Map();
   private _middlewares: IMiddleware[] = [];
+  private _cache: Map<string, Promise<unknown>> = new Map();
   private _get(request: IRequest, param: Record<string, unknown>) {
     const _param: string[] = [];
     Object.keys(param).forEach((name) => {
@@ -252,6 +253,28 @@ export const queryList = async <T>(
     "queryList",
     { record },
     schema,
+    context,
+    baseURL
+  );
+};
+export const queryPage = async <T>(
+  model: string,
+  record: Record<string, unknown>,
+  current: number,
+  pageSize: number,
+  schema: ISchema,
+  context: Record<string, unknown> = {},
+  baseURL?: string
+) => {
+  return callFunction<{ list: T[]; total: number; current: number }>(
+    model,
+    "queryPage",
+    { record, current, pageSize },
+    {
+      current: "number",
+      total: "number",
+      list: schema,
+    },
     context,
     baseURL
   );

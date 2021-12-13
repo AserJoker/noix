@@ -9,15 +9,15 @@ const mock = [
     children: [
       {
         label: "模型",
-        key: "base.model",
+        key: "model.table",
       },
       {
         label: "字段",
-        key: "base.field",
+        key: "field.table",
       },
       {
         label: "方法",
-        key: "base.function",
+        key: "function.table",
       },
     ],
   },

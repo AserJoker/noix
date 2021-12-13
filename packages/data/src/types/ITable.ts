@@ -5,7 +5,7 @@ export interface ITable {
   getName(): string;
   getColumns(): IColumn[];
   select<T>(record: Record<string, unknown>): Promise<T[]>;
-  count(): Promise<number>;
+  count(recod?: Record<string, unknown>): Promise<number>;
   insert<T>(record: Record<string, unknown>): Promise<T | null>;
   update<T>(record: Record<string, unknown>): Promise<T | null>;
   delete<T>(record: Record<string, unknown>): Promise<T | null>;

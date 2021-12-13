@@ -6,7 +6,6 @@
   "dependencies": {
     "@noix/core":"0.1.0"
   },
-  "devDependencies": {},
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/index.js",

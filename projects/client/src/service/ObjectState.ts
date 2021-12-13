@@ -6,56 +6,80 @@ import {
   insertOrUpdateOne,
   queryOne,
   updateOne,
-  useAction,
 } from "../hooks";
 import { IViewNode } from "../types";
-import sget from "lodash/get";
 import { convertViewToSchema } from "../helper/view";
 import { Loading } from "../helper/loading.decorator";
 
 export class ObjectService<
   T extends Record<string, unknown>
 > extends BaseService<T> {
-  private _node: IReactiveState<IViewNode>;
-  private _loading: IReactiveState<boolean>;
-  public constructor(defaultValue: T, node: IViewNode) {
-    super(new State<T>(defaultValue));
+  private _fields: Record<string, () => IViewNode> = {};
+  private _validateInfo: IReactiveState<Record<string, string>>;
+  public constructor(defaultValue: IReactiveState<T>, node: IViewNode) {
+    super(defaultValue, node);
     if (!node.attrs.model) {
       throw new Error("not a model node");
     }
-    this._node = new State(node);
-    this._loading = new State(false);
+    const resolveFields = (n: IViewNode) => {
+      if (n.attrs.field) {
+        this._fields[n.attrs.field as string] = () => n;
+      } else {
+        n.children.forEach((c) => resolveFields(c));
+      }
+    };
+    resolveFields(node);
+    this._validateInfo = new State({});
+    this.current.value = [this.state.raw];
   }
-  public get node() {
-    return this._node;
+  public setField(name: string, getter: () => IViewNode) {
+    this._fields[name] = getter;
   }
-  public get loading() {
-    return this._loading;
+  public get validateInfo() {
+    return this._validateInfo;
+  }
+  private _computed(code: string) {
+    const _is = new Function("current", `return ${code}`);
+    return _is(this.state.raw);
+  }
+  public isDisabled(node: IViewNode) {
+    const state = node.attrs["disabled"] as string;
+    if (node.attrs.value) {
+      return true;
+    }
+    if (!state) {
+      return false;
+    }
+    if (state.startsWith("${") && state.endsWith("}")) {
+      return !!this._computed(state.substring(2, state.length - 1));
+    } else {
+      return state === "true";
+    }
+  }
+  public isInvisible(node: IViewNode) {
+    const state = node.attrs["invisible"] as string;
+    if (!state) {
+      return false;
+    }
+    if (state.startsWith("${") && state.endsWith("}")) {
+      return !!this._computed(state.substring(2, state.length - 1));
+    } else {
+      return state === "true";
+    }
+  }
+  public computed(node: IViewNode) {
+    return this._computed(node.attrs.value as string);
+  }
+  public getField(name: string) {
+    const getter = this._fields[name];
+    if (getter) {
+      return getter();
+    }
   }
   public async execAction(node: IViewNode): Promise<void> {
-    const getter = (code: string): unknown => {
-      return sget(
-        {
-          current: this.state.raw,
-        },
-        code
-      );
-    };
-    const pnodes = node.children.filter((p) => p.name === "param");
-    const param: Record<string, unknown> = {};
-    pnodes.forEach((node) => {
-      const value = node.attrs.value as string;
-      const name = node.attrs.name as string;
-      if (value.startsWith("${") && value.endsWith("}")) {
-        param[name] = getter(value.substring(2, value.length - 1));
-      } else {
-        param[name] = value;
-      }
+    return super._execAction(node, {
+      current: this.state.raw,
     });
-    const handle = useAction(node.attrs.name as string);
-    if (handle) {
-      return handle(param, this);
-    }
   }
   @Loading
   public async queryOne(
@@ -64,13 +88,10 @@ export class ObjectService<
   ) {
     const model = this.node.raw.attrs.model as string;
     const schema = convertViewToSchema(this.node.raw);
-    const data = await queryOne<T>(
-      model,
-      this.state.raw,
-      schema,
-      context,
-      baseURL
-    );
+    const record: Record<string, unknown> = {};
+    const key = (this.node.raw.attrs.key as string) || "code";
+    record[(this.node.raw.attrs.key as string) || "code"] = this.state.raw[key];
+    const data = await queryOne<T>(model, record, schema, context, baseURL);
     if (data) {
       this.state.value = data;
     }
@@ -116,7 +137,7 @@ export class ObjectService<
   }
 
   @Loading
-  public async insertOrUpdate(
+  public async insertOrUpdateOne(
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
@@ -135,7 +156,7 @@ export class ObjectService<
   }
 
   @Loading
-  public async query(
+  public async submit(
     param: Record<string, unknown>,
     funName: string,
     context: Record<string, unknown> = {},
@@ -165,6 +186,25 @@ export class ObjectService<
     );
     if (data) {
       this.state.value = data;
+    }
+  }
+  public async validate() {
+    const fields = Object.keys(this._fields);
+    const result: Record<string, string> = {};
+    fields.forEach((name) => {
+      const node = this.getField(name);
+      if (node) {
+        if (node.attrs.required === "true") {
+          if (!this.state.raw[name])
+            result[name] =
+              (node.attrs.requiredMessage as string) ||
+              `${node.attrs.displayName} is required`;
+        }
+      }
+    });
+    this.validateInfo.value = result;
+    if (Object.keys(result).length) {
+      throw new Error("validate failed");
     }
   }
 }

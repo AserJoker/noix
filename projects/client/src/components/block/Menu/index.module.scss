@@ -2,3 +2,8 @@
   border-right: 1px solid #ccc;
   min-width: 360px;
 }
+@media screen and (max-width: 1200px) {
+  .menu {
+    display: none;
+  }
+}

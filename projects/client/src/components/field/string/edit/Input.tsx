@@ -12,11 +12,21 @@ export const Input = defineComponent({
       type: String,
       default: "",
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
     onChange: {
       type: Function as PropType<(newValue: string) => void>,
     },
   },
   setup(props) {
-    return () => <NInput value={props.value} onUpdateValue={props.onChange} />;
+    return () => (
+      <NInput
+        value={props.value}
+        onUpdateValue={props.onChange}
+        disabled={props.disabled}
+      />
+    );
   },
 });
