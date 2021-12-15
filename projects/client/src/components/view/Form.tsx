@@ -30,12 +30,12 @@ export const Form = defineComponent({
     },
   },
   setup(props, ctx) {
-    const service = new ObjectService<Record<string, unknown>>(
-      new State({}),
-      props.node
-    );
+    const service = inject<ObjectService<Record<string, unknown>>>("service");
+    if (!service) {
+      throw new Error("service is not defined");
+    }
     const loading = useRef(service.loading);
-    const router = useRouter();
+    const param = inject<Ref<Record<string, unknown>>>("view-param");
     watch(
       () => props.node,
       (node) => {
@@ -46,8 +46,8 @@ export const Form = defineComponent({
     provide("service", service);
     provide("validate", validate);
     onMounted(() => {
-      if (router.raw.param.code) {
-        service.state.value.code = router.raw.param.code;
+      if (param && param.value.code) {
+        service.state.value.code = param.value.code;
         service.queryOne();
       }
     });

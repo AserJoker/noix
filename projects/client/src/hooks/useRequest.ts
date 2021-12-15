@@ -117,6 +117,7 @@ export const useRequest = (option?: IRequestOption) => {
   };
   return HttpClient.getClient(option || { baseURL: config.baseURL });
 };
+
 export const query = async <T>(
   module: string,
   schema: ISchema,

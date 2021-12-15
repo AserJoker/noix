@@ -26,4 +26,22 @@ export class Base {
   ) {
     return await service.run(schema, context);
   }
+
+  @Post("/batch")
+  public async onBatch(
+    @Body
+    body: { schema: ISchema; context: Record<string, unknown> | undefined }[],
+    @Service service: NoixService
+  ) {
+    const list: Record<string, unknown>[] = [];
+    await body.reduce(async (last, now, index) => {
+      await last;
+      list[index] = (await this.onPost(
+        service,
+        now.schema,
+        now.context
+      )) as Record<string, unknown>;
+    }, new Promise<void>((resolve) => resolve()));
+    return list;
+  }
 }

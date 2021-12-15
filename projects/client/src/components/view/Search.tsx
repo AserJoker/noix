@@ -1,5 +1,5 @@
 import { NButton, NSpace } from "naive-ui";
-import { defineComponent, PropType, provide, inject } from "vue";
+import { defineComponent, PropType, provide, inject, onMounted } from "vue";
 import { useRef } from "../../hooks";
 import { ListService, ObjectService } from "../../service";
 import { IViewNode } from "../../types";
@@ -27,6 +27,9 @@ export const Search = defineComponent({
     const onReset = () => {
       service.reset();
     };
+    onMounted(() => {
+      onSearch();
+    })
     return () => {
       return (
         <div class={style["search"]}>

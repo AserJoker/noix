@@ -135,16 +135,8 @@ export class FileTable implements ITable {
 
   public async delete<T>(record: Record<string, unknown>) {
     const _record: Record<string, unknown> = {};
-    this._columns
-      .filter((col) => record[col.name] !== undefined)
-      .forEach((col) => {
-        if (col.serialize === "json") {
-          _record[col.name] = JSON.stringify(record[col.name]);
-        } else {
-          _record[col.name] = record[col.name];
-        }
-      });
     const key = this._columns.find((col) => col.name == this._key) as IColumn;
+    _record[key.name] = record[key.name]
     if (!_record[key.name]) {
       return null;
     }

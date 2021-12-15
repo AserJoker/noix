@@ -16,9 +16,6 @@ export abstract class BaseService<T = unknown> {
   }
   protected constructor(state: IReactiveState<T>, node: IViewNode) {
     this._state = state;
-    if (!node.attrs.model) {
-      throw new Error("not a model node");
-    }
     this._node = new State(node);
     this._loading = new State(false);
     this._current = new State([]);

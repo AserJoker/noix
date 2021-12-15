@@ -5,12 +5,13 @@ import {
   submit,
   goto,
   insertOrUpdateOne,
+  dialog,
+  deleteBatch,
 } from "./actions";
 import {
   Action,
   ActionBar,
   ColContainr,
-  DataTable,
   FlexContainer,
   Form,
   FormItem,
@@ -18,6 +19,7 @@ import {
   RowItem,
   Search,
   Table,
+  Data,
 } from "./components";
 
 import { Input as StringInput } from "./components/field/string";
@@ -32,7 +34,7 @@ import { useAction, useComponent } from "./hooks";
 export const initBundles = async () => {
   // view
   useComponent("form", Form);
-  useComponent("data-table", DataTable);
+  useComponent("data", Data);
   useComponent("search", Search);
   useComponent("table", Table);
 
@@ -63,6 +65,8 @@ export const initBundles = async () => {
   useAction("complex", complex);
   useAction("validate", validate);
   useAction("insertOrUpdateOne", insertOrUpdateOne);
+  useAction('delete-batch', deleteBatch);
+  useAction("dialog", dialog);
 
   useAction("submit", submit);
 };

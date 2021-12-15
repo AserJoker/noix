@@ -1,6 +1,6 @@
 import { BaseService, IReactiveState, ObjectService, State } from ".";
 import { IViewNode } from "../types";
-import { queryPage } from "../hooks";
+import { deleteOne, queryPage } from "../hooks";
 import { convertViewToSchema } from "../helper/view";
 import { Loading } from "../helper/loading.decorator";
 
@@ -39,16 +39,17 @@ export class ListService<T extends Record<string, unknown>> extends BaseService<
   public get search() {
     return this._search;
   }
-
+  protected getListNode() {
+    return this.node.raw.children.find((c) => c.name === "table") as IViewNode;
+  }
   @Loading
   public async queryPage(
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(
-      this.node.raw.children.find((c) => c.name === "table") as IViewNode
-    );
+    const node = this.getListNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     const result = await queryPage<T>(
       model,
       this.search.raw,
@@ -67,6 +68,19 @@ export class ListService<T extends Record<string, unknown>> extends BaseService<
       };
     }
   }
+
+  @Loading
+  public async deleteOne(
+    record: Record<string, unknown>,
+    context: Record<string, unknown> = {},
+    baseURL?: string
+  ) {
+    const node = this.getListNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
+    await deleteOne<T>(model, record, schema, context, baseURL);
+  }
+
   public async setPageSize(pageSize: number) {
     this.state.setRaw({
       ...this.state.raw,

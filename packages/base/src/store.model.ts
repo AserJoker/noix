@@ -44,7 +44,7 @@ export class StoreModel extends BaseModel {
     field: IComplexField,
     record: Record<string, unknown>
   ) {
-    const value = record[field.name] as Record<string, unknown>;
+    const value = (record[field.name] as Record<string, unknown>) || {};
     const [module, name] = field.refModel.split(".");
     const service = NoixService.select(module);
     if (service) {
@@ -66,7 +66,7 @@ export class StoreModel extends BaseModel {
     field: IComplexField,
     record: Record<string, unknown>
   ) {
-    const value = record[field.name] as Record<string, unknown>[];
+    const value = (record[field.name] as Record<string, unknown>[]) || [];
     field.refs.forEach((ref, index) => {
       const rel = field.rels[index];
       value.forEach((item) => {
@@ -91,7 +91,7 @@ export class StoreModel extends BaseModel {
     field: IComplexField,
     record: Record<string, unknown>
   ) {
-    const value = record[field.name] as Record<string, unknown>;
+    const value = (record[field.name] as Record<string, unknown>) || {};
     const [module, name] = field.namespace.split(".");
     const [_, refModelName] = field.refModel.split(".");
     const relationModelName = `${name}_${refModelName}`;
@@ -115,7 +115,7 @@ export class StoreModel extends BaseModel {
     field: IComplexField,
     record: Record<string, unknown>
   ) {
-    const value = record[field.name] as Record<string, unknown>[];
+    const value = (record[field.name] as Record<string, unknown>[]) || [];
     const [module, name] = field.namespace.split(".");
     const [_, refModelName] = field.refModel.split(".");
     const relationModelName = `${name}_${refModelName}`;

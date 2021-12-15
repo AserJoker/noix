@@ -18,9 +18,6 @@ export class ObjectService<
   private _validateInfo: IReactiveState<Record<string, string>>;
   public constructor(defaultValue: IReactiveState<T>, node: IViewNode) {
     super(defaultValue, node);
-    if (!node.attrs.model) {
-      throw new Error("not a model node");
-    }
     const resolveFields = (n: IViewNode) => {
       if (n.attrs.field) {
         this._fields[n.attrs.field as string] = () => n;
@@ -28,7 +25,7 @@ export class ObjectService<
         n.children.forEach((c) => resolveFields(c));
       }
     };
-    resolveFields(node);
+    resolveFields(this.getFormNode());
     this._validateInfo = new State({});
     this.current.value = [this.state.raw];
   }
@@ -81,16 +78,20 @@ export class ObjectService<
       current: this.state.raw,
     });
   }
+  protected getFormNode() {
+    return this.node.raw.children.find((c) => c.name === "form") as IViewNode;
+  }
   @Loading
   public async queryOne(
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(this.node.raw);
+    const node = this.getFormNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     const record: Record<string, unknown> = {};
-    const key = (this.node.raw.attrs.key as string) || "code";
-    record[(this.node.raw.attrs.key as string) || "code"] = this.state.raw[key];
+    const key = (node.attrs.key as string) || "code";
+    record[(node.attrs.key as string) || "code"] = this.state.raw[key];
     const data = await queryOne<T>(model, record, schema, context, baseURL);
     if (data) {
       this.state.value = data;
@@ -102,8 +103,9 @@ export class ObjectService<
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(this.node.raw);
+    const node = this.getFormNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     const data = await insertOne<T>(
       model,
       this.state.raw,
@@ -121,8 +123,9 @@ export class ObjectService<
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(this.node.raw);
+    const node = this.getFormNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     await updateOne<T>(model, this.state.raw, schema, context, baseURL);
   }
 
@@ -131,8 +134,9 @@ export class ObjectService<
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(this.node.raw);
+    const node = this.getFormNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     await deleteOne<T>(model, this.state.raw, schema, context, baseURL);
   }
 
@@ -141,8 +145,9 @@ export class ObjectService<
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(this.node.raw);
+    const node = this.getFormNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     const data = await insertOrUpdateOne<T>(
       model,
       this.state.raw,
@@ -162,8 +167,9 @@ export class ObjectService<
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(this.node.raw);
+    const node = this.getFormNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     await callFunction<T>(model, funName, param, schema, context, baseURL);
   }
 
@@ -174,8 +180,9 @@ export class ObjectService<
     context: Record<string, unknown> = {},
     baseURL?: string
   ) {
-    const model = this.node.raw.attrs.model as string;
-    const schema = convertViewToSchema(this.node.raw);
+    const node = this.getFormNode();
+    const model = node.attrs.model as string;
+    const schema = convertViewToSchema(node);
     const data = await callFunction<T>(
       model,
       funName,
