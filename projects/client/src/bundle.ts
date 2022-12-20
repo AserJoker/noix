@@ -20,9 +20,10 @@ import {
   Search,
   Table,
   Data,
+  TextInput,
 } from "./components";
 
-import { Input as StringInput } from "./components/field/string";
+import { Input as StringInput, Text } from "./components/field/string";
 import { MultiInput as StringMultiInput } from "./components";
 import { Text as StringText } from "./components/field/string";
 import { Radio as BooleanRadio } from "./components/field/boolean";
@@ -57,6 +58,8 @@ export const initBundles = async () => {
 
   useComponent("enum-select", EnumSelect);
 
+  useComponent("text-input", TextInput);
+
   //action
   useComponent("action", Action);
 
@@ -65,7 +68,7 @@ export const initBundles = async () => {
   useAction("complex", complex);
   useAction("validate", validate);
   useAction("insertOrUpdateOne", insertOrUpdateOne);
-  useAction('delete-batch', deleteBatch);
+  useAction("delete-batch", deleteBatch);
   useAction("dialog", dialog);
 
   useAction("submit", submit);

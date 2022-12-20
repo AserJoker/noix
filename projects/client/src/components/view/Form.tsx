@@ -91,7 +91,9 @@ export const FormItem = defineComponent({
           invisible.value = service.isInvisible(props.node);
         }
         if (props.node.attrs.value) {
-          const _value = service.computed(props.node);
+          const _value =
+            service.computed(props.node) ||
+            service.state.raw[props.node.attrs.field as string];
           if (_value !== value.value) {
             onChange(_value);
           }

@@ -108,12 +108,13 @@ export class Application implements IApplication {
     const rootPath = path.resolve(__dirname, "./view");
     const files = fs.readdirSync(rootPath);
     await Promise.all(
-      files.map(async (name) => {
+      files.map(async (name, index) => {
         const filepath = path.resolve(rootPath, name);
         await service.call("view", "insertOne", [
           {
             xml: fs.readFileSync(path.resolve(filepath)).toString(),
             name: path.basename(filepath, path.extname(filepath)),
+            code: path.basename(filepath, path.extname(filepath)),
           },
         ]);
       })

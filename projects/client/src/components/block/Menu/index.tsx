@@ -31,7 +31,7 @@ const mock = [
       },
       {
         label: "视图",
-        key: "system.view",
+        key: "view.table",
       },
     ],
   },

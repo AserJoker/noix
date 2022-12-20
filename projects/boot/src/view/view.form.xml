@@ -1,0 +1,31 @@
+<data type="object">
+    <form model="system.view">
+        <col-container>
+            <action-bar>
+                <action name="back" displayName="返回"/>
+                <action name="complex" displayName="确认" type="primary">
+                    <action name="validate"/>
+                    <action name="insertOrUpdateOne"/>
+                    <action name="back"/>
+                </action>
+            </action-bar>
+            <row-container cols="12">
+                <row-item span="4">
+                    <form-item component="string-input" field="id" displayName="ID" type="INTEGER" invisible="true"/>
+                </row-item>
+                <row-item span="4">
+                    <form-item component="string-input" field="name" displayName="名称" type="STRING" required="true"/>
+                </row-item>
+                <row-item span="4">
+                    <form-item component="string-input" field="code" displayName="编码" type="STRING" required="true" value="current.name" invisible="true"/>
+                </row-item>
+                <row-item span="4">
+                    <form-item component="string-input" field="displayName" displayName="展示名称" type="STRING"/>
+                </row-item>
+                <row-item span="8">
+                    <form-item component="text-input" field="xml" displayName="模板" type="TEXT"/>
+                </row-item>
+            </row-container>
+        </col-container>
+    </form>
+</data>

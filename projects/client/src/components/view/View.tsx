@@ -21,6 +21,9 @@ export const View = defineComponent({
       () => props.param,
       () => {
         param.value = props.param;
+      },
+      {
+        immediate: true,
       }
     );
     watch(

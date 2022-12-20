@@ -1,0 +1,37 @@
+<data type="list">
+    <search model="system.view">
+        <form model="system.view">
+            <row-container cols="10">
+                <row-item width="320">
+                    <form-item component="string-input" field="code" displayName="编码"/>
+                </row-item>
+                <row-item width="320">
+                    <form-item component="string-input" field="name" displayName="名称"/>
+                </row-item>
+                <row-item width="320">
+                    <form-item component="string-input" field="displayName" displayName="展示名称"/>
+                </row-item>
+            </row-container>
+        </form>
+    </search>
+    <action-bar>
+        <action name="goto" displayName="新建" type="primary">
+            <param name="view" value="view.form"/>
+        </action>
+        <action name="delete-batch" displayName="删除" contextType="SINGLE_AND_BATCH">
+            <param name="records" value="${current}"/>
+        </action>
+    </action-bar>
+    <table model="system.view" key="code">
+        <column field="id" displayName="ID" type="INTEGER"/>
+        <column field="code" displayName="编码" type="STRING"/>
+        <column field="name" displayName="名称" type="STRING"/>
+        <column field="displayName" displayName="展示名称" type="STRING"/>
+        <inline-action>
+            <action name="goto" displayName="编辑" inline="true" type="primary">
+                <param name="view" value="view.form"/>
+                <param name="code" value="${current[0].code}"/>
+            </action>
+        </inline-action>
+    </table>
+</data>
